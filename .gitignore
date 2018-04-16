@@ -1,0 +1,9 @@
+#Binaries
+*.exe
+*.dll
+*.so
+*.dylib
+
+data/log/
+data/projects/
+notes/
