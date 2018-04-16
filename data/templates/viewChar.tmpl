@@ -1,0 +1,22 @@
+<html>
+
+<head>
+</head>
+
+<body>
+	<h1>{{.Name.PrimaryName}}</h1>
+	
+	<p>{{.Age.BioAge}}</p>
+	
+	<p>{{.Description}}</p>
+	
+	
+	<h3>Aliases</h3>
+	{{range .Aliases}}
+		<p>{{.PrimaryName}}</p>
+	{{end}}
+	
+	
+</body>
+
+</html>

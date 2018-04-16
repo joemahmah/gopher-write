@@ -1,0 +1,37 @@
+<html>
+
+<head>
+</head>
+
+<body>
+
+{{if .Error}}
+	<h3>Error Adding Character</h3>
+	<p>{{.ErrorMsg}}</p>
+{{end}}
+
+{{if .Success}}
+	<h3>Character Added - <a href="/char/view/{{.Name}}">View Profile</a></h3>
+{{end}}
+	
+<h1>Add Char</h1>
+<form method="POST">
+	<label>Name:</label><br/>
+	<input type="text" name="name_primary"><br/>
+	<input type="submit">
+</form>
+
+
+<!-- SCRIPTS -->
+<script type="text/javascript">
+
+function postNewChar(){
+	var xhr = new XMLHttpRequest();
+	var url = "/"
+}
+
+</script>
+
+</body>
+
+</html>
