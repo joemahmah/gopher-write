@@ -60,19 +60,5 @@ func main(){
 }
 
 func testHandler(w http.ResponseWriter, r *http.Request) {
-	//t := template.New("testTemplate")
-	t, err := template.ParseFiles("tmpl/test.html")
-
-	if err != nil {
-		fmt.Println("Error loading template.")
-		return
-	}
-	fmt.Println("Loaded template.")
-
-	//char := character.Character{Name: common.Name{PrimaryName: "test"}}
-	err = t.Execute(w, nil)
-
-	if err != nil {
-		fmt.Printf("Error executing template: %s\n", err.Error())
-	}
+	//DO NOTHING
 }
