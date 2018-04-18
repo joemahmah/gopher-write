@@ -5,6 +5,8 @@ import (
 )
 
 type Section struct {
+	UID		int
+
 	Name	common.Name
 	Text	string
 	Status	common.Status

@@ -15,6 +15,8 @@ var (
 
 func InitLogs() error{
 
+	//TODO: make data/log directory if not exists
+
 	logFile, err := os.OpenFile("./data/log/logfile", os.O_RDWR|os.O_CREATE|os.O_APPEND, 0660)
 	
 	if err != nil {

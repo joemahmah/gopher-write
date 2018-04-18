@@ -70,7 +70,7 @@ func ViewCharHandler(w http.ResponseWriter, r *http.Request) {
 		}
 		
 	} else {
-		w.WriteHeader(http.StatusInternalServerError)
+		w.WriteHeader(http.StatusNotFound)
 		LogWarning.Println("Character with uid " + strconv.Itoa(cid) + " does not exist in project " + ActiveProject.Name + ".")
 	}
 	

@@ -16,6 +16,8 @@ type Project struct {
 		Name			string
 		SaveName		string
 		Stories			map[int]story.Story
+		Chapters		map[int]story.Chapter
+		Sections		map[int]story.Section
 		Locations		map[int]location.Location
 		Characters		map[int]character.Character
 		ResLinks		map[int]resources.Link
@@ -26,6 +28,8 @@ type Project struct {
 		//if old element deleted
 		CharacterNext	int
 		StoryNext		int
+		ChapterNext		int
+		SectionNext		int
 		LocationNext	int
 		ResLinkNext		int
 		ResNoteNext		int
@@ -38,6 +42,8 @@ func MakeProject(name string, savePath string) *Project {
 	project.SaveName = savePath
 	
 	project.Stories = make(map[int]story.Story)
+	project.Chapters = make(map[int]story.Chapter)
+	project.Sections = make(map[int]story.Section)
 	project.Locations = make(map[int]location.Location)
 	project.Characters = make(map[int]character.Character)
 	project.ResLinks = make(map[int]resources.Link)
@@ -45,6 +51,8 @@ func MakeProject(name string, savePath string) *Project {
 	
 	project.CharacterNext = 0
 	project.StoryNext = 0
+	project.ChapterNext = 0
+	project.SectionNext = 0
 	project.LocationNext = 0
 	project.ResLinkNext = 0
 	project.ResNoteNext = 0
@@ -73,6 +81,25 @@ func (p *Project) RemoveStory(uid int) {
 	delete(p.Stories, uid)
 }
 
+func (p *Project) AddChapter(chapter story.Chapter) {
+	chapter.UID = p.ChapterNext //Set UID to next available
+	p.ChapterNext++ //Increment next UID available
+	p.Chapters[chapter.UID] = chapter //Add to map 
+}
+
+func (p *Project) RemoveChapter(uid int) {
+	delete(p.Chapters, uid)
+}
+
+func (p *Project) AddSection(section story.Section) {
+	section.UID = p.SectionNext //Set UID to next available
+	p.SectionNext++ //Increment next UID available
+	p.Sections[section.UID] = section //Add to map 
+}
+
+func (p *Project) RemoveSection(uid int) {
+	delete(p.Sections, uid)
+}
 
 func (p *Project) AddLocation(loc location.Location) {
 	loc.UID = p.LocationNext //Set UID to next available

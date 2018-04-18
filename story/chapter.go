@@ -6,8 +6,10 @@ import (
 )
 
 type Chapter struct {
+	UID			int
+
 	Name		common.Name
-	Sections	[]Section
+	Sections	[]int
 	Status		common.Status
 }
 
