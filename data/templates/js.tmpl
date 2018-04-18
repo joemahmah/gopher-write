@@ -1,3 +1,47 @@
 {{define "js"}}
 
+<script language="javascript">
+
+function Name(PrimaryName, AlternateNames, IsAlias){
+	this.PrimaryName = PrimaryName;
+	this.AlternateNames = AlternateNames;
+	this.IsAlias = IsAlias;
+}
+
+function MakeName(name, isAlias, ...alternateNames){
+	var name = new Name(name, null, isAlias);
+
+	if(alternateNames.length >= 1){
+		name.AlternateNames = alternateNames;
+	}
+
+	return name;
+}
+
+function Age(BioAge, ChronoAge){
+	this.BioAge = BioAge;
+	this.ChronoAge = ChronoAge;
+}
+
+function Character(UID, Name, Description, Age, Aliases){
+	this.UID = UID;
+	this.Name = Name;
+	this.Description = Description;
+	this.Age = Age;
+	this.Aliases = Aliases;
+}
+
+function MakeCharacter(name, description, age, ...aliases){
+	var character = new Character(0, name, description, age, null);
+
+	if(aliases.length >= 1){
+		character.Aliases = aliases;
+	}
+
+	return character
+
+}
+
+</script>
+
 {{end}}
