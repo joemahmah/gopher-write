@@ -2,6 +2,9 @@
 
 <script language="javascript">
 
+//
+//Common
+//
 function Name(PrimaryName, AlternateNames, IsAlias){
 	this.PrimaryName = PrimaryName;
 	this.AlternateNames = AlternateNames;
@@ -14,7 +17,6 @@ function MakeName(name, isAlias, ...alternateNames){
 	if(alternateNames.length >= 1){
 		name.AlternateNames = alternateNames;
 	}
-
 	return name;
 }
 
@@ -23,6 +25,26 @@ function Age(BioAge, ChronoAge){
 	this.ChronoAge = ChronoAge;
 }
 
+function StatusToString(status){
+	switch(status){
+		case 0:
+			return "Not Started";
+		case 1:
+			return "In Progress";
+		case 2:
+			return "Almost Done";
+		case 3:
+			return "Done";
+		case 4:
+			return "Unknown";
+		default:
+			return "Invalid Status";
+	}
+}
+
+//
+//Character
+//
 function Character(UID, Name, Description, Age, Aliases){
 	this.UID = UID;
 	this.Name = Name;
@@ -38,8 +60,56 @@ function MakeCharacter(name, description, age, ...aliases){
 		character.Aliases = aliases;
 	}
 
-	return character
+	return character;
 
+}
+
+//
+//Story
+//
+function Section(UID, Name, Text, Status){
+	this.UID = UID;
+	this.Name = Name;
+	this.Text = Text;
+	this.Status = Status;
+}
+
+function MakeSection(name, text, stat){
+	return new Section(0, name, text, stat);
+}
+
+function Chapter(UID, Name, Sections, Status){
+	this.UID = UID;
+	this.Name = Name;
+	this.Sections = Sections;
+	this.Status = Status;
+}
+
+function MakeChapter(name, stat, ...sections){
+	var chapter = new Chapter(0, name, null, stat);
+
+	if(sections.length >= 1){
+		chapter.Sections = sections;
+	}
+
+	return chapter;
+}
+
+function Story(UID, Name, Chapters, Status){
+	this.UID = UID;
+	this.Name = Name;
+	this.Chapters = Chapters;
+	this.Status = Status;
+}
+
+function MakeStory(name, stat, ...chapters){
+	var story = new Story(0, name, null, stat);
+
+	if(chapters.length >= 1){
+		story.Chapters = chapters;
+	}
+
+	return story;
 }
 
 </script>
