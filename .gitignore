@@ -4,6 +4,12 @@
 *.so
 *.dylib
 
+#linux binary
+gopher-write
+
+#don't catch vim trash
+*.swp
+
 data/log/
 data/projects/
 notes/
