@@ -11,10 +11,10 @@ function Name(PrimaryName, AlternateNames, IsAlias){
 	this.IsAlias = IsAlias;
 }
 
-function MakeName(name, isAlias, ...alternateNames){
+function MakeName(name, isAlias, alternateNames){
 	var name = new Name(name, null, isAlias);
 
-	if(alternateNames.length >= 1){
+	if(alternateNames != null && alternateNames.length >= 1){
 		name.AlternateNames = alternateNames;
 	}
 	return name;
@@ -53,10 +53,10 @@ function Character(UID, Name, Description, Age, Aliases){
 	this.Aliases = Aliases;
 }
 
-function MakeCharacter(name, description, age, ...aliases){
+function MakeCharacter(name, description, age, aliases){
 	var character = new Character(0, name, description, age, null);
 
-	if(aliases.length >= 1){
+	if(aliases != null && aliases.length >= 1){
 		character.Aliases = aliases;
 	}
 
@@ -85,10 +85,10 @@ function Chapter(UID, Name, Sections, Status){
 	this.Status = Status;
 }
 
-function MakeChapter(name, stat, ...sections){
+function MakeChapter(name, stat, sections){
 	var chapter = new Chapter(0, name, null, stat);
 
-	if(sections.length >= 1){
+	if(sections != null && sections.length >= 1){
 		chapter.Sections = sections;
 	}
 
@@ -102,14 +102,39 @@ function Story(UID, Name, Chapters, Status){
 	this.Status = Status;
 }
 
-function MakeStory(name, stat, ...chapters){
+function MakeStory(name, stat, chapters){
 	var story = new Story(0, name, null, stat);
 
-	if(chapters.length >= 1){
+	if(chapters != null && chapters.length >= 1){
 		story.Chapters = chapters;
 	}
 
 	return story;
+}
+
+//
+//Location
+//
+function Location(UID, Name, Aliases, Description, Sublocations){
+	this.UID = UID;
+	this.Name = Name;
+	this.Aliases = Aliases;
+	this.Description = Description;
+	this.Sublocations = Sublocations;
+}
+
+function MakeLocation(name, description, aliases, sublocations){
+	var location = new Location(0, name, null, description, null);
+
+	if(aliases != null && aliases.length >= 1){
+		location.Aliases = aliases;
+	}
+
+	if(sublocations != null && sublocations.length >= 1){
+		location.Sublocations = sublocations;
+	}
+
+	return location;
 }
 
 </script>
