@@ -148,7 +148,7 @@ func OverviewCharHandler(w http.ResponseWriter, r *http.Request) {
 	} 
 	
 	//serve template
-	err = tmpl.Execute(w, ActiveProject.Characters)
+	err = tmpl.Execute(w, nil)
 	
 	//IF error executing template
 	if err != nil {

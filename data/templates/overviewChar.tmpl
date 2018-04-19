@@ -2,7 +2,7 @@
 
 <head>
 	<meta charset="utf-8">
-	<title>View Characters</title>
+	<title>Characters | gopher-write</title>
 	
 	{{template "css"}}
 </head>
@@ -12,6 +12,8 @@
 {{template "js"}}
 
 <script language="javascript">
+
+window.onload = updateCharList;
 
 function getForm(){
 	return document.getElementById("form");
@@ -172,9 +174,6 @@ xhr.send();
 </div>
 
 <div class="charlist" id="charlist">
-{{range $index, $element := .}}
-	<p><a href="/char/view/{{$index}}">{{$element.Name.PrimaryName}}</a></p>
-{{end}}
 </div>
 
 </body>
