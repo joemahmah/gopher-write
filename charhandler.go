@@ -137,7 +137,7 @@ func OverviewCharHandler(w http.ResponseWriter, r *http.Request) {
 	LogNet.Println("Access " + r.URL.Path + " by "+ r.RemoteAddr)
 	
 	//Parse template
-	tmpl, err := template.ParseFiles("data/templates/overviewChar.tmpl")
+	tmpl, err := template.ParseFiles("data/templates/overviewChar.tmpl", "data/templates/style.tmpl", "data/templates/header.tmpl", "data/templates/js.tmpl")
 	
 	//if error parsing template
 	if err != nil {
