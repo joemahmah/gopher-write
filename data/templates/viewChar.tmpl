@@ -1,9 +1,17 @@
 <html>
 
 <head>
+	<meta charset="utf-8">
+	<title>View Character {{.Name.PrimaryName}} | gopher-write</title>
+
+	{{template "css"}}
 </head>
 
 <body>
+	
+	{{template "js"}}
+	{{template "header"}}
+
 	<h1>{{.Name.PrimaryName}}</h1>
 	
 	<p>{{.Age.BioAge}}</p>

@@ -50,7 +50,7 @@ func ViewCharHandler(w http.ResponseWriter, r *http.Request) {
 	//check if exists
 	if char, exists := ActiveProject.Characters[cid]; exists {
 		//Parse template
-		tmpl, err := template.ParseFiles("data/templates/viewChar.tmpl")
+		tmpl, err := template.ParseFiles("data/templates/viewChar.tmpl", "data/templates/style.tmpl", "data/templates/header.tmpl", "data/templates/js.tmpl")
 		
 		//if error parsing template
 		if err != nil {
