@@ -3,6 +3,30 @@
 <script language="javascript">
 
 //
+//Form
+//
+function MakeForm(id){
+	var form = document.createElement("form");
+	form.id = id;
+	
+	var formContainer = document.getElementById("form_container");
+	//TODO: create form container if needed
+	
+	var formControl = document.getElementById("form_control");
+	//TODO: create controller if needed
+	
+	formContainer.insertBefore(form, formControl);
+	
+	return form;
+}
+
+function DeleteNodeById(id){
+	var node = document.getElementById(id);
+	node.parentNode.removeChild(node);
+	delete node;
+}
+
+//
 //Common
 //
 function Name(PrimaryName, AlternateNames, IsAlias){

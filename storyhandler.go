@@ -178,7 +178,7 @@ func ListJSONStoryHandler(w http.ResponseWriter, r *http.Request) {
 	var uids []int
 	
 	//Fill slices
-	for _,elem := range ActiveProject.Characters{
+	for _,elem := range ActiveProject.Stories{
 		names = append(names, elem.Name.PrimaryName)
 		uids = append(uids, elem.UID)
 	}
@@ -198,7 +198,7 @@ func OverviewStoryHandler(w http.ResponseWriter, r *http.Request) {
 	LogNet.Println("Access " + r.URL.Path + " by "+ r.RemoteAddr)
 	
 	//Parse template
-	tmpl, err := template.ParseFiles("data/templates/overviewStories.tmpl")
+	tmpl, err := template.ParseFiles("data/templates/overviewStories.tmpl", "data/templates/style.tmpl", "data/templates/header.tmpl", "data/templates/js.tmpl")
 	
 	//if error parsing template
 	if err != nil {

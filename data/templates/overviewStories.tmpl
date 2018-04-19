@@ -1,141 +1,88 @@
 <html>
 
 <head>
-	<title>View Characters</title>
+	<meta charset="utf-8">
+	<title>Story List | gopher-write</title>
+	
+	{{template "css"}}
 </head>
 
 <body>
 
+{{template "js"}}
+
 <script language="javascript">
 
-function getForm(){
-	return document.getElementById("form");
-}
+//Set story list to update on load
+window.onload = updateStoryList;
 
-function addCharForm(){
-	var form = getForm();
+function addStoryForm(){
+
+	var form = document.getElementById("story_form");
+	
+	if(form == null){
+		form = MakeForm("story_form");
+	}
 	
 	form.innerHTML=form.innerHTML + "Name:<br><input id=\"form_name\" type=\"text\" ><br>";
-	form.innerHTML=form.innerHTML + "Description:<br><input id=\"form_desc\" type=\"text\" ><br>";
-	form.innerHTML=form.innerHTML + "Biological Age:<br><input id=\"form_age_bio\" type=\"number\" ><br>";
-	form.innerHTML=form.innerHTML + "Chronological Age:<br><input id=\"form_age_chrono\" type=\"number\" ><br>";
 	
 	document.getElementById("form_new").style.display = 'none'
 	document.getElementById("form_control").style.display = 'block'
 }
 
-function removeCharForm(){
-	var form = getForm();
-	
-	form.innerHTML="";
+function removeStoryForm(){
+	DeleteNodeById("story_form");
 	
 	document.getElementById("form_new").style.display = 'block'
 	document.getElementById("form_control").style.display = 'none'
 }
 
-function addName(){
-	var form = getForm();
-	var newName = document.createElement("div");
-	newName.className = "form_alias_div";
-	newName.innerHTML = "Alias:<br><input class=\"form_alias\" type=\"text\"><br>";
-	
-	form.appendChild(newName);
-	
-}
+function processStory(){
 
-function removeLastName(){
-	var form = getForm();
-	var aliases = form.getElementsByClassName("form_alias_div");
-	
-	if(aliases.length > 0){
-		form.removeChild(aliases[aliases.length - 1]);
-	}
-}
-
-function processChar(){
-
-//Make new object for the character
-var character = {}
-
-//give dummy UID for benefit of go
-character.UID = 0;
-
-//Make new name object and assign values from form
-character.Name = {};
-character.Name.PrimaryName = document.getElementById("form_name").value;
-character.Name.AlternateNames = null;
-character.Name.IsAlias = false;
-
-//Set char description from form value
-character.Description = document.getElementById("form_desc").value;
-
-//Make new age object and assign values from form
-character.Age = {};
-character.Age.BioAge = parseInt(document.getElementById("form_age_bio").value);
-character.Age.ChronoAge = parseInt(document.getElementById("form_age_chrono").value);
-
-//Get alias objects
-var aliases = document.getElementsByClassName("form_alias");
-
-if (aliases.length == 0) { //if no aliases
-	//set to null
-	character.Aliases = null;
-} else { //otherwise
-	//make array
-	var aliasArray = []
-	
-	//assign values
-	for(var i=0; i<aliases.length; i++){
-		aliasArray[i] = {}; //make new name object and assign to array
-		aliasArray[i].PrimaryName = aliases[i].value;
-		aliasArray[i].AlternateNames = null;
-		aliasArray[i].IsAlias = true;
-	}
-	
-	character.Aliases = aliasArray;
-}
+var name = MakeName(document.getElementById("form_name").value,false,null);
+var story = MakeStory(name,0,null);
 
 var xhr = new XMLHttpRequest();
-var url = "/char/new";
+var url = "/story/new";
 xhr.open("POST", url, true);
 xhr.setRequestHeader("Content-Type", "application/json");
 xhr.onreadystatechange = function () {
 	//if server returns proper, update display
 	if (this.readyState == 4 && this.status == 200){
-		removeCharForm(); //remove form
-		updateCharList(); //update char list
+		removeStoryForm(); //remove form
+		updateStoryList(); //update char list
 	} else if (this.readyState == 4 && this.status == 500) {
 		//flag error
 	}
 }
 
-xhr.send(JSON.stringify(character));
+xhr.send(JSON.stringify(story));
 
 
 }
 
-function updateCharList(){
-
-var charlist = document.getElementById("charlist");
+function updateStoryList(){
 	
 var xhr = new XMLHttpRequest();
-var url = "/char/list";
+var url = "/story/list";
 xhr.open("POST", url, true);
 xhr.onreadystatechange = function () {
 	//if server returns JSON, update display
-	if (this.readyState == 4 && this.status === 200){
+	if (this.readyState === 4 && this.status === 200){
 		//get the char list
-		var charlist = document.getElementById("charlist");
+		var storyList = document.getElementById("story_list");
 		
 		//blank the existing list
-		charlist.innerHTML = "";
+		storyList.innerHTML = "";
 		
 		//convert json into object
-		var charlistjson = JSON.parse(this.responseText);
+		var storyListJSON = JSON.parse(this.responseText);
 		
-		//add the chars to the page
-		for (var i = 0; i < charlistjson.Names.length; i++) {
-			charlist.innerHTML += "<p><a href=\"/char/view/" + charlistjson.UIDS[i] + "\">" + charlistjson.Names[i] + "</a></p>";
+		if(storyListJSON.Names != null) {
+			//add the chars to the page
+			for (var i = 0; i < storyListJSON.Names.length; i++) {
+				storyList.innerHTML += "<p><a href=\"/story/" + storyListJSON.UIDS[i] + "\">" + storyListJSON.Names[i] + "</a></p>";
+			}
 		}
 		
 	}
@@ -148,23 +95,23 @@ xhr.send();
 
 </script>
 
-<h1>Characters</h1>
+{{template "header"}}
 
-<div class="charnew" id="charnew">
+<h1>Stories</h1>
+
+<div class="form_container" id="form_container">
 	<div id="form_new">
-		<button type="button" onclick="addCharForm()">New Character</button>
+		<button type="button" onclick="addStoryForm()">New Character</button>
 	</div>
 	<form id="form" action="#">
 		
 	</form>
 	<div id="form_control" style="display:none">
-		<button onclick="addName()">Add Alias</button>
-		<button onclick="removeLastName()">Remove Alias</button>
-		<button onclick="processChar()">Submit</button>
+		<button onclick="processStory()">Submit</button>
 	</div>
 </div>
 
-<div class="charlist" id="charlist">
+<div class="list" id="story_list">
 
 </div>
 
