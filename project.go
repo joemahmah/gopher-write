@@ -15,13 +15,13 @@ var ActiveProject *Project = MakeProject("","")
 type Project struct {
 		Name			string
 		SaveName		string
-		Stories			map[int]story.Story
-		Chapters		map[int]story.Chapter
-		Sections		map[int]story.Section
-		Locations		map[int]location.Location
-		Characters		map[int]character.Character
-		ResLinks		map[int]resources.Link
-		ResNotes		map[int]resources.Note
+		Stories			map[int]*story.Story
+		Chapters		map[int]*story.Chapter
+		Sections		map[int]*story.Section
+		Locations		map[int]*location.Location
+		Characters		map[int]*character.Character
+		ResLinks		map[int]*resources.Link
+		ResNotes		map[int]*resources.Note
 		
 		//Next key available
 		//Old keys not reused even
@@ -41,13 +41,13 @@ func MakeProject(name string, savePath string) *Project {
 	project.Name = name
 	project.SaveName = savePath
 	
-	project.Stories = make(map[int]story.Story)
-	project.Chapters = make(map[int]story.Chapter)
-	project.Sections = make(map[int]story.Section)
-	project.Locations = make(map[int]location.Location)
-	project.Characters = make(map[int]character.Character)
-	project.ResLinks = make(map[int]resources.Link)
-	project.ResNotes = make(map[int]resources.Note)
+	project.Stories = make(map[int]*story.Story)
+	project.Chapters = make(map[int]*story.Chapter)
+	project.Sections = make(map[int]*story.Section)
+	project.Locations = make(map[int]*location.Location)
+	project.Characters = make(map[int]*character.Character)
+	project.ResLinks = make(map[int]*resources.Link)
+	project.ResNotes = make(map[int]*resources.Note)
 	
 	project.CharacterNext = 0
 	project.StoryNext = 0
@@ -60,7 +60,7 @@ func MakeProject(name string, savePath string) *Project {
 	return project
 }
 
-func (p *Project) AddCharacter(char character.Character) {
+func (p *Project) AddCharacter(char *character.Character) {
 	char.UID = p.CharacterNext //Set UID to next available
 	p.CharacterNext++ //Increment next UID available
 	p.Characters[char.UID] = char //Add to map 
@@ -71,7 +71,7 @@ func (p *Project) RemoveCharacter(uid int) {
 }
 
 
-func (p *Project) AddStory(story story.Story) {
+func (p *Project) AddStory(story *story.Story) {
 	story.UID = p.StoryNext //Set UID to next available
 	p.StoryNext++ //Increment next UID available
 	p.Stories[story.UID] = story //Add to map 
@@ -81,7 +81,7 @@ func (p *Project) RemoveStory(uid int) {
 	delete(p.Stories, uid)
 }
 
-func (p *Project) AddChapter(chapter story.Chapter) {
+func (p *Project) AddChapter(chapter *story.Chapter) {
 	chapter.UID = p.ChapterNext //Set UID to next available
 	p.ChapterNext++ //Increment next UID available
 	p.Chapters[chapter.UID] = chapter //Add to map 
@@ -91,7 +91,7 @@ func (p *Project) RemoveChapter(uid int) {
 	delete(p.Chapters, uid)
 }
 
-func (p *Project) AddSection(section story.Section) {
+func (p *Project) AddSection(section *story.Section) {
 	section.UID = p.SectionNext //Set UID to next available
 	p.SectionNext++ //Increment next UID available
 	p.Sections[section.UID] = section //Add to map 
@@ -101,7 +101,7 @@ func (p *Project) RemoveSection(uid int) {
 	delete(p.Sections, uid)
 }
 
-func (p *Project) AddLocation(loc location.Location) {
+func (p *Project) AddLocation(loc *location.Location) {
 	loc.UID = p.LocationNext //Set UID to next available
 	p.LocationNext++ //Increment next UID available
 	p.Locations[loc.UID] = loc //Add to map 
@@ -111,7 +111,7 @@ func (p *Project) RemoveLocation(uid int) {
 	delete(p.Locations, uid)
 }
 
-func (p *Project) AddResLink(link resources.Link) {
+func (p *Project) AddResLink(link *resources.Link) {
 	link.UID = p.ResLinkNext //Set UID to next available
 	p.ResLinkNext++ //Increment next UID available
 	p.ResLinks[link.UID] = link //Add to map 
@@ -121,7 +121,7 @@ func (p *Project) RemoveResLink(uid int) {
 	delete(p.ResLinks, uid)
 }
 
-func (p *Project) AddResNote(note resources.Note) {
+func (p *Project) AddResNote(note *resources.Note) {
 	note.UID = p.ResNoteNext //Set UID to next available
 	p.ResNoteNext++ //Increment next UID available
 	p.ResNotes[note.UID] = note //Add to map 

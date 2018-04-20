@@ -15,10 +15,10 @@ func NewCharHandler(w http.ResponseWriter, r *http.Request) {
 	LogNet.Println("Access " + r.URL.Path + " by "+ r.RemoteAddr)
 	
 	//Make new char
-	newChar := character.Character{}
+	newChar := &character.Character{}
 	
 	//Decode the request
-	err := json.NewDecoder(r.Body).Decode(&newChar)
+	err := json.NewDecoder(r.Body).Decode(newChar)
 	
 	if err != nil {
 		w.WriteHeader(http.StatusInternalServerError)

@@ -28,10 +28,10 @@ func NewStoryHandler(w http.ResponseWriter, r *http.Request) {
 	LogNet.Println("Access " + r.URL.Path + " by "+ r.RemoteAddr)
 	
 	//Make new story
-	newStory := story.Story{}
+	newStory := &story.Story{}
 	
 	//Decode the request
-	err := json.NewDecoder(r.Body).Decode(&newStory)
+	err := json.NewDecoder(r.Body).Decode(newStory)
 	
 	if err != nil {
 		w.WriteHeader(http.StatusInternalServerError)
@@ -50,18 +50,28 @@ func NewChapterHandler(w http.ResponseWriter, r *http.Request) {
 	//Print log message
 	LogNet.Println("Access " + r.URL.Path + " by "+ r.RemoteAddr)
 	
-	//Make new char
-	newChapter := story.Chapter{}
+	//Make new chapter
+	newChapter := &story.Chapter{}
+	
+	//Get the selectedStory	UID
+	suid, err := strconv.Atoi(mux.Vars(r)["storyuid"])
 	
 	//Decode the request
-	err := json.NewDecoder(r.Body).Decode(&newChapter)
+	err = json.NewDecoder(r.Body).Decode(newChapter)
 	
 	if err != nil {
 		w.WriteHeader(http.StatusInternalServerError)
 		LogError.Println(err)
 	} else {
 		w.WriteHeader(http.StatusOK)
+		
+		//Add chapter to project to assign uid
 		ActiveProject.AddChapter(newChapter)
+		
+		//Add chapter to story
+		ActiveProject.Stories[suid].Chapters = append(ActiveProject.Stories[suid].Chapters, newChapter.UID)
+		
+		//Log
 		LogInfo.Println("Chapter " + newChapter.Name.PrimaryName + " added to project " + ActiveProject.Name + ".")
 	}
 	
@@ -73,18 +83,28 @@ func NewSectionHandler(w http.ResponseWriter, r *http.Request) {
 	//Print log message
 	LogNet.Println("Access " + r.URL.Path + " by "+ r.RemoteAddr)
 	
-	//Make new char
-	newSection := story.Section{}
+	//Make new section
+	newSection := &story.Section{}
+	
+	//Get the selectedChapter UID
+	cuid, err := strconv.Atoi(mux.Vars(r)["chapteruid"])
 	
 	//Decode the request
-	err := json.NewDecoder(r.Body).Decode(&newSection)
+	err = json.NewDecoder(r.Body).Decode(newSection)
 	
 	if err != nil {
 		w.WriteHeader(http.StatusInternalServerError)
 		LogError.Println(err)
 	} else {
 		w.WriteHeader(http.StatusOK)
+		
+		//Add section to project to assign uid
 		ActiveProject.AddSection(newSection)
+		
+		//Add chapter to story
+		ActiveProject.Chapters[cuid].Sections = append(ActiveProject.Chapters[cuid].Sections, newSection.UID)
+		
+		//Log
 		LogInfo.Println("Section " + newSection.Name.PrimaryName + " added to project " + ActiveProject.Name + ".")
 	}
 	
@@ -107,9 +127,9 @@ func ViewStoryHandler(w http.ResponseWriter, r *http.Request) {
 	}
 	
 	//check if exists
-	if _, exists := ActiveProject.Stories[suid]; exists {
+	if selectedStory, exists := ActiveProject.Stories[suid]; exists {
 		//Parse template
-		tmpl, err := template.ParseFiles("data/templates/viewStory.tmpl")
+		tmpl, err := template.ParseFiles("data/templates/viewStory.tmpl", "data/templates/style.tmpl", "data/templates/header.tmpl", "data/templates/js.tmpl")
 		
 		//if error parsing template
 		if err != nil {
@@ -120,7 +140,7 @@ func ViewStoryHandler(w http.ResponseWriter, r *http.Request) {
 		} 
 		
 		//serve template
-		err = tmpl.Execute(w, nil)
+		err = tmpl.Execute(w, selectedStory)
 		
 		//If error, return code 500
 		if err != nil {
@@ -131,6 +151,52 @@ func ViewStoryHandler(w http.ResponseWriter, r *http.Request) {
 	} else {
 		w.WriteHeader(http.StatusNotFound)
 		LogWarning.Println("Story with uid " + strconv.Itoa(suid) + " does not exist in project " + ActiveProject.Name + ".")
+	}
+	
+}
+
+func ViewChapterHandler(w http.ResponseWriter, r *http.Request) {
+	
+	//Print log message
+	LogNet.Println("Access " + r.URL.Path + " by "+ r.RemoteAddr)
+	
+	//Get the selected chapter UID
+	suid, err := strconv.Atoi(mux.Vars(r)["storyuid"])
+	cuid, err := strconv.Atoi(mux.Vars(r)["chapteruid"])
+	
+	//If unable to convert string to int
+	if err != nil {
+		w.WriteHeader(http.StatusInternalServerError)
+		LogError.Println(err)
+		
+		return
+	}
+	
+	//check if exists
+	if selectedChapter, exists := ActiveProject.Chapters[cuid]; exists {
+		//Parse template
+		tmpl, err := template.ParseFiles("data/templates/viewChapter.tmpl", "data/templates/style.tmpl", "data/templates/header.tmpl", "data/templates/js.tmpl")
+		
+		//if error parsing template
+		if err != nil {
+			w.WriteHeader(http.StatusInternalServerError)
+			LogError.Println(err)
+			
+			return
+		} 
+		
+		//serve template
+		err = tmpl.Execute(w, struct{StoryUID int; Chapter *story.Chapter}{StoryUID: suid, Chapter: selectedChapter})
+		
+		//If error, return code 500
+		if err != nil {
+			w.WriteHeader(http.StatusInternalServerError)
+			LogError.Println(err)
+		}
+		
+	} else {
+		w.WriteHeader(http.StatusNotFound)
+		LogWarning.Println("Chapter with uid " + strconv.Itoa(cuid) + " does not exist in project " + ActiveProject.Name + ".")
 	}
 	
 }
@@ -160,9 +226,7 @@ func GetJSONStoryHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 func EditStoryHandler(w http.ResponseWriter, r *http.Request) {
-	
-	ActiveProject.AddStory(story.Story{})
-	
+
 	//Print log message
 	LogNet.Println("Access " + r.URL.Path + " by "+ r.RemoteAddr)
 
@@ -185,6 +249,60 @@ func ListJSONStoryHandler(w http.ResponseWriter, r *http.Request) {
 	
 	//Encode and send off
 	err := json.NewEncoder(w).Encode(struct{Names []string; UIDS []int}{Names: names, UIDS: uids})
+	
+	if err != nil {
+		w.WriteHeader(http.StatusInternalServerError)
+		LogError.Println(err)
+	} 
+}
+
+func ListJSONChapterHandler(w http.ResponseWriter, r *http.Request) {
+	
+	//Print log message
+	LogNet.Println("Access " + r.URL.Path + " by "+ r.RemoteAddr)
+
+	//Get the selectedStory	UID
+	suid, err := strconv.Atoi(mux.Vars(r)["storyuid"])
+	
+	//Slices to store data
+	var names []string
+	var uids []int
+	
+	//Fill slices
+	for _,elem := range ActiveProject.Stories[suid].Chapters{
+		names = append(names, ActiveProject.Chapters[elem].Name.PrimaryName)
+		uids = append(uids, elem)
+	}
+	
+	//Encode and send off
+	err = json.NewEncoder(w).Encode(struct{Names []string; UIDS []int}{Names: names, UIDS: uids})
+	
+	if err != nil {
+		w.WriteHeader(http.StatusInternalServerError)
+		LogError.Println(err)
+	} 
+}
+
+func ListJSONSectionHandler(w http.ResponseWriter, r *http.Request) {
+	
+	//Print log message
+	LogNet.Println("Access " + r.URL.Path + " by "+ r.RemoteAddr)
+	
+	//Get the selected Chapter UID
+	cuid, err := strconv.Atoi(mux.Vars(r)["chapteruid"])
+
+	//Slices to store data
+	var names []string
+	var uids []int
+	
+	//Fill slices
+	for _,elem := range ActiveProject.Chapters[cuid].Sections{
+		names = append(names, ActiveProject.Sections[elem].Name.PrimaryName)
+		uids = append(uids, elem)
+	}
+	
+	//Encode and send off
+	err = json.NewEncoder(w).Encode(struct{Names []string; UIDS []int}{Names: names, UIDS: uids})
 	
 	if err != nil {
 		w.WriteHeader(http.StatusInternalServerError)

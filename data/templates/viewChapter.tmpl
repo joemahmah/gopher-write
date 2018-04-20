@@ -2,7 +2,7 @@
 
 <head>
 	<meta charset="utf-8">
-	<title>View Story {{.Name.PrimaryName}} | gopher-write</title>
+	<title>View Chapter {{.Chapter.Name.PrimaryName}} | gopher-write</title>
 
 	{{template "css"}}
 </head>
@@ -13,17 +13,18 @@
 
 <script language="javascript">
 
-var currentStoryUID = {{.UID}};
+var currentStoryUID = {{.StoryUID}};
+var currentChapterUID = {{.Chapter.UID}};
 
 //Set story list to update on load
-window.onload = updateChapterList;
+window.onload = updateSectionList;
 
-function addChapterForm(){
+function addSectionForm(){
 
-	var form = document.getElementById("chapter_form");
+	var form = document.getElementById("section_form");
 	
 	if(form == null){
-		form = MakeForm("chapter_form");
+		form = MakeForm("section_form");
 	}
 	
 	form.innerHTML=form.innerHTML + "Name:<br><input id=\"form_name\" type=\"text\" ><br>";
@@ -32,49 +33,49 @@ function addChapterForm(){
 	document.getElementById("form_control").style.display = 'block'
 }
 
-function removeChapterForm(){
-	DeleteNodeById("chapter_form");
+function removeSectionForm(){
+	DeleteNodeById("section_form");
 	
 	document.getElementById("form_new").style.display = 'block'
 	document.getElementById("form_control").style.display = 'none'
 }
-function processChapter(){
+function processSection(){
 
 var name = MakeName(document.getElementById("form_name").value,false,null);
-var story = MakeChapter(name,0,null);
+var section = MakeSection(name,"",0);
 
 var xhr = new XMLHttpRequest();
-var url = "/story/" + currentStoryUID + "/new";
+var url = "/story/" + currentStoryUID + "/" + currentChapterUID + "/new";
 xhr.open("POST", url, true);
 xhr.setRequestHeader("Content-Type", "application/json");
 xhr.onreadystatechange = function () {
 	//if server returns proper, update display
 	if (this.readyState == 4 && this.status == 200){
-		removeChapterForm(); //remove form
-		updateChapterList(); //update Chapter list
+		removeSectionForm(); //remove form
+		updateSectionList(); //update Chapter list
 	} else if (this.readyState == 4 && this.status == 500) {
 		//flag error
 	}
 }
 
-xhr.send(JSON.stringify(story));
+xhr.send(JSON.stringify(section));
 
 
 }
 
-function updateChapterList(){
+function updateSectionList(){
 	
 var xhr = new XMLHttpRequest();
-var url = "/story/" + currentStoryUID + "/list";
+var url = "/story/" + currentStoryUID + "/" + currentChapterUID + "/list";
 xhr.open("POST", url, true);
 xhr.onreadystatechange = function () {
 	//if server returns JSON, update display
 	if (this.readyState === 4 && this.status === 200){
 		//get the char list
-		var storyList = document.getElementById("chapter_list");
+		var sectionList = document.getElementById("section_list");
 		
 		//blank the existing list
-		storyList.innerHTML = "";
+		sectionList.innerHTML = "";
 		
 		//convert json into object
 		var storyListJSON = JSON.parse(this.responseText);
@@ -82,7 +83,7 @@ xhr.onreadystatechange = function () {
 		if(storyListJSON.Names != null) {
 			//add the chars to the page
 			for (var i = 0; i < storyListJSON.Names.length; i++) {
-				storyList.innerHTML += "<p><a href=\"/story/" + currentStoryUID + "/" + storyListJSON.UIDS[i] + "\">" + storyListJSON.Names[i] + "</a></p>";
+				sectionList.innerHTML += "<p><a href=\"/story/" + currentStoryUID + "/" + currentChapterUID + "/" + storyListJSON.UIDS[i] + "\">" + storyListJSON.Names[i] + "</a></p>";
 			}
 		}
 		
@@ -97,18 +98,18 @@ xhr.send();
 
 {{template "header"}}
 
-<h1>Chapters</h1>
+<h1>Sections</h1>
 
 <div class="form_container" id="form_container">
 	<div id="form_new">
-		<button type="button" onclick="addChapterForm()">Add Chapter</button>
+		<button type="button" onclick="addSectionForm()">Add Section</button>
 	</div>
 	<div id="form_control" style="display:none">
-		<button onclick="processChapter()">Submit</button>
+		<button onclick="processSection()">Submit</button>
 	</div>
 </div>
 
-<div class="list" id="chapter_list">
+<div class="list" id="section_list">
 
 </div>
 
