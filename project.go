@@ -15,7 +15,7 @@ var ActiveProject *Project = MakeProject("","")
 type Project struct {
 		Name			string
 		SaveName		string
-		Stories			map[int]*story.Story
+		Stories			[]*story.Story
 		Chapters		map[int]*story.Chapter
 		Sections		map[int]*story.Section
 		Locations		map[int]*location.Location
@@ -41,7 +41,7 @@ func MakeProject(name string, savePath string) *Project {
 	project.Name = name
 	project.SaveName = savePath
 	
-	project.Stories = make(map[int]*story.Story)
+	project.Stories = make([]*story.Story, 0)
 	project.Chapters = make(map[int]*story.Chapter)
 	project.Sections = make(map[int]*story.Section)
 	project.Locations = make(map[int]*location.Location)
@@ -74,11 +74,19 @@ func (p *Project) RemoveCharacter(uid int) {
 func (p *Project) AddStory(story *story.Story) {
 	story.UID = p.StoryNext //Set UID to next available
 	p.StoryNext++ //Increment next UID available
-	p.Stories[story.UID] = story //Add to map 
+	p.Stories = append(p.Stories, story) //Add to map 
 }
 
 func (p *Project) RemoveStory(uid int) {
-	delete(p.Stories, uid)
+	//Remove story and shift others
+	p.Stories = append(p.Stories[:uid], p.Stories[uid+1:]...)
+	
+	//Reassign story UID
+	for index, elem := range p.Stories[uid:] {
+		elem.UID = index
+	}
+	
+	p.StoryNext-- //Decrement next UID available
 }
 
 func (p *Project) AddChapter(chapter *story.Chapter) {

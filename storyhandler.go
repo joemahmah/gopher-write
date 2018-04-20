@@ -131,7 +131,9 @@ func ViewStoryHandler(w http.ResponseWriter, r *http.Request) {
 	}
 	
 	//check if exists
-	if selectedStory, exists := ActiveProject.Stories[suid]; exists {
+	if suid < len(ActiveProject.Stories) {
+		selectedStory := ActiveProject.Stories[suid]
+	
 		//Parse template
 		tmpl, err := template.ParseFiles("data/templates/viewStory.tmpl", "data/templates/style.tmpl", "data/templates/header.tmpl", "data/templates/js.tmpl")
 		
