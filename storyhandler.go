@@ -87,7 +87,11 @@ func NewSectionHandler(w http.ResponseWriter, r *http.Request) {
 	newSection := &story.Section{}
 	
 	//Get the selectedChapter UID
-	cuid, err := strconv.Atoi(mux.Vars(r)["chapteruid"])
+	suid, err := strconv.Atoi(mux.Vars(r)["storyuid"])
+	cuidRel, err := strconv.Atoi(mux.Vars(r)["chapteruid"])
+	
+	//Calc project CUID from relative CUID
+	cuid := ActiveProject.Stories[suid].Chapters[cuidRel]
 	
 	//Decode the request
 	err = json.NewDecoder(r.Body).Decode(newSection)
@@ -162,7 +166,10 @@ func ViewChapterHandler(w http.ResponseWriter, r *http.Request) {
 	
 	//Get the selected chapter UID
 	suid, err := strconv.Atoi(mux.Vars(r)["storyuid"])
-	cuid, err := strconv.Atoi(mux.Vars(r)["chapteruid"])
+	cuidRel, err := strconv.Atoi(mux.Vars(r)["chapteruid"])
+	
+	//Calc project CUID from relative CUID
+	cuid := ActiveProject.Stories[suid].Chapters[cuidRel]
 	
 	//If unable to convert string to int
 	if err != nil {
@@ -186,7 +193,7 @@ func ViewChapterHandler(w http.ResponseWriter, r *http.Request) {
 		} 
 		
 		//serve template
-		err = tmpl.Execute(w, struct{StoryUID int; Chapter *story.Chapter}{StoryUID: suid, Chapter: selectedChapter})
+		err = tmpl.Execute(w, struct{UIDS [2]int; Chapter *story.Chapter}{UIDS: [2]int{suid,cuidRel}, Chapter: selectedChapter})
 		
 		//If error, return code 500
 		if err != nil {
@@ -269,9 +276,10 @@ func ListJSONChapterHandler(w http.ResponseWriter, r *http.Request) {
 	var uids []int
 	
 	//Fill slices
-	for _,elem := range ActiveProject.Stories[suid].Chapters{
-		names = append(names, ActiveProject.Chapters[elem].Name.PrimaryName)
-		uids = append(uids, elem)
+	for index,_ := range ActiveProject.Stories[suid].Chapters{
+		cuid := ActiveProject.Stories[suid].Chapters[index] //get the project CUID of the chapter
+		names = append(names, ActiveProject.Chapters[cuid].Name.PrimaryName)
+		uids = append(uids, index)
 	}
 	
 	//Encode and send off
@@ -289,16 +297,21 @@ func ListJSONSectionHandler(w http.ResponseWriter, r *http.Request) {
 	LogNet.Println("Access " + r.URL.Path + " by "+ r.RemoteAddr)
 	
 	//Get the selected Chapter UID
-	cuid, err := strconv.Atoi(mux.Vars(r)["chapteruid"])
+	suid, err := strconv.Atoi(mux.Vars(r)["storyuid"])
+	cuidRel, err := strconv.Atoi(mux.Vars(r)["chapteruid"])
 
+	//Calc project CUID from relative CUID
+	cuid := ActiveProject.Stories[suid].Chapters[cuidRel]
+	
 	//Slices to store data
 	var names []string
 	var uids []int
 	
 	//Fill slices
-	for _,elem := range ActiveProject.Chapters[cuid].Sections{
-		names = append(names, ActiveProject.Sections[elem].Name.PrimaryName)
-		uids = append(uids, elem)
+	for index,_ := range ActiveProject.Chapters[cuid].Sections{
+		secuid := ActiveProject.Chapters[cuid].Sections[index] //get the project CUID of the chapter
+		names = append(names, ActiveProject.Sections[secuid].Name.PrimaryName)
+		uids = append(uids, index)
 	}
 	
 	//Encode and send off
