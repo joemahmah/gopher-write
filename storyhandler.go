@@ -210,6 +210,56 @@ func ViewChapterHandler(w http.ResponseWriter, r *http.Request) {
 	
 }
 
+func ViewSectionHandler(w http.ResponseWriter, r *http.Request) {
+	
+	//Print log message
+	LogNet.Println("Access " + r.URL.Path + " by "+ r.RemoteAddr)
+	
+	//Get the selected chapter UID
+	suid, err := strconv.Atoi(mux.Vars(r)["storyuid"])
+	cuidRel, err := strconv.Atoi(mux.Vars(r)["chapteruid"])
+	seuidRel, err := strconv.Atoi(mux.Vars(r)["sectionuid"])
+	
+	//Calc project CUID from relative CUID
+	cuid := ActiveProject.Stories[suid].Chapters[cuidRel]
+	seuid := ActiveProject.Chapters[cuid].Sections[seuidRel]
+	
+	//If unable to convert string to int
+	if err != nil {
+		w.WriteHeader(http.StatusInternalServerError)
+		LogError.Println(err)
+		
+		return
+	}
+	
+	//check if exists
+	if selectedSection, exists := ActiveProject.Sections[seuid]; exists {
+		//Parse template
+		tmpl, err := template.ParseFiles("data/templates/viewSection.tmpl", "data/templates/style.tmpl", "data/templates/header.tmpl", "data/templates/js.tmpl")
+		
+		//if error parsing template
+		if err != nil {
+			w.WriteHeader(http.StatusInternalServerError)
+			LogError.Println(err)
+			
+			return
+		} 
+		
+		//serve template
+		err = tmpl.Execute(w, struct{UIDS [3]int; Section *story.Section}{UIDS: [3]int{suid,cuidRel,seuidRel}, Section: selectedSection})
+		
+		//If error, return code 500
+		if err != nil {
+			w.WriteHeader(http.StatusInternalServerError)
+			LogError.Println(err)
+		}
+		
+	} else {
+		w.WriteHeader(http.StatusNotFound)
+		LogWarning.Println("Section with uid " + strconv.Itoa(cuid) + " does not exist in project " + ActiveProject.Name + ".")
+	}
+}
+
 func GetJSONStoryHandler(w http.ResponseWriter, r *http.Request) {
 	
 	//Print log message

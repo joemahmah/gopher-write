@@ -1,0 +1,68 @@
+<html>
+
+<head>
+	<meta charset="utf-8">
+	<title>View Chapter {{.Section.Name.PrimaryName}} | gopher-write</title>
+
+	{{template "css"}}
+</head>
+
+<body>
+
+{{template "js"}}
+
+<script type="">
+
+var currentStoryUID = {{index .UIDS 0}};
+var currentChapterUID = {{index .UIDS 1}};
+var status = {{.Section.Status}}
+
+var changes = false;
+
+window.onload = initPage;
+
+function initPage(){
+	//Set the status
+	setStatus();
+
+	//Save changes every 30 seconds
+	window.setInterval(saveChanges, 30 * 1000);
+}
+
+function setStatus(){
+	var statusText = document.getElementById("status_text");
+	statusText.innerHTML = StatusToString(status);
+}
+
+function saveChanges(){
+	//Only save changes if there is actually something to save.
+	if(changes === true){
+		//reset change status
+		changes = false;
+		alert("good");
+	}
+}
+
+</script>
+
+{{template "header"}}
+
+<h1>{{.Section.Name.PrimaryName}}</h1>
+
+<a href="/story/{{index .UIDS 0}}/{{index .UIDS 1}}">Return to chapter </a>
+
+<div class="status_wrap" id="status_wrap">
+	<span class="status_label" >Status: </span>
+	<span class="status_text" id="status_text" ></span>
+</div>
+
+<div class="text_wrap" id="text_wrap">
+	<div class="text_control" id="text_control">
+
+	</div>
+	<textarea id="text_textarea" onkeypress="changes=true;">{{.Section.Text}}</textarea>
+</div>
+
+</body>
+
+</html>
