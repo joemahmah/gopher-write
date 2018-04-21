@@ -284,6 +284,64 @@ func GetJSONStoryHandler(w http.ResponseWriter, r *http.Request) {
 	} 
 }
 
+func GetJSONChapterHandler(w http.ResponseWriter, r *http.Request) {
+	
+	//Print log message
+	LogNet.Println("Access " + r.URL.Path + " by "+ r.RemoteAddr)
+
+	//Get the char UID
+	suid, err := strconv.Atoi(mux.Vars(r)["storyuid"])
+	cuidRel, err := strconv.Atoi(mux.Vars(r)["chapteruid"])
+	
+	//Calc project CUID from relative CUID
+	cuid := ActiveProject.Stories[suid].Chapters[cuidRel]
+	
+	//Check if error convering into int
+	if err != nil {
+		w.WriteHeader(http.StatusInternalServerError)
+		LogError.Println(err)
+	} 
+	
+	//Encode and send off
+	r.Header.Set("Content-Type","application/json")
+	err = json.NewEncoder(w).Encode(ActiveProject.Chapters[cuid])
+
+	if err != nil {
+		w.WriteHeader(http.StatusInternalServerError)
+		LogError.Println(err)
+	} 
+}
+
+func GetJSONSectionHandler(w http.ResponseWriter, r *http.Request) {
+	
+	//Print log message
+	LogNet.Println("Access " + r.URL.Path + " by "+ r.RemoteAddr)
+
+	//Get the char UID
+	suid, err := strconv.Atoi(mux.Vars(r)["storyuid"])
+	cuidRel, err := strconv.Atoi(mux.Vars(r)["chapteruid"])
+	seuidRel, err := strconv.Atoi(mux.Vars(r)["sectionuid"])
+	
+	//Calc project CUID from relative CUID
+	cuid := ActiveProject.Stories[suid].Chapters[cuidRel]
+	seuid := ActiveProject.Chapters[cuid].Sections[seuidRel]
+	
+	//Check if error convering into int
+	if err != nil {
+		w.WriteHeader(http.StatusInternalServerError)
+		LogError.Println(err)
+	} 
+	
+	//Encode and send off
+	r.Header.Set("Content-Type","application/json")
+	err = json.NewEncoder(w).Encode(ActiveProject.Sections[seuid])
+
+	if err != nil {
+		w.WriteHeader(http.StatusInternalServerError)
+		LogError.Println(err)
+	} 
+}
+
 func EditStoryHandler(w http.ResponseWriter, r *http.Request) {
 
 	//Print log message
@@ -296,6 +354,39 @@ func EditChapterHandler(w http.ResponseWriter, r *http.Request) {
 	//Print log message
 	LogNet.Println("Access " + r.URL.Path + " by "+ r.RemoteAddr)
 
+	//Make new chapter
+	newChapter := &story.Chapter{}
+	
+	//Get the selectedChapter UID
+	suid, err := strconv.Atoi(mux.Vars(r)["storyuid"])
+	cuidRel, err := strconv.Atoi(mux.Vars(r)["chapteruid"])
+	
+	//Calc project CUID from relative CUID
+	cuid := ActiveProject.Stories[suid].Chapters[cuidRel]
+	
+	//check if exists
+	if selectedChapter, exists := ActiveProject.Chapters[cuid]; exists {
+	
+		//Decode the request
+		err = json.NewDecoder(r.Body).Decode(newChapter)
+		
+		if err != nil {
+			w.WriteHeader(http.StatusInternalServerError)
+			LogError.Println(err)
+		} else {
+			w.WriteHeader(http.StatusOK)
+			
+			selectedChapter.Name = newChapter.Name;
+			selectedChapter.Status = newChapter.Status;
+			
+			//Log
+			LogInfo.Println("Section " + selectedChapter.Name.PrimaryName + " of project " + ActiveProject.Name + " was updated.")
+		}
+		
+	} else {
+		w.WriteHeader(http.StatusNotFound)
+		LogWarning.Println("Chapter with uid " + strconv.Itoa(cuid) + " does not exist in project " + ActiveProject.Name + ".")
+	}
 }
 
 func EditSectionHandler(w http.ResponseWriter, r *http.Request) {
@@ -337,7 +428,7 @@ func EditSectionHandler(w http.ResponseWriter, r *http.Request) {
 		
 	} else {
 		w.WriteHeader(http.StatusNotFound)
-		LogWarning.Println("Section with uid " + strconv.Itoa(cuid) + " does not exist in project " + ActiveProject.Name + ".")
+		LogWarning.Println("Section with uid " + strconv.Itoa(seuid) + " does not exist in project " + ActiveProject.Name + ".")
 	}
 }
 
