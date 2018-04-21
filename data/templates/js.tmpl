@@ -3,6 +3,24 @@
 <script language="javascript">
 
 //
+//Project
+//
+function SaveProject(){
+		var xhr = new XMLHttpRequest();
+		var url = "/project/save";
+		xhr.open("POST", url, true);
+		xhr.setRequestHeader("Content-Type", "text/plain");
+		xhr.onreadystatechange = function () {
+			//if server returns proper, update display
+			if (this.readyState == 4 && this.status == 200){
+				
+			}
+		}
+		
+		xhr.send("");
+}
+
+//
 //Form
 //
 function MakeForm(id){
