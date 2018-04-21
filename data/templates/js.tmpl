@@ -13,7 +13,8 @@ function SaveProject(){
 		xhr.onreadystatechange = function () {
 			//if server returns proper, update display
 			if (this.readyState == 4 && this.status == 200){
-				
+				showResponse("Project saved.");
+				setTimeout("hideResponse()",2000);
 			}
 		}
 		
@@ -21,7 +22,7 @@ function SaveProject(){
 }
 
 //
-//Form
+//Utility Functions
 //
 function MakeForm(id){
 	var form = document.createElement("form");
@@ -36,6 +37,25 @@ function MakeForm(id){
 	formContainer.insertBefore(form, formControl);
 	
 	return form;
+}
+
+function showResponse(text){
+	var response = document.getElementById("response_text");
+	
+	if(response === null){
+		var newResponseTextElement = document.createElement("div");
+		newResponseTextElement.id = "response_text";
+		newResponseTextElement.className = "response_text";
+		document.body.appendChild(newResponseTextElement);
+	}
+	
+	response.innerHTML = text;
+}
+
+function hideResponse(){
+	var response = document.getElementById("response_text");
+	
+	response.innerHTML = "";
 }
 
 function DeleteNodeById(id){
