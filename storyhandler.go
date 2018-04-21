@@ -291,6 +291,56 @@ func EditStoryHandler(w http.ResponseWriter, r *http.Request) {
 
 }
 
+func EditChapterHandler(w http.ResponseWriter, r *http.Request) {
+
+	//Print log message
+	LogNet.Println("Access " + r.URL.Path + " by "+ r.RemoteAddr)
+
+}
+
+func EditSectionHandler(w http.ResponseWriter, r *http.Request) {
+
+	//Print log message
+	LogNet.Println("Access " + r.URL.Path + " by "+ r.RemoteAddr)
+
+	//Make new section
+	newSection := &story.Section{}
+	
+	//Get the selectedChapter UID
+	suid, err := strconv.Atoi(mux.Vars(r)["storyuid"])
+	cuidRel, err := strconv.Atoi(mux.Vars(r)["chapteruid"])
+	seuidRel, err := strconv.Atoi(mux.Vars(r)["sectionuid"])
+	
+	//Calc project CUID from relative CUID
+	cuid := ActiveProject.Stories[suid].Chapters[cuidRel]
+	seuid := ActiveProject.Chapters[cuid].Sections[seuidRel]
+	
+	//check if exists
+	if selectedSection, exists := ActiveProject.Sections[seuid]; exists {
+	
+		//Decode the request
+		err = json.NewDecoder(r.Body).Decode(newSection)
+		
+		if err != nil {
+			w.WriteHeader(http.StatusInternalServerError)
+			LogError.Println(err)
+		} else {
+			w.WriteHeader(http.StatusOK)
+			
+			selectedSection.Name = newSection.Name;
+			selectedSection.Status = newSection.Status;
+			selectedSection.Text = newSection.Text;
+			
+			//Log
+			LogInfo.Println("Section " + selectedSection.Name.PrimaryName + " of project " + ActiveProject.Name + " was updated.")
+		}
+		
+	} else {
+		w.WriteHeader(http.StatusNotFound)
+		LogWarning.Println("Section with uid " + strconv.Itoa(cuid) + " does not exist in project " + ActiveProject.Name + ".")
+	}
+}
+
 func ListJSONStoryHandler(w http.ResponseWriter, r *http.Request) {
 	
 	//Print log message
@@ -372,7 +422,8 @@ func ListJSONSectionHandler(w http.ResponseWriter, r *http.Request) {
 	if err != nil {
 		w.WriteHeader(http.StatusInternalServerError)
 		LogError.Println(err)
-	} 
+	}
+	
 }
 
 func OverviewStoryHandler(w http.ResponseWriter, r *http.Request) {

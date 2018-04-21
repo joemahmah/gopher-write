@@ -11,18 +11,19 @@
 
 {{template "js"}}
 
-<script type="">
+<script language="javascript">
 
 var currentStoryUID = {{index .UIDS 0}};
 var currentChapterUID = {{index .UIDS 1}};
-var status = {{.Section.Status}}
+var currentSectionUID = {{index .UIDS 2}};
+var sectStatus = {{.Section.Status}};
 
 var changes = false;
 
 window.onload = initPage;
 
 function initPage(){
-	//Set the status
+	//Set the sectStatus
 	setStatus();
 
 	//Save changes every 30 seconds
@@ -31,36 +32,78 @@ function initPage(){
 
 function setStatus(){
 	var statusText = document.getElementById("status_text");
-	statusText.innerHTML = StatusToString(status);
+	statusText.value = sectStatus;
 }
 
 function saveChanges(){
 	//Only save changes if there is actually something to save.
 	if(changes === true){
-		//reset change status
+		//reset change sectStatus
 		changes = false;
-		alert("good");
+		
+		var name = MakeName(document.getElementById("name_text").innerHTML,false,null);
+		var section = MakeSection(name,document.getElementById("text_textarea").value,parseInt(document.getElementById("status_text").value));
+		
+		var xhr = new XMLHttpRequest();
+		var url = "/story/" + currentStoryUID + "/" + currentChapterUID + "/" + currentSectionUID + "/edit";
+		xhr.open("POST", url, true);
+		xhr.setRequestHeader("Content-Type", "application/json");
+		xhr.onreadystatechange = function () {
+			//if server returns proper, update display
+			if (this.readyState == 4 && this.status == 200){
+				showResponse("Section updated.");
+				setTimeout("hideResponse()",5000);
+			} else if (this.readyState == 4 && this.status == 500) {
+				showResponse("Unable to update.");
+				setTimeout("hideResponse()",5000);
+			}
+		}
+		
+		xhr.send(JSON.stringify(section));
+		
 	}
+}
+
+function showResponse(text){
+	var response = document.getElementById("response_text");
+	
+	response.innerHTML = text;
+}
+
+function hideResponse(){
+	var response = document.getElementById("response_text");
+	
+	response.innerHTML = "";
 }
 
 </script>
 
 {{template "header"}}
 
-<h1>{{.Section.Name.PrimaryName}}</h1>
+<div class="response_text" id="response_text"></div>
 
-<a href="/story/{{index .UIDS 0}}/{{index .UIDS 1}}">Return to chapter </a>
+<h1 id="name_text">{{.Section.Name.PrimaryName}}</h1>
+
+<div class="meta_control">
+	<a href="/story/{{index .UIDS 0}}/{{index .UIDS 1}}">Return to chapter </a>
+</div>
 
 <div class="status_wrap" id="status_wrap">
 	<span class="status_label" >Status: </span>
-	<span class="status_text" id="status_text" ></span>
+	<select class="status_text" id="status_text" onchange="changes=true;" >
+		<option value="0">Not Started</option>
+		<option value="1">In Progress</option>
+		<option value="2">Almost Done</option>
+		<option value="3">Done</option>
+		<option value="4">Unknown</option>
+	</select>
 </div>
 
 <div class="text_wrap" id="text_wrap">
 	<div class="text_control" id="text_control">
-
+		<span class="button_control" onclick="saveChanges();">Save</span>
 	</div>
-	<textarea id="text_textarea" onkeypress="changes=true;">{{.Section.Text}}</textarea>
+	<textarea id="text_textarea" onchange="changes=true;">{{.Section.Text}}</textarea>
 </div>
 
 </body>
