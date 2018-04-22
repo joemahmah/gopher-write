@@ -64,6 +64,19 @@ function DeleteNodeById(id){
 	delete node;
 }
 
+function ConsumeEnterKeyEvent(e){
+	//if not given, set e to the event 
+	var e = e || window.event;
+	
+	//get key code (or set to 0 if not existing)
+	var key = e.charCode || e.keyCode || 0;
+	
+	//consume enter key event
+	if(key == 13){
+		e.preventDefault();
+	}
+}
+
 //
 //Common
 //

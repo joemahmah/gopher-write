@@ -41,7 +41,7 @@ function addSectionForm(){
 		form = MakeForm("section_form");
 	}
 	
-	form.innerHTML=form.innerHTML + "Name:<br><input id=\"form_name\" type=\"text\" ><br>";
+	form.innerHTML=form.innerHTML + "Name:<br><input id=\"form_name\" type=\"text\" onkeypress=\"ConsumeEnterKeyEvent();\"><br>";
 	
 	document.getElementById("form_new").style.display = 'none'
 	document.getElementById("form_control").style.display = 'block'
