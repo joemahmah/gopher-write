@@ -66,7 +66,8 @@ function processChapter(){
 			removeChapterForm(); //remove form
 			updateChapterList(); //update Chapter list
 		} else if (this.readyState == 4 && this.status == 500) {
-			//flag error
+			showResponse("There was an error adding the chapter.");
+			setTimeout("hideResponse()",2000);
 		}
 	}
 	

@@ -38,59 +38,141 @@ function removeStoryForm(){
 }
 
 function processStory(){
-
-var name = MakeName(document.getElementById("form_name").value,false,null);
-var story = MakeStory(name,0,null);
-
-var xhr = new XMLHttpRequest();
-var url = "/story/new";
-xhr.open("POST", url, true);
-xhr.setRequestHeader("Content-Type", "application/json");
-xhr.onreadystatechange = function () {
-	//if server returns proper, update display
-	if (this.readyState == 4 && this.status == 200){
-		removeStoryForm(); //remove form
-		updateStoryList(); //update char list
-	} else if (this.readyState == 4 && this.status == 500) {
-		//flag error
+	var name = MakeName(document.getElementById("form_name").value,false,null);
+	var story = MakeStory(name,0,null);
+	
+	var xhr = new XMLHttpRequest();
+	var url = "/story/new";
+	xhr.open("POST", url, true);
+	xhr.setRequestHeader("Content-Type", "application/json");
+	xhr.onreadystatechange = function () {
+		//if server returns proper, update display
+		if (this.readyState == 4 && this.status == 200){
+			removeStoryForm(); //remove form
+			updateStoryList(); //update char list
+		} else if (this.readyState == 4 && this.status == 500) {
+			showResponse("There was an error adding the story.");
+			setTimeout("hideResponse()",2000);
+		}
 	}
-}
-
-xhr.send(JSON.stringify(story));
-
-
+	
+	xhr.send(JSON.stringify(story));
 }
 
 function updateStoryList(){
-	
-var xhr = new XMLHttpRequest();
-var url = "/story/list";
-xhr.open("POST", url, true);
-xhr.onreadystatechange = function () {
-	//if server returns JSON, update display
-	if (this.readyState === 4 && this.status === 200){
-		//get the char list
-		var storyList = document.getElementById("story_list");
-		
-		//blank the existing list
-		storyList.innerHTML = "";
-		
-		//convert json into object
-		var storyListJSON = JSON.parse(this.responseText);
-		
-		if(storyListJSON.Names != null) {
-			//add the chars to the page
-			for (var i = 0; i < storyListJSON.Names.length; i++) {
-				storyList.innerHTML += "<p><a href=\"/story/" + storyListJSON.UIDS[i] + "\">" + storyListJSON.Names[i] + "</a></p>";
+	var xhr = new XMLHttpRequest();
+	var url = "/story/list";
+	xhr.open("POST", url, true);
+	xhr.onreadystatechange = function () {
+		//if server returns JSON, update display
+		if (this.readyState === 4 && this.status === 200){
+			//get the char list
+			var storyList = document.getElementById("story_list");
+			
+			//blank the existing list
+			storyList.innerHTML = "";
+			
+			//convert json into object
+			var storyListJSON = JSON.parse(this.responseText);
+			
+			if(storyListJSON.Names != null) {
+				document.getElementById("story_list").innerHTML = "";
+			
+				//add the chars to the page
+				for (var i = 0; i <= storyListJSON.Names.length; i++) {
+					if(i === storyListJSON.Names.length){
+						var storyElem = document.createElement("div");
+						storyElem.className = "list_elem list_elem_ghost";
+						storyElem.setAttribute("data-story-uid",i);
+						storyElem.setAttribute("draggable","false");
+						storyElem.addEventListener("drop",dropListElement);
+						storyElem.addEventListener("dragover",allowDragListElement);
+						
+						document.getElementById("story_list").appendChild(storyElem);
+					} else {
+						var storyElem = document.createElement("div");
+						storyElem.className = "list_elem";
+						storyElem.setAttribute("data-story-uid",storyListJSON.UIDS[i]);
+						storyElem.setAttribute("draggable","true");
+						storyElem.addEventListener("drop",dropListElement);
+						storyElem.addEventListener("dragover",allowDragListElement);
+						storyElem.addEventListener("dragstart",dragListElement);
+						storyElem.addEventListener("dblclick",linkListElement);
+						
+						var storyElemLink = document.createElement("span");
+						storyElem.setAttribute("draggable","true");
+						storyElemLink.innerHTML = storyListJSON.Names[i];
+						
+						storyElem.appendChild(storyElemLink);
+						
+						document.getElementById("story_list").appendChild(storyElem);
+					}
+				}
 			}
+			
 		}
-		
+	}
+	
+	xhr.send();
+}
+
+function moveStory(first, second){var xhr = new XMLHttpRequest();
+	var url = "/move/story/" + first + "/" + second;
+	xhr.open("POST", url, true);
+	xhr.onreadystatechange = function () {
+		if (this.readyState === 4 && this.status === 200){
+			updateStoryList();
+		} else if(this.readyState === 4 && this.status !== 200){
+			showResponse("There was an error moving the story.");
+			setTimeout("hideResponse()",2000);
+		}
+	}
+	
+	xhr.send();
+}
+
+function linkListElement(e){
+	var suid = e.target.getAttribute("data-story-uid");
+	location.href = "/story/" + suid;
+}
+
+function dropListElement(e){
+	e.preventDefault();
+	
+	if(e.stopPropagation !== "undefined"){
+		e.stopPropagation();
+	}
+	
+	var firstID = parseInt(e.dataTransfer.getData("text"));
+	var secondID = parseInt(e.target.getAttribute("data-story-uid"));
+	
+	var target = e.target;
+	
+	while(isNaN(secondID)){
+		target = target.parentNode
+		secondID = parseInt(target.getAttribute("data-story-uid"));
+	}
+	
+	if(firstID !== secondID){
+		moveStory(firstID, secondID);
 	}
 }
 
-xhr.send();
-
+function dragListElement(e){
+	var storyUID = e.target.getAttribute("data-story-uid");
 	
+	var target = e.target;
+	
+	while(storyUID === null){
+		target = target.parentNode
+		storyUID = parseInt(target.getAttribute("data-story-uid"));
+	}
+	
+	e.dataTransfer.setData("text", storyUID);
+}
+
+function allowDragListElement(e){
+	e.preventDefault();
 }
 
 </script>
