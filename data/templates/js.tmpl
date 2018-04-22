@@ -74,6 +74,11 @@ function ConsumeEnterKeyEvent(e){
 	//consume enter key event
 	if(key == 13){
 		e.preventDefault();
+		
+		if(typeof NewEnterKeyEvent === "function"){
+			NewEnterKeyEvent();
+		}
+		
 	}
 }
 
