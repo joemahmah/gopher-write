@@ -9,20 +9,165 @@
 
 <body>
 	
-	{{template "js"}}
-	{{template "header"}}
+{{template "js"}}
+	
+<script language="javascript">
 
-	<h1>{{.Name.PrimaryName}}</h1>
+var currentCharUID = {{.UID}};
+var sectStatus = 5;
+
+var changes = false;
+
+window.onload = initPage;
+
+function initPage(){
+	//Set the character status
+	//setStatus();
+
+	//Save changes every 30 seconds
+	window.setInterval(saveChanges, 30 * 1000);
+}
+
+//Have ConsumeEnterKeyEvent hook this function
+//to allow enter to save changes.
+function NewEnterKeyEvent(){
+	saveChanges();
+}
+
+function setStatus(){
+	var statusText = document.getElementById("status_text");
+	statusText.value = sectStatus;
+}
+
+function addChronoAgeInput(){
+	var chronoAgeInput = document.createElement("input");
+	chronoAgeInput.id = "age_chrono_text";
+	chronoAgeInput.type = "number";
+	chronoAgeInput.className = "age_text";
+	chronoAgeInput.value = document.getElementById("age_bio_text").value;
+	chronoAgeInput.onchange = function(){changes=true;};
 	
-	<p>{{.Age.BioAge}}</p>
+	//Target insert location
+	var chronoAgeTarget = document.getElementById("age_chrono_target");
 	
-	<p>{{.Description}}</p>
+	chronoAgeTarget.parentNode.insertBefore(chronoAgeInput, chronoAgeTarget); //add actual input box
 	
+	//Change label
+	document.getElementById("age_label").innerHTML = "Biological Age || Chronological age";
 	
-	<h3>Aliases</h3>
-	{{range .Aliases}}
-		<p>{{.PrimaryName}}</p>
-	{{end}}
+	//clear target location
+	chronoAgeTarget.innerHTML = "";
+	chronoAgeTarget.classList.remove("form_make_button");
+}
+
+function saveChanges(){
+	//Only save changes if there is actually something to save.
+	if(changes === true){
+		//reset change sectStatus
+		changes = false;
+		
+		//Name
+		var name = MakeName(document.getElementById("name_text").innerHTML,false,null);
+		//Description
+		var description = document.getElementById("text_textarea").value;
+		//Age
+		if(document.getElementById("age_chrono_text") != null){
+			var age = MakeAge(parseInt(document.getElementById("age_bio_text").value),parseInt(document.getElementById("age_chrono_text").value));
+		} else {
+			var age = MakeAge(parseInt(document.getElementById("age_bio_text").value));
+		}
+		//Aliases
+		var aliasArray = null;
+		/*var aliases = document.getElementsByClassName("form_alias");
+		if (aliases.length == 0) { //if no aliases
+			//set to null
+			var aliasArray = null;
+		} else { //otherwise
+			//make array
+			var aliasArray = []
+			//assign values
+			for(var i=0; i<aliases.length; i++){
+				aliasArray[i] = MakeName(aliases[i].value, true, null); //make new name object and assign to array
+			}	
+		}*/
+		
+		//Make the character
+		var character = MakeCharacter(name, description, age, aliasArray);
+	
+		var xhr = new XMLHttpRequest();
+		var url = "/char/" + currentCharUID + "/edit";
+		xhr.open("POST", url, true);
+		xhr.setRequestHeader("Content-Type", "application/json");
+		xhr.onreadystatechange = function () {
+			//if server returns proper, update display
+			if (this.readyState == 4 && this.status == 200){
+				showResponse("Character updated.");
+				setTimeout("hideResponse()",5000);
+			} else if (this.readyState == 4 && this.status == 500) {
+				showResponse("Unable to update.");
+				setTimeout("hideResponse()",5000);
+			}
+		}
+		
+		xhr.send(JSON.stringify(character));
+		
+	}
+}
+
+</script>
+	
+{{template "header"}}
+
+<h1 id="name_text">{{.Name.PrimaryName}}</h1>
+
+<div class="meta_control">
+	<a href="/char">Return to character list </a>
+</div>
+
+<div class="profile" id="profile">
+
+	<div class="age_wrap" id="age_wrap">
+		{{if ageEq .}}
+			<span class="age_label" id="age_label">Age</span><br>
+			<input type="number" class="age_text" id="age_bio_text" value="{{.Age.BioAge}}" onchange="changes=true;"></input>
+		{{else}}
+			<span class="age_label" id="age_label">Biological Age (Chronological age)</span><br>
+			<input type="number" class="age_text" id="age_bio_text" value="{{.Age.BioAge}}" onchange="changes=true;"></input> (
+		{{end}}
+		
+		{{if ageEq .}}
+			<span type="number" class="form_make_button" id="age_chrono_target" onclick="addChronoAgeInput();" > Split Age</span><br>
+		{{else}}
+			<input type="number" class="age_text" id="age_chrono_text" value="{{.Age.ChronoAge}}" onchange="changes=true;"></input> )<br>
+		{{end}}
+	</div>
+	
+	<!--
+	<div class="status_wrap" id="status_wrap">
+		<span class="status_label" >Status: </span>
+		<select class="status_text" id="status_text" onchange="changes=true;" >
+			<option value="0">Not Started</option>
+			<option value="1">In Progress</option>
+			<option value="2">Almost Done</option>
+			<option value="3">Done</option>
+			<option value="4">Unknown</option>
+		</select>
+	</div>
+	-->
+
+</div>
+
+<div class="text_wrap" id="text_wrap">
+	<div class="text_control" id="text_control">
+		<span class="button_control" onclick="saveChanges();">Save</span>
+	</div>
+	<textarea id="text_textarea" onchange="changes=true;">{{.Description}}</textarea>
+</div>
+
+<h3>Aliases</h3>
+{{range .Aliases}}
+	<p>{{.PrimaryName}}</p>
+{{end}}
 	
 	
 </body>

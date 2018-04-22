@@ -25,9 +25,9 @@ func main(){
 
 	//Add char manip routes
 	router.HandleFunc("/char/new", NewCharHandler) //new char
-	router.HandleFunc("/char/view/{cid:[0-9]{1,9}}", ViewCharHandler) //view char
-	router.HandleFunc("/char/json/{cid:[0-9]{1,9}}", GetJSONCharHandler) //get char json
-	router.HandleFunc("/char/edit/{cid:[0-9]{1,9}}", EditCharHandler) //edit char
+	router.HandleFunc("/char/{cid:[0-9]{1,9}}/view", ViewCharHandler) //view char
+	router.HandleFunc("/char/{cid:[0-9]{1,9}}/json", GetJSONCharHandler) //get char json
+	router.HandleFunc("/char/{cid:[0-9]{1,9}}/edit", EditCharHandler) //edit char
 	router.HandleFunc("/char/list",ListJSONCharHandler) //Char list json
 	router.HandleFunc("/char", OverviewCharHandler) //Char overview
 

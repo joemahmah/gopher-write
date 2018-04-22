@@ -25,7 +25,7 @@ function addCharForm(){
 	form.innerHTML=form.innerHTML + "Name:<br><input id=\"form_name\" type=\"text\" ><br>";
 	form.innerHTML=form.innerHTML + "Description:<br><input id=\"form_desc\" type=\"text\" ><br>";
 	form.innerHTML=form.innerHTML + "Biological Age:<br><input id=\"form_age_bio\" type=\"number\" ><br>";
-	form.innerHTML=form.innerHTML + "Chronological Age:<span class=\"form-make-button\" id=\"age_chrono_target\" onclick=\"addChronoAgeInput();\" >Add</span><br>";
+	form.innerHTML=form.innerHTML + "Chronological Age:<span class=\"form_make_button\" id=\"age_chrono_target\" onclick=\"addChronoAgeInput();\" >Add</span><br>";
 	
 	document.getElementById("form_new").style.display = 'none'
 	document.getElementById("form_control").style.display = 'block'
@@ -47,7 +47,7 @@ function addChronoAgeInput(){
 		chronoAgeTarget.parentNode.insertBefore(chronoAgeInput, chronoAgeTarget); //add actual input box
 		
 		chronoAgeTarget.innerHTML = "";
-		chronoAgeTarget.classList.remove("form-make-button");
+		chronoAgeTarget.classList.remove("form_make_button");
 	}
 }
 
@@ -148,7 +148,7 @@ function updateCharList(){
 			if(charListJSON.Names != null) {
 				//add the chars to the page
 				for (var i = 0; i < charListJSON.Names.length; i++) {
-					charList.innerHTML += "<p><a href=\"/char/view/" + charListJSON.UIDS[i] + "\">" + charListJSON.Names[i] + "</a></p>";
+					charList.innerHTML += "<p><a href=\"/char/" + charListJSON.UIDS[i] + "/view\">" + charListJSON.Names[i] + "</a></p>";
 				}
 			}
 			

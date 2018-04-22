@@ -49,8 +49,18 @@ func ViewCharHandler(w http.ResponseWriter, r *http.Request) {
 	
 	//check if exists
 	if char, exists := ActiveProject.Characters[cid]; exists {
+	
+		tmpl := template.New("viewChar.tmpl");
+	
+		//Add function to check age equality
+		tmpl.Funcs(template.FuncMap{
+			"ageEq": func(c character.Character) bool{
+				return c.Age.BioAge == c.Age.ChronoAge
+			},
+		})
+	
 		//Parse template
-		tmpl, err := template.ParseFiles("data/templates/viewChar.tmpl", "data/templates/style.tmpl", "data/templates/header.tmpl", "data/templates/js.tmpl")
+		tmpl, err := tmpl.ParseFiles("data/templates/viewChar.tmpl", "data/templates/style.tmpl", "data/templates/header.tmpl", "data/templates/js.tmpl")
 		
 		//if error parsing template
 		if err != nil {
@@ -105,6 +115,36 @@ func EditCharHandler(w http.ResponseWriter, r *http.Request) {
 	//Print log message
 	LogNet.Println("Access " + r.URL.Path + " by "+ r.RemoteAddr)
 
+	//Make new story
+	newChar := &character.Character{}
+	
+	//Get the story UID
+	cuid, err := strconv.Atoi(mux.Vars(r)["cid"])
+	
+	//check if exists
+	if selectedChar, exists := ActiveProject.Characters[cuid]; exists {
+		//Decode the request
+		err = json.NewDecoder(r.Body).Decode(newChar)
+		
+		if err != nil {
+			w.WriteHeader(http.StatusInternalServerError)
+			LogError.Println(err)
+		} else {
+			w.WriteHeader(http.StatusOK)
+			
+			selectedChar.Name = newChar.Name;
+			selectedChar.Description = newChar.Description;
+			selectedChar.Age = newChar.Age;
+			selectedChar.Aliases = newChar.Aliases;
+			
+			//Log
+			LogInfo.Println("Character " + selectedChar.Name.PrimaryName + " of project " + ActiveProject.Name + " was updated.")
+		}
+		
+	} else {
+		w.WriteHeader(http.StatusNotFound)
+		LogWarning.Println("Character with uid " + strconv.Itoa(cuid) + " does not exist in project " + ActiveProject.Name + ".")
+	}
 }
 
 func ListJSONCharHandler(w http.ResponseWriter, r *http.Request) {
