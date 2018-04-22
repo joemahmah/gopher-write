@@ -24,7 +24,8 @@ func StoryMoveHandler(w http.ResponseWriter, r *http.Request) {
 	
 	//If story indices are out of bounds
 	if secondStoryIndex > len(ActiveProject.Stories) || firstStoryIndex >= len(ActiveProject.Stories) || firstStoryIndex == secondStoryIndex{
-		//error
+		w.WriteHeader(http.StatusInternalServerError)
+		LogError.Println("Story index out of bounds.")
 		return
 	}
 	
@@ -48,20 +49,35 @@ func StoryMoveHandler(w http.ResponseWriter, r *http.Request) {
 		
 		//set stories to new slice
 		ActiveProject.Stories = newStorySlice
+	} else if (firstStoryIndex < secondStoryIndex){
+		left := ActiveProject.Stories[:firstStoryIndex]
+		right := ActiveProject.Stories[secondStoryIndex:]
+		between := ActiveProject.Stories[firstStoryIndex+1:secondStoryIndex]
+		
+		//create new slice (eliminates slice BS)
+		var newStorySlice []*story.Story;
+		newStorySlice = append(newStorySlice, left...)
+		newStorySlice = append(newStorySlice, between...)
+		newStorySlice = append(newStorySlice, ActiveProject.Stories[firstStoryIndex])
+		newStorySlice = append(newStorySlice, right...)
+		
+		//set stories to new slice
+		ActiveProject.Stories = newStorySlice
+	} else {
+		left := ActiveProject.Stories[:secondStoryIndex]
+		right := ActiveProject.Stories[firstStoryIndex:]
+		between := ActiveProject.Stories[secondStoryIndex:firstStoryIndex]
+		
+		//create new slice (eliminates slice BS)
+		var newStorySlice []*story.Story;
+		newStorySlice = append(newStorySlice, left...)
+		newStorySlice = append(newStorySlice, ActiveProject.Stories[firstStoryIndex])
+		newStorySlice = append(newStorySlice, between...)
+		newStorySlice = append(newStorySlice, right...)
+		
+		//set stories to new slice
+		ActiveProject.Stories = newStorySlice
 	}
-	
-	/*
-	if(first < second)
-		get left of first
-		get between first, second
-		get second and right of second
-		append left, between, first, second+right
-	else 
-		get right of first
-		get left of second
-		get between first and second + second
-		append left, first, between+second, right
-	*/
 	
 	//Recalculate story UID
 	//Note: this is fairly slow, but realistically, there
