@@ -25,10 +25,30 @@ function addCharForm(){
 	form.innerHTML=form.innerHTML + "Name:<br><input id=\"form_name\" type=\"text\" ><br>";
 	form.innerHTML=form.innerHTML + "Description:<br><input id=\"form_desc\" type=\"text\" ><br>";
 	form.innerHTML=form.innerHTML + "Biological Age:<br><input id=\"form_age_bio\" type=\"number\" ><br>";
-	form.innerHTML=form.innerHTML + "Chronological Age:<br><input id=\"form_age_chrono\" type=\"number\" ><br>";
+	form.innerHTML=form.innerHTML + "Chronological Age:<span class=\"form-make-button\" id=\"age_chrono_target\" onclick=\"addChronoAgeInput();\" >Add</span><br>";
 	
 	document.getElementById("form_new").style.display = 'none'
 	document.getElementById("form_control").style.display = 'block'
+}
+
+function addChronoAgeInput(){
+	var form = document.getElementById("form");
+	
+	//only do stuff if form exists
+	if(form != null){
+		var chronoAgeInput = document.createElement("input");
+		chronoAgeInput.id = "form_age_chrono";
+		chronoAgeInput.type = "number";
+		
+		//Target insert location
+		var chronoAgeTarget = document.getElementById("age_chrono_target");
+		
+		chronoAgeTarget.parentNode.insertBefore(document.createElement("br"), chronoAgeTarget); //add line break
+		chronoAgeTarget.parentNode.insertBefore(chronoAgeInput, chronoAgeTarget); //add actual input box
+		
+		chronoAgeTarget.innerHTML = "";
+		chronoAgeTarget.classList.remove("form-make-button");
+	}
 }
 
 function removeCharForm(){
