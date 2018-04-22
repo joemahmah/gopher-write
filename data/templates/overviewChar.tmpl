@@ -60,97 +60,82 @@ function removeLastName(){
 }
 
 function processChar(){
-
-//Make new object for the character
-var character = {}
-
-//give dummy UID for benefit of go
-character.UID = 0;
-
-//Make new name object and assign values from form
-character.Name = {};
-character.Name.PrimaryName = document.getElementById("form_name").value;
-character.Name.AlternateNames = null;
-character.Name.IsAlias = false;
-
-//Set char description from form value
-character.Description = document.getElementById("form_desc").value;
-
-//Make new age object and assign values from form
-character.Age = {};
-character.Age.BioAge = parseInt(document.getElementById("form_age_bio").value);
-character.Age.ChronoAge = parseInt(document.getElementById("form_age_chrono").value);
-
-//Get alias objects
-var aliases = document.getElementsByClassName("form_alias");
-
-if (aliases.length == 0) { //if no aliases
-	//set to null
-	character.Aliases = null;
-} else { //otherwise
-	//make array
-	var aliasArray = []
+	//Collect data for character
 	
-	//assign values
-	for(var i=0; i<aliases.length; i++){
-		aliasArray[i] = {}; //make new name object and assign to array
-		aliasArray[i].PrimaryName = aliases[i].value;
-		aliasArray[i].AlternateNames = null;
-		aliasArray[i].IsAlias = true;
+	//Name
+	var name = MakeName(document.getElementById("form_name").value,false,null);
+	//Description
+	var description = document.getElementById("form_desc").value;
+	//Age
+	if(document.getElementById("form_age_chrono") != null){
+		var age = MakeAge(parseInt(document.getElementById("form_age_bio").value),parseInt(document.getElementById("form_age_chrono").value));
+	} else {
+		var age = MakeAge(parseInt(document.getElementById("form_age_bio").value));
+	}
+	//Aliases
+	var aliases = document.getElementsByClassName("form_alias");
+	if (aliases.length == 0) { //if no aliases
+		//set to null
+		var aliasArray = null;
+	} else { //otherwise
+		//make array
+		var aliasArray = []
+		//assign values
+		for(var i=0; i<aliases.length; i++){
+			aliasArray[i] = MakeName(aliases[i].value, true, null); //make new name object and assign to array
+		}	
 	}
 	
-	character.Aliases = aliasArray;
-}
-
-var xhr = new XMLHttpRequest();
-var url = "/char/new";
-xhr.open("POST", url, true);
-xhr.setRequestHeader("Content-Type", "application/json");
-xhr.onreadystatechange = function () {
-	//if server returns proper, update display
-	if (this.readyState == 4 && this.status == 200){
-		removeCharForm(); //remove form
-		updateCharList(); //update char list
-	} else if (this.readyState == 4 && this.status == 500) {
-		//flag error
+	//Make the character
+	//Note: javascript does not have block scope, so aliasarray and age are in scope
+	var character = MakeCharacter(name, description, age, aliasArray);
+	
+	var xhr = new XMLHttpRequest();
+	var url = "/char/new";
+	xhr.open("POST", url, true);
+	xhr.setRequestHeader("Content-Type", "application/json");
+	xhr.onreadystatechange = function () {
+		//if server returns proper, update display
+		if (this.readyState == 4 && this.status == 200){
+			removeCharForm(); //remove form
+			updateCharList(); //update char list
+		} else if (this.readyState == 4 && this.status == 500) {
+			//flag error
+		}
 	}
-}
-
-xhr.send(JSON.stringify(character));
-
-
+	
+	xhr.send(JSON.stringify(character));
 }
 
 function updateCharList(){
-
-var charlist = document.getElementById("charlist");
-	
-var xhr = new XMLHttpRequest();
-var url = "/char/list";
-xhr.open("POST", url, true);
-xhr.onreadystatechange = function () {
-	//if server returns JSON, update display
-	if (this.readyState == 4 && this.status === 200){
-		//get the char list
-		var charlist = document.getElementById("charlist");
+	var charList = document.getElementById("char_list");
 		
-		//blank the existing list
-		charlist.innerHTML = "";
-		
-		//convert json into object
-		var charlistjson = JSON.parse(this.responseText);
-		
-		//add the chars to the page
-		for (var i = 0; i < charlistjson.Names.length; i++) {
-			charlist.innerHTML += "<p><a href=\"/char/view/" + charlistjson.UIDS[i] + "\">" + charlistjson.Names[i] + "</a></p>";
+	var xhr = new XMLHttpRequest();
+	var url = "/char/list";
+	xhr.open("POST", url, true);
+	xhr.onreadystatechange = function () {
+		//if server returns JSON, update display
+		if (this.readyState == 4 && this.status === 200){
+			//get the char list
+			var charList = document.getElementById("char_list");
+			
+			//blank the existing list
+			charList.innerHTML = "";
+			
+			//convert json into object
+			var charListJSON = JSON.parse(this.responseText);
+			
+			if(charListJSON.Names != null) {
+				//add the chars to the page
+				for (var i = 0; i < charListJSON.Names.length; i++) {
+					charList.innerHTML += "<p><a href=\"/char/view/" + charListJSON.UIDS[i] + "\">" + charListJSON.Names[i] + "</a></p>";
+				}
+			}
+			
 		}
-		
 	}
-}
-
-xhr.send();
-
 	
+	xhr.send();	
 }
 
 </script>
@@ -173,7 +158,7 @@ xhr.send();
 	</div>
 </div>
 
-<div class="charlist" id="charlist">
+<div class="list" id="char_list">
 </div>
 
 </body>

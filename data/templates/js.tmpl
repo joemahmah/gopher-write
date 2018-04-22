@@ -43,10 +43,10 @@ function showResponse(text){
 	var response = document.getElementById("response_text");
 	
 	if(response === null){
-		var newResponseTextElement = document.createElement("div");
-		newResponseTextElement.id = "response_text";
-		newResponseTextElement.className = "response_text";
-		document.body.appendChild(newResponseTextElement);
+		response = document.createElement("div");
+		response.id = "response_text";
+		response.className = "response_text";
+		document.body.appendChild(response);
 	}
 	
 	response.innerHTML = text;
@@ -85,6 +85,16 @@ function MakeName(name, isAlias, alternateNames){
 function Age(BioAge, ChronoAge){
 	this.BioAge = BioAge;
 	this.ChronoAge = ChronoAge;
+}
+
+function MakeAge(bioAge, chronoAge){
+	var age = new Age(bioAge, bioAge);
+	
+	if(typeof chronoAge !== "undefined"){
+		age.ChronoAge = chronoAge;
+	}
+	
+	return age;
 }
 
 function StatusToString(status){
