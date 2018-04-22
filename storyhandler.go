@@ -347,6 +347,36 @@ func EditStoryHandler(w http.ResponseWriter, r *http.Request) {
 	//Print log message
 	LogNet.Println("Access " + r.URL.Path + " by "+ r.RemoteAddr)
 
+	//Make new story
+	newStory := &story.Story{}
+	
+	//Get the story UID
+	suid, err := strconv.Atoi(mux.Vars(r)["storyuid"])
+	
+	//check if exists
+	if suid < len(ActiveProject.Stories) {
+		selectedStory := ActiveProject.Stories[suid]
+	
+		//Decode the request
+		err = json.NewDecoder(r.Body).Decode(newStory)
+		
+		if err != nil {
+			w.WriteHeader(http.StatusInternalServerError)
+			LogError.Println(err)
+		} else {
+			w.WriteHeader(http.StatusOK)
+			
+			selectedStory.Name = newStory.Name;
+			selectedStory.Status = newStory.Status;
+			
+			//Log
+			LogInfo.Println("Story " + selectedStory.Name.PrimaryName + " of project " + ActiveProject.Name + " was updated.")
+		}
+		
+	} else {
+		w.WriteHeader(http.StatusNotFound)
+		LogWarning.Println("Story with uid " + strconv.Itoa(suid) + " does not exist in project " + ActiveProject.Name + ".")
+	}
 }
 
 func EditChapterHandler(w http.ResponseWriter, r *http.Request) {
@@ -380,7 +410,7 @@ func EditChapterHandler(w http.ResponseWriter, r *http.Request) {
 			selectedChapter.Status = newChapter.Status;
 			
 			//Log
-			LogInfo.Println("Section " + selectedChapter.Name.PrimaryName + " of project " + ActiveProject.Name + " was updated.")
+			LogInfo.Println("Chapter " + selectedChapter.Name.PrimaryName + " of project " + ActiveProject.Name + " was updated.")
 		}
 		
 	} else {

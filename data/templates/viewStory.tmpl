@@ -14,9 +14,23 @@
 <script language="javascript">
 
 var currentStoryUID = {{.UID}};
+var chapStatus = {{.Status}};
 
-//Set story list to update on load
-window.onload = updateChapterList;
+var changes = false;
+
+window.onload = initPage;
+
+function initPage(){
+	//Set the chapter status
+	setStatus();
+	
+	//Update the section list
+	updateChapterList();
+
+	//Save changes every second
+	//User shouldn't be editing a lot, so catching their change as quick as possible is good.
+	window.setInterval(saveChanges, 1000);
+}
 
 function addChapterForm(){
 
@@ -39,65 +53,115 @@ function removeChapterForm(){
 	document.getElementById("form_control").style.display = 'none'
 }
 function processChapter(){
-
-var name = MakeName(document.getElementById("form_name").value,false,null);
-var story = MakeChapter(name,0,null);
-
-var xhr = new XMLHttpRequest();
-var url = "/story/" + currentStoryUID + "/new";
-xhr.open("POST", url, true);
-xhr.setRequestHeader("Content-Type", "application/json");
-xhr.onreadystatechange = function () {
-	//if server returns proper, update display
-	if (this.readyState == 4 && this.status == 200){
-		removeChapterForm(); //remove form
-		updateChapterList(); //update Chapter list
-	} else if (this.readyState == 4 && this.status == 500) {
-		//flag error
+	var name = MakeName(document.getElementById("form_name").value,false,null);
+	var story = MakeChapter(name,0,null);
+	
+	var xhr = new XMLHttpRequest();
+	var url = "/story/" + currentStoryUID + "/new";
+	xhr.open("POST", url, true);
+	xhr.setRequestHeader("Content-Type", "application/json");
+	xhr.onreadystatechange = function () {
+		//if server returns proper, update display
+		if (this.readyState == 4 && this.status == 200){
+			removeChapterForm(); //remove form
+			updateChapterList(); //update Chapter list
+		} else if (this.readyState == 4 && this.status == 500) {
+			//flag error
+		}
 	}
-}
-
-xhr.send(JSON.stringify(story));
-
-
+	
+	xhr.send(JSON.stringify(story));
 }
 
 function updateChapterList(){
+	var xhr = new XMLHttpRequest();
+	var url = "/story/" + currentStoryUID + "/list";
+	xhr.open("POST", url, true);
+	xhr.onreadystatechange = function () {
+		//if server returns JSON, update display
+		if (this.readyState === 4 && this.status === 200){
+			//get the char list
+			var storyList = document.getElementById("chapter_list");
+			
+			//blank the existing list
+			storyList.innerHTML = "";
+			
+			//convert json into object
+			var storyListJSON = JSON.parse(this.responseText);
+			
+			if(storyListJSON.Names != null) {
+				//add the chars to the page
+				for (var i = 0; i < storyListJSON.Names.length; i++) {
+					storyList.innerHTML += "<p><a href=\"/story/" + currentStoryUID + "/" + storyListJSON.UIDS[i] + "\">" + storyListJSON.Names[i] + "</a></p>";
+				}
+			}
+			
+		}
+	}
 	
-var xhr = new XMLHttpRequest();
-var url = "/story/" + currentStoryUID + "/list";
-xhr.open("POST", url, true);
-xhr.onreadystatechange = function () {
-	//if server returns JSON, update display
-	if (this.readyState === 4 && this.status === 200){
-		//get the char list
-		var storyList = document.getElementById("chapter_list");
+	xhr.send();
+}
+
+function setStatus(){
+	var statusText = document.getElementById("status_text");
+	statusText.value = chapStatus;
+}
+
+function saveChanges(){
+	//Only save changes if there is actually something to save.
+	if(changes === true){
+		//reset change chapter status
+		changes = false;
 		
-		//blank the existing list
-		storyList.innerHTML = "";
+		//Get and create the name
+		var name = MakeName(document.getElementById("name_text").innerHTML,false,null);
+		//Create a chapter object with the new status and/or name
+		var chapter = MakeStory(name,parseInt(document.getElementById("status_text").value),null);
 		
-		//convert json into object
-		var storyListJSON = JSON.parse(this.responseText);
-		
-		if(storyListJSON.Names != null) {
-			//add the chars to the page
-			for (var i = 0; i < storyListJSON.Names.length; i++) {
-				storyList.innerHTML += "<p><a href=\"/story/" + currentStoryUID + "/" + storyListJSON.UIDS[i] + "\">" + storyListJSON.Names[i] + "</a></p>";
+		var xhr = new XMLHttpRequest();
+		var url = "/story/" + currentStoryUID + "/edit";
+		xhr.open("POST", url, true);
+		xhr.setRequestHeader("Content-Type", "application/json");
+		xhr.onreadystatechange = function () {
+			//if server returns proper, update display
+			if (this.readyState == 4 && this.status == 200){
+				showResponse("Story updated.");
+				setTimeout("hideResponse()",2000);
+			} else if (this.readyState == 4 && this.status == 500) {
+				showResponse("Unable to update.");
+				setTimeout("hideResponse()",2000);
 			}
 		}
 		
+		xhr.send(JSON.stringify(chapter));
+		
 	}
-}
-
-xhr.send();
-
-	
 }
 </script>
 
 {{template "header"}}
 
-<h1>Chapters</h1>
+<div class="response_text" id="response_text"></div>
+
+<h1 id="name_text">{{.Name.PrimaryName}}</h1>
+
+<div class="meta_control">
+	<a href="/story">Return to story list</a>
+</div>
+
+<div class="status_wrap" id="status_wrap">
+	<span class="status_label" >Status: </span>
+	<select class="status_text" id="status_text" onchange="changes=true;" >
+		<option value="0">Not Started</option>
+		<option value="1">In Progress</option>
+		<option value="2">Almost Done</option>
+		<option value="3">Done</option>
+		<option value="4">Unknown</option>
+	</select>
+</div>
+
+<hr>
+<h2>Chapters</h2>
 
 <div class="form_container" id="form_container">
 	<div id="form_new">
