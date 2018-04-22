@@ -139,7 +139,8 @@ func (p *Project) RemoveResNote(uid int) {
 	delete(p.ResNotes, uid)
 }
 
-
+///////////////////////////////////////////////////////////
+//                Save/Load Operations                   //
 ///////////////////////////////////////////////////////////
 
 func LoadProject(project *Project, path string) error {

@@ -9,19 +9,6 @@ import (
 	"html/template"
 )
 
-	/*
-	TODO:
-	-----
-	
-	router.HandleFunc("/story/{storyuid:[0-9]{1,9}}/{chapteruid:[0-9]{1,9}}", testHandler) //Chapter overview
-	router.HandleFunc("/story/{storyuid:[0-9]{1,9}}/{chapteruid:[0-9]{1,9}}/delete", testHandler) //delete chapter
-	router.HandleFunc("/story/{storyuid:[0-9]{1,9}}/{chapteruid:[0-9]{1,9}}/edit", testHandler) //edit chapter
-	
-	router.HandleFunc("/story/{storyuid:[0-9]{1,9}}/{chapteruid:[0-9]{1,9}}/{sectionuid:[0-9]{1,9}}", testHandler) //Section Overview
-	router.HandleFunc("/story/{storyuid:[0-9]{1,9}}/{chapteruid:[0-9]{1,9}}/{sectionuid:[0-9]{1,9}}", testHandler) //delete section
-	router.HandleFunc("/story/{storyuid:[0-9]{1,9}}/{chapteruid:[0-9]{1,9}}/{sectionuid:[0-9]{1,9}}", testHandler) //edit section
-	*/
-
 func NewStoryHandler(w http.ResponseWriter, r *http.Request) {
 	
 	//Print log message

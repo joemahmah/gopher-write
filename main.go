@@ -13,17 +13,24 @@ func main(){
 	//create router
 	router := mux.NewRouter()
 
-	//Add overview pages
+	/////////////////////////
+	//       overview      //
+	/////////////////////////
 	router.HandleFunc("/", testHandler) //Landing page, routes if project open
-	router.HandleFunc("/list", testHandler) //List projects
 	router.HandleFunc("/settings", testHandler) //Program settings
 
-	//Add project io routes
+	/////////////////////////
+	//      project io     //
+	/////////////////////////
 	router.HandleFunc("/project/load/{project:[0-9]{14}.[0-9]{6}}", LoadProjectHandler)
 	router.HandleFunc("/project/save", SaveProjectHandler)
 	router.HandleFunc("/project/new/{project}", NewProjectHandler)
+	router.HandleFunc("/project/list", testHandler) //List projects
 
-	//Add char manip routes
+	
+	/////////////////////////
+	//      char manip     //
+	/////////////////////////
 	router.HandleFunc("/char/new", NewCharHandler) //new char
 	router.HandleFunc("/char/{cid:[0-9]{1,9}}/view", ViewCharHandler) //view char
 	router.HandleFunc("/char/{cid:[0-9]{1,9}}/json", GetJSONCharHandler) //get char json
@@ -31,7 +38,10 @@ func main(){
 	router.HandleFunc("/char/list",ListJSONCharHandler) //Char list json
 	router.HandleFunc("/char", OverviewCharHandler) //Char overview
 
-	//Add story manip routes 
+	
+	/////////////////////////
+	//     story manip     //
+	///////////////////////// 
 		//Story
 	router.HandleFunc("/story/{storyuid:[0-9]{1,9}}", ViewStoryHandler) //Story overview
 	router.HandleFunc("/story/new", NewStoryHandler) //new story
@@ -59,6 +69,18 @@ func main(){
 		//overview
 	router.HandleFunc("/story", OverviewStoryHandler) //Story list
 
+	/////////////////////////
+	//   move operations   //
+	/////////////////////////
+	
+	router.HandleFunc("/move/story/{first:[0-9]{1,9}}/{second:[0-9]{1,9}}", StoryMoveHandler) //Swap story positions
+	router.HandleFunc("/move/chapter/intra/suid:[0-9]{1,9}}/{first:[0-9]{1,9}}/{second:[0-9]{1,9}}", IntraChapterMoveHandler) //swap chapter positions within a story (first in front of second)
+	router.HandleFunc("/move/chapter/inter/fsuid:[0-9]{1,9}}/{first:[0-9]{1,9}}/ssuid:[0-9]{1,9}}/{second:[0-9]{1,9}}", InterChapterMoveHandler) //move chapter positions between stories (first in front of second)
+
+	
+	/////////////////////////
+	//        server       //
+	/////////////////////////
 	http.ListenAndServe(":8080", router)
 }
 
