@@ -120,7 +120,7 @@ function updateChapterList(){
 						
 						storyElem.appendChild(storyElemLink);
 						
-						document.getElementById("story_list").appendChild(storyElem);
+						document.getElementById("chapter_list").appendChild(storyElem);
 					}
 				}
 			}
@@ -176,7 +176,7 @@ function moveStory(first, second){var xhr = new XMLHttpRequest();
 	xhr.open("POST", url, true);
 	xhr.onreadystatechange = function () {
 		if (this.readyState === 4 && this.status === 200){
-			updateStoryList();
+			updateChapterList();
 		} else if(this.readyState === 4 && this.status !== 200){
 			showResponse("There was an error moving the chapter.");
 			setTimeout("hideResponse()",2000);

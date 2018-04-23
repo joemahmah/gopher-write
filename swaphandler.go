@@ -5,6 +5,7 @@ import (
 	"github.com/gorilla/mux"
 	"github.com/joemahmah/gopher-write/story"
 	"strconv"
+	"errors"
 )
 
 /*
@@ -12,6 +13,92 @@ import (
 	router.HandleFunc("/move/chapter/intra/suid:[0-9]{1,9}}/{first:[0-9]{1,9}}/{second:[0-9]{1,9}}", testHandler) //swap chapter positions within a story (first in front of second)
 	router.HandleFunc("/move/chapter/inter/fsuid:[0-9]{1,9}}/{first:[0-9]{1,9}}/ssuid:[0-9]{1,9}}/{second:[0-9]{1,9}}", testHandler) //move chapter positions between stories (first in front of second)
 */
+
+func moveItemInSlice(slice []int, targetIndex int, moveBeforeIndex int) ([]int, error) {
+	if targetIndex == moveBeforeIndex {
+		//Don't do anything, but don't error because
+		//the operation is already done...
+		return slice, nil
+	}
+
+	if targetIndex >= len(slice) {
+		return nil, errors.New("targetIndex out of bounds.")
+	}
+
+	if moveBeforeIndex > len(slice) {
+		return nil, errors.New("moveBeforeIndex out of bounds.")
+	}
+
+	if len(slice) == moveBeforeIndex {
+		left := slice[:targetIndex]
+		var right []int
+
+		//edge case, targetIndex is at right
+		if(targetIndex == len(slice) - 1){
+			//Do noting since nothing is there
+		} else {
+			right = slice[targetIndex+1:]
+		}
+
+		//create new slice (eliminates slice BS)
+		var newSlice []int;
+		newSlice = append(newSlice, left...)
+		newSlice = append(newSlice, right...)
+		newSlice = append(newSlice, slice[targetIndex])
+
+		//set stories to new slice
+		return newSlice, nil
+	} else if (targetIndex < moveBeforeIndex){
+		left := slice[:targetIndex]
+		right := slice[moveBeforeIndex:]
+		between := slice[targetIndex+1:moveBeforeIndex]
+
+		//create new slice (eliminates slice BS)
+		var newSlice []int;
+		newSlice = append(newSlice, left...)
+		newSlice = append(newSlice, between...)
+		newSlice = append(newSlice, slice[targetIndex])
+		newSlice = append(newSlice, right...)
+
+		//set stories to new slice
+		return newSlice, nil
+	} else {
+		left := slice[:moveBeforeIndex]
+		right := slice[targetIndex:]
+		between := slice[moveBeforeIndex:targetIndex]
+
+		//create new slice (eliminates slice BS)
+		var newSlice []int;
+		newSlice = append(newSlice, left...)
+		newSlice = append(newSlice, slice[targetIndex])
+		newSlice = append(newSlice, between...)
+		newSlice = append(newSlice, right...)
+
+		//set stories to new slice
+		return newSlice, nil
+	}
+}
+
+func moveItemFromSlice(slice []int, targetIndex int) (int,[]int,error) {
+	targetAtEnd, err := moveItemInSlice(slice, targetIndex, len(slice))
+
+	if err != nil {
+		return 0, nil, err
+	}
+
+	return targetAtEnd[len(targetAtEnd)-1], targetAtEnd[:len(targetAtEnd)-1], nil
+}
+
+func insertItemIntoSlice(slice []int, item int, moveBeforeIndex int) ([]int, error){
+	appendedSlice := append(slice, item)
+	newSlice, err := moveItemInSlice(appendedSlice, len(appendedSlice)-1, moveBeforeIndex)
+
+	if err != nil {
+		return nil, err
+	}
+
+	return newSlice, nil
+}
 
 func StoryMoveHandler(w http.ResponseWriter, r *http.Request) {
 	
@@ -60,32 +147,32 @@ func StoryMoveHandler(w http.ResponseWriter, r *http.Request) {
 		newStorySlice = append(newStorySlice, between...)
 		newStorySlice = append(newStorySlice, ActiveProject.Stories[firstStoryIndex])
 		newStorySlice = append(newStorySlice, right...)
-		
+
 		//set stories to new slice
 		ActiveProject.Stories = newStorySlice
 	} else {
 		left := ActiveProject.Stories[:secondStoryIndex]
 		right := ActiveProject.Stories[firstStoryIndex:]
 		between := ActiveProject.Stories[secondStoryIndex:firstStoryIndex]
-		
+
 		//create new slice (eliminates slice BS)
 		var newStorySlice []*story.Story;
 		newStorySlice = append(newStorySlice, left...)
 		newStorySlice = append(newStorySlice, ActiveProject.Stories[firstStoryIndex])
 		newStorySlice = append(newStorySlice, between...)
 		newStorySlice = append(newStorySlice, right...)
-		
+
 		//set stories to new slice
 		ActiveProject.Stories = newStorySlice
 	}
-	
+
 	//Recalculate story UID
 	//Note: this is fairly slow, but realistically, there
 	//won't be that many stories that the process is too slow...
 	for index, story := range ActiveProject.Stories {
 		story.UID = index
 	}
-	
+
 	//Write response
 	w.WriteHeader(http.StatusOK)
 
@@ -94,10 +181,37 @@ func StoryMoveHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 func IntraChapterMoveHandler(w http.ResponseWriter, r *http.Request) {
-		
+
+	//Print log message
+	LogNet.Println("Access " + r.URL.Path + " by "+ r.RemoteAddr)
+
+	//Get the story uids
+	firstChapterIndex, _ := strconv.Atoi(mux.Vars(r)["first"])
+	secondChapterIndex, _ := strconv.Atoi(mux.Vars(r)["second"])
+	suid, _ := strconv.Atoi(mux.Vars(r)["suid"])
+
+	if len(ActiveProject.Stories) <= suid {
+		w.WriteHeader(http.StatusInternalServerError)
+		LogError.Println("Story index out of bounds.")
+		return
+	}
+
+	newChapterSlice, err := moveItemInSlice(ActiveProject.Stories[suid].Chapters, firstChapterIndex, secondChapterIndex)
+
+	if err != nil {
+		w.WriteHeader(http.StatusInternalServerError)
+		LogError.Println("Story index out of bounds.")
+		return
+	}
+
+	ActiveProject.Stories[suid].Chapters = newChapterSlice
+
+	w.WriteHeader(http.StatusOK)
+
+	//TODO: log action
 }
 
 func InterChapterMoveHandler(w http.ResponseWriter, r *http.Request) {
-		
+
 }
 
