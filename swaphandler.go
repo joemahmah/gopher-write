@@ -64,7 +64,7 @@ func moveItemInSlice(slice []int, targetIndex int, moveBeforeIndex int) ([]int, 
 		return newSlice, nil
 	} else {
 		left := slice[:moveBeforeIndex]
-		right := slice[targetIndex:]
+		right := slice[targetIndex+1:]
 		between := slice[moveBeforeIndex:targetIndex]
 
 		//create new slice (eliminates slice BS)
@@ -91,9 +91,7 @@ func moveItemFromSlice(slice []int, targetIndex int) (int,[]int,error) {
 
 func insertItemIntoSlice(slice []int, item int, moveBeforeIndex int) ([]int, error){
 	appendedSlice := append(slice, item)
-	LogWarning.Println(appendedSlice)
 	newSlice, err := moveItemInSlice(appendedSlice, len(appendedSlice)-1, moveBeforeIndex)
-	LogWarning.Println(newSlice)
 
 	if err != nil {
 		return nil, err
