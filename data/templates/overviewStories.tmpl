@@ -78,7 +78,7 @@ function updateStoryList(){
 			if(storyListJSON.Names != null) {
 				document.getElementById("story_list").innerHTML = "";
 			
-				//add the chars to the page
+				//add the stories to the page
 				for (var i = 0; i <= storyListJSON.Names.length; i++) {
 					if(i === storyListJSON.Names.length){
 						var storyElem = document.createElement("div");

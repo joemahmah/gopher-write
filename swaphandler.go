@@ -8,12 +8,6 @@ import (
 	"errors"
 )
 
-/*
-	router.HandleFunc("/move/story/{first:[0-9]{1,9}}/{second:[0-9]{1,9}}", testHandler) //Swap story positions
-	router.HandleFunc("/move/chapter/intra/suid:[0-9]{1,9}}/{first:[0-9]{1,9}}/{second:[0-9]{1,9}}", testHandler) //swap chapter positions within a story (first in front of second)
-	router.HandleFunc("/move/chapter/inter/fsuid:[0-9]{1,9}}/{first:[0-9]{1,9}}/ssuid:[0-9]{1,9}}/{second:[0-9]{1,9}}", testHandler) //move chapter positions between stories (first in front of second)
-*/
-
 func moveItemInSlice(slice []int, targetIndex int, moveBeforeIndex int) ([]int, error) {
 	if targetIndex == moveBeforeIndex {
 		//Don't do anything, but don't error because
@@ -152,7 +146,7 @@ func StoryMoveHandler(w http.ResponseWriter, r *http.Request) {
 		ActiveProject.Stories = newStorySlice
 	} else {
 		left := ActiveProject.Stories[:secondStoryIndex]
-		right := ActiveProject.Stories[firstStoryIndex:]
+		right := ActiveProject.Stories[firstStoryIndex+1:]
 		between := ActiveProject.Stories[secondStoryIndex:firstStoryIndex]
 
 		//create new slice (eliminates slice BS)
@@ -175,9 +169,6 @@ func StoryMoveHandler(w http.ResponseWriter, r *http.Request) {
 
 	//Write response
 	w.WriteHeader(http.StatusOK)
-
-	//Log Action
-	LogInfo.Println("Moved story " + ActiveProject.Stories[secondStoryIndex - 1].Name.PrimaryName + " from project " + ActiveProject.Name + ".")
 }
 
 func IntraChapterMoveHandler(w http.ResponseWriter, r *http.Request) {
@@ -207,9 +198,6 @@ func IntraChapterMoveHandler(w http.ResponseWriter, r *http.Request) {
 	ActiveProject.Stories[suid].Chapters = newChapterSlice
 
 	w.WriteHeader(http.StatusOK)
-
-	//TODO: log action
-	LogInfo.Println("Moved chapter " + ActiveProject.Chapters[ActiveProject.Stories[suid].Chapters[secondChapterIndex-1]].Name.PrimaryName + " to index " + strconv.Itoa(secondChapterIndex) + ".")
 }
 
 func InterChapterMoveHandler(w http.ResponseWriter, r *http.Request) {
@@ -253,7 +241,5 @@ func InterChapterMoveHandler(w http.ResponseWriter, r *http.Request) {
 	ActiveProject.Stories[ssuid].Chapters = newSecondChapterSlice
 
 	w.WriteHeader(http.StatusOK)
-
-	//TODO: log action
 }
 
