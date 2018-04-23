@@ -91,7 +91,9 @@ func moveItemFromSlice(slice []int, targetIndex int) (int,[]int,error) {
 
 func insertItemIntoSlice(slice []int, item int, moveBeforeIndex int) ([]int, error){
 	appendedSlice := append(slice, item)
+	LogWarning.Println(appendedSlice)
 	newSlice, err := moveItemInSlice(appendedSlice, len(appendedSlice)-1, moveBeforeIndex)
+	LogWarning.Println(newSlice)
 
 	if err != nil {
 		return nil, err
@@ -200,7 +202,7 @@ func IntraChapterMoveHandler(w http.ResponseWriter, r *http.Request) {
 
 	if err != nil {
 		w.WriteHeader(http.StatusInternalServerError)
-		LogError.Println("Story index out of bounds.")
+		LogError.Println(err)
 		return
 	}
 
@@ -209,9 +211,51 @@ func IntraChapterMoveHandler(w http.ResponseWriter, r *http.Request) {
 	w.WriteHeader(http.StatusOK)
 
 	//TODO: log action
+	LogInfo.Println("Moved chapter " + ActiveProject.Chapters[ActiveProject.Stories[suid].Chapters[secondChapterIndex-1]].Name.PrimaryName + " to index " + strconv.Itoa(secondChapterIndex) + ".")
 }
 
 func InterChapterMoveHandler(w http.ResponseWriter, r *http.Request) {
 
+	//Print log message
+	LogNet.Println("Access " + r.URL.Path + " by "+ r.RemoteAddr)
+
+	//Get the story uids
+	firstChapterIndex, _ := strconv.Atoi(mux.Vars(r)["first"])
+	secondChapterIndex, _ := strconv.Atoi(mux.Vars(r)["second"])
+	fsuid, _ := strconv.Atoi(mux.Vars(r)["fsuid"])
+	ssuid, _ := strconv.Atoi(mux.Vars(r)["ssuid"])
+
+	if len(ActiveProject.Stories) <= fsuid || len(ActiveProject.Stories) <= ssuid {
+		w.WriteHeader(http.StatusInternalServerError)
+		LogError.Println("Story index out of bounds.")
+		return
+	}
+
+	//Make new first chapter slice and get value (remove and get)
+	value, newFirstChapterSlice, err := moveItemFromSlice(ActiveProject.Stories[fsuid].Chapters, firstChapterIndex)
+
+	//Check for errors
+	if err != nil {
+		w.WriteHeader(http.StatusInternalServerError)
+		LogError.Println(err)
+		return
+	}
+
+	//Make new second chapter slice (insert and move)
+	newSecondChapterSlice, err2 := insertItemIntoSlice(ActiveProject.Stories[ssuid].Chapters, value, secondChapterIndex)
+
+	//Check for errors
+	if err2 != nil {
+		w.WriteHeader(http.StatusInternalServerError)
+		LogError.Println(err2)
+		return
+	}
+
+	ActiveProject.Stories[fsuid].Chapters = newFirstChapterSlice
+	ActiveProject.Stories[ssuid].Chapters = newSecondChapterSlice
+
+	w.WriteHeader(http.StatusOK)
+
+	//TODO: log action
 }
 
