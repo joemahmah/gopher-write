@@ -19,7 +19,12 @@ var currentSectionUID = {{index .UIDS 2}};
 var sectStatus = {{.Section.Status}};
 
 var changes = false;
+
 var characters = {{.Section.Characters}};
+var charactersToAdd = [];
+
+var locations = {{.Section.Locations}};
+var locationsToAdd = [];
 
 window.onload = initPage;
 
@@ -132,13 +137,34 @@ function addToCharacters(e){
 		charuid = parseInt(e.target.getAttribute("data-character-uid"));	
 	}
 
+	//Set page to look like added
 	e.target.classList.add("ui_modal_list_elem_faded");
 	e.target.removeEventListener("dblclick", addToCharacters);
+	
+	//Add local
 	characters.push(charuid);
 
-	//flag change; update
-	changes = true;
-	saveChanges();
+	//Update ui
+	updateCharacterList();
+	
+	//Try to add remote
+	var xhr = new XMLHttpRequest();
+	var url = "/story/" + currentStoryUID + "/" + currentChapterUID + "/" + currentSectionUID + "/edit/addchar/" + charuid;
+	xhr.open("POST", url, true);
+	xhr.setRequestHeader("Content-Type", "text/plain");
+	xhr.onreadystatechange = function () {
+		if (this.readyState == 4 && this.status === 200){
+			showResponse("Character added to section.");
+			setTimeout("hideResponse()",2000);
+		} else if (this.readyState == 4 && this.status !== 200) {
+			//If unable to add
+			charactersToAdd.push(charuid); //Add to cache to try again on next save
+			showResponse("Unable to add character to section. Will try again on next save.");
+			setTimeout("hideResponse()",2000);
+		}
+	}
+	
+	xhr.send();
 }
 
 function populateCharacterAddModal(){
@@ -147,7 +173,6 @@ function populateCharacterAddModal(){
 		setTimeout(populateCharacterAddModal,50);
 		return;
 	}
-
 	
 	//get the char list
 	var modalList = document.getElementById("character_modal_list");
@@ -240,9 +265,9 @@ function populateCharacterAddModal(){
 	<div id="character_modal_list">
 		
 	</div>
+	<br>
 	<div class="ui_modal_control">
-			<span class="form_make_button" onclick="addCharacterToSection()">Confirm</span>
-			<span class="form_make_button" onclick='HideModal("character_modal")'>Cancel</span>
+			<span class="form_make_button form_make_button_big form_make_button_round form_make_button_right" onclick='HideModal("character_modal")'>Close</span>
 	</div>
 </div>
 </div>
