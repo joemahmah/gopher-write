@@ -21,3 +21,15 @@ func (c *Chapter) SwapSections(first int, second int) error{
 	c.Sections[first], c.Sections[second] = c.Sections[second], c.Sections[first]
 	return nil
 }
+
+///////////////////////////////////////////////////////////
+//                  Getting Operations                   //
+///////////////////////////////////////////////////////////
+
+func (c *Chapter) GetSectionId(reluid int) (int, error) {
+	if reluid >= len(c.Sections){
+		return -1, errors.New("Section uid out of bounds.")
+	}
+	
+	return c.Sections[reluid], nil
+}

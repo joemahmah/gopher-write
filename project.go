@@ -8,6 +8,7 @@ import (
 	"encoding/json"
 	"os"
 	"bufio"
+	"errors"
 )
 
 var ActiveProject *Project = MakeProject("","")
@@ -137,6 +138,60 @@ func (p *Project) AddResNote(note *resources.Note) {
 
 func (p *Project) RemoveResNote(uid int) {
 	delete(p.ResNotes, uid)
+}
+
+///////////////////////////////////////////////////////////
+//                  Getting Operations                   //
+///////////////////////////////////////////////////////////
+
+func (p *Project) GetStory(suid int) (*story.Story, error) {
+	if suid >= len(p.Stories){
+		return nil, errors.New("Story uid out of bounds.")
+	}
+	
+	return p.Stories[suid], nil
+}
+
+func (p *Project) GetChapter(suid int, cuidRel int) (*story.Chapter, error) {
+	story, err := p.GetStory(suid)
+	
+	if err != nil {
+		return nil, err
+	}
+	
+	cuid, err := story.GetChapterId(cuidRel)
+	
+	if err != nil {
+		return nil, err
+	}
+	
+	if chapter, exists := ActiveProject.Chapters[cuid]; exists {
+		return chapter, nil
+	} else {
+		return nil, errors.New("Chapter does not exist.")
+	
+	}
+}
+
+func (p *Project) GetSection(suid int, cuidRel int, seuidRel int) (*story.Section, error) {
+	chapter, err := p.GetChapter(suid, cuidRel)
+	
+	if err != nil {
+		return nil, err
+	}
+	
+	seuid, err := chapter.GetSectionId(seuidRel)
+	
+	if err != nil {
+		return nil, err
+	}
+	
+	if section, exists := ActiveProject.Sections[seuid]; exists {
+		return section, nil
+	} else {
+		return nil, errors.New("Section does not exist.")
+	
+	}
 }
 
 ///////////////////////////////////////////////////////////

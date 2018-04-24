@@ -14,4 +14,3 @@ type Section struct {
 	Locations	[]int
 	Note		string
 }
-

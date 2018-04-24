@@ -15,21 +15,21 @@ func EditSectionAddCharHandler(w http.ResponseWriter, r *http.Request){
 	cuidRel, _ := strconv.Atoi(mux.Vars(r)["chapteruid"])
 	seuidRel, _ := strconv.Atoi(mux.Vars(r)["sectionuid"])
 
-	//calc uids from relative uids
-	cuid := ActiveProject.Stories[suid].Chapters[cuidRel]
-	seuid := ActiveProject.Chapters[cuid].Sections[seuidRel]
-
+	//Get the id of the character to be added
 	newChar, _ := strconv.Atoi(mux.Vars(r)["charid"])
 
-	if _, exists := ActiveProject.Characters[newChar]; exists {
-
-		if selectedSection, exists := ActiveProject.Sections[seuid]; exists {
-			w.WriteHeader(http.StatusOK)
-
-			selectedSection.Characters = append(selectedSection.Characters, newChar)
-		}
-	} else {
+	//Get the section
+	section, err := ActiveProject.GetSection(suid, cuidRel, seuidRel)
+	
+	if err != nil {
 		w.WriteHeader(http.StatusNotFound)
-		LogWarning.Println("Character with uid " + strconv.Itoa(newChar) + " does not exist.")
+		LogWarning.Println(err)
+	} else {
+		//Send ok
+		w.WriteHeader(http.StatusOK)
+
+		//Add character
+		section.Characters = append(section.Characters, newChar)
+	
 	}
 }

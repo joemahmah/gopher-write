@@ -34,3 +34,16 @@ func (s *Story) SwapSectionBetweenChapters(chap1 int, chap2 int, sec1 int, sec2 
 	//s.Chapters[chap1].Sections[sec1], s.Chapters[chap2].Sections[sec2] = s.Chapters[chap2].Sections[sec2], s.Chapters[chap1].Sections[sec1]
 	return nil
 }
+
+
+///////////////////////////////////////////////////////////
+//                  Getting Operations                   //
+///////////////////////////////////////////////////////////
+
+func (s *Story) GetChapterId(reluid int) (int, error) {
+	if reluid >= len(s.Chapters){
+		return -1, errors.New("Chapter uid out of bounds.")
+	}
+	
+	return s.Chapters[reluid], nil
+}
