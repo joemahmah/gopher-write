@@ -19,13 +19,19 @@ var currentSectionUID = {{index .UIDS 2}};
 var sectStatus = {{.Section.Status}};
 
 var changes = false;
+var characters = {{.Section.Characters}};
 
 window.onload = initPage;
 
 function initPage(){
 	//Set the sectStatus
 	setStatus();
-
+	
+	PopulateCharacterList();
+	
+	//Update character list
+	updateCharacterList()
+	
 	//Save changes every 30 seconds
 	window.setInterval(saveChanges, 30 * 1000);
 }
@@ -64,6 +70,47 @@ function saveChanges(){
 	}
 }
 
+function updateCharacterList(){
+
+	if(CharacterList === null) {
+		setTimeout(updateCharacterList,50);
+	}
+
+	for(var i=0; i < characters.length; i++){
+		var currentChar = GetCharacter(characters[i]);
+		
+		//if character doesn't exist/was deleted
+		if(currentChar === null){
+			
+		} else {
+			//TODO: make popup w/ more info on hover
+			var storyElem = document.createElement("div");
+			storyElem.className = "aux_list_elem";
+			
+			var storyElemLink = document.createElement("span");
+			storyElemLink.innerHTML = currentChar.name;
+			
+			storyElem.appendChild(storyElemLink);
+			
+			document.getElementById("character_list").appendChild(storyElem);
+		}
+	}
+}
+
+function addCharacterToSectionForm(){
+
+}
+
+function toggleCharacterVisability(){
+	if(document.getElementById("character_list_control").style.display == "grid"){
+		document.getElementById("character_list_control").style.display = "none";
+		document.getElementById("character_list").style.display = "none";
+	} else {
+		document.getElementById("character_list_control").style.display = "grid";
+		document.getElementById("character_list").style.display = "flex";
+	}
+}
+
 </script>
 
 {{template "header"}}
@@ -90,6 +137,34 @@ function saveChanges(){
 		<span class="button_control" onclick="saveChanges();">Save</span>
 	</div>
 	<textarea id="text_textarea" onchange="changes=true;">{{.Section.Text}}</textarea>
+</div>
+
+<div class="ui_grid">
+<div class="aux_list_wrap">
+	<div class="aux_list_header" onclick="toggleCharacterVisability()">
+		<h3>Characters</h3>
+	</div>
+	<div class="aux_list_control" id="character_list_control">
+		<span id="character_list_control_add" class="form_make_button" onclick="addCharacterToSectionForm()">Add Character</span>
+		<span id="character_list_control_add" class="form_make_button" onclick="addCharacterToSection()">Confirm</span>
+		<span id="character_list_control_add" class="form_make_button" onclick="removeCharacterToSectionForm()">Cancel</span>
+	</div>
+	<div class="aux_list" id="character_list">
+	
+	</div>
+</div>
+
+<div class="aux_list_wrap">
+	<div class="aux_list_header" onclick="">
+		<h3>Locations</h3>
+	</div>
+</div>
+
+<div class="aux_list_wrap">
+	<div class="aux_list_header" onclick="">
+		<h3>Notes</h3>
+	</div>
+</div>
 </div>
 
 </body>

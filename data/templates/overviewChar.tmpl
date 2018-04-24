@@ -128,8 +128,6 @@ function processChar(){
 }
 
 function updateCharList(){
-	var charList = document.getElementById("char_list");
-		
 	var xhr = new XMLHttpRequest();
 	var url = "/char/list";
 	xhr.open("POST", url, true);

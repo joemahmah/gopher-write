@@ -5,10 +5,13 @@ import (
 )
 
 type Section struct {
-	UID		int
+	UID			int
 
-	Name	common.Name
-	Text	string
-	Status	common.Status
+	Name		common.Name
+	Text		string
+	Status		common.Status
+	Characters	[]int
+	Locations	[]int
+	Note		string
 }
 

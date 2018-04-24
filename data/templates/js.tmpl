@@ -154,6 +154,49 @@ function MakeCharacter(name, description, age, aliases){
 
 }
 
+var CharacterList = null;
+
+function PopulateCharacterList(){
+	
+	CharacterList = null;
+	
+	var xhr = new XMLHttpRequest();
+	var url = "/char/list";
+	xhr.open("POST", url, true);
+	xhr.onreadystatechange = function () {
+		//if server returns JSON, update display
+		if (this.readyState == 4 && this.status === 200){
+			
+			CharacterList = new Map();
+			
+			//convert json into object
+			var response = JSON.parse(this.responseText);
+			
+			if(response.Names != null) {
+				//add the chars to the page
+				for (var i = 0; i < response.Names.length; i++) {
+					CharacterList.set(response.UIDS[i], {uid:response.UIDS[i], name:response.Names[i]})
+				}
+			}
+		}
+	}
+	
+	xhr.send();	
+}
+
+function GetCharacter(id){
+	if(CharacterList === null){
+		return null;
+	}
+	
+	//if exists
+	if(CharacterList.has(id)){
+		return CharacterList.get(id);
+	} else {
+		return null;
+	}
+}
+
 //
 //Story
 //
