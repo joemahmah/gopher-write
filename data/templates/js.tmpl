@@ -225,15 +225,32 @@ function GetCharacter(id){
 //
 //Story
 //
-function Section(UID, Name, Text, Status){
+function Section(UID, Name, Text, Status, Characters, Locations, Note){
 	this.UID = UID;
 	this.Name = Name;
 	this.Text = Text;
 	this.Status = Status;
+	this.Characters = Characters;
+	this.Locations = Locations;
+	this.Note = Note;
 }
 
-function MakeSection(name, text, stat){
-	return new Section(0, name, text, stat);
+function MakeSection(name, text, stat, chars, locs, note){
+	var sect = new Section(0, name, text, 0, [], [], "");
+
+	if(typeof stat !== "undefined"){
+		sect.Status = stat;
+	}
+	if(typeof chars !== "undefined"){
+		sect.Characters = chars;
+	}
+	if(typeof locs !== "undefined"){
+		sect.Locations = locs;
+	}
+	if(typeof note !== "undefined"){
+		sect.Note = note;
+	}
+
 }
 
 function Chapter(UID, Name, Sections, Status){

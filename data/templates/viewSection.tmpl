@@ -49,7 +49,10 @@ function saveChanges(){
 		changes = false;
 		
 		var name = MakeName(document.getElementById("name_text").innerHTML,false,null);
-		var section = MakeSection(name,document.getElementById("text_textarea").value,parseInt(document.getElementById("status_text").value));
+
+		var text = document.getElementById("text_textarea").value;
+		var stat = parseInt(document.getElementById("status_text").value);
+		var section = MakeSection(name,stat,stat,characters);
 		
 		var xhr = new XMLHttpRequest();
 		var url = "/story/" + currentStoryUID + "/" + currentChapterUID + "/" + currentSectionUID + "/edit";
@@ -116,10 +119,26 @@ function toggleCharacterVisability(){
 }
 
 function addToCharacters(e){
-	var charuid = e.target.getAttribute("data-character-uid");
+
+	if(e.stopPropagation !== "undefined"){
+		e.stopPropagation();
+	}
+
+	var charuid = parseInt(e.target.getAttribute("data-character-uid"));
+	var target = e.target;
+
+	while(isNaN(charuid)){
+		target = target.parentNode;
+		charuid = parseInt(e.target.getAttribute("data-character-uid"));	
+	}
+
 	e.target.classList.add("ui_modal_list_elem_faded");
-	e.target.removeEventListener("dblclick", addToCharacters)
+	e.target.removeEventListener("dblclick", addToCharacters);
 	characters.push(charuid);
+
+	//flag change; update
+	changes = true;
+	saveChanges();
 }
 
 function populateCharacterAddModal(){

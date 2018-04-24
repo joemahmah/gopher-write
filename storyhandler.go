@@ -435,10 +435,13 @@ func EditSectionHandler(w http.ResponseWriter, r *http.Request) {
 		} else {
 			w.WriteHeader(http.StatusOK)
 			
-			selectedSection.Name = newSection.Name;
-			selectedSection.Status = newSection.Status;
-			selectedSection.Text = newSection.Text;
-			
+			selectedSection.Name = newSection.Name
+			selectedSection.Status = newSection.Status
+			selectedSection.Text = newSection.Text
+			selectedSection.Characters = newSection.Characters
+			selectedSection.Locations = newSection.Locations
+			selectedSection.Note = newSection.Note
+
 			//Log
 			LogInfo.Println("Section " + selectedSection.Name.PrimaryName + " of project " + ActiveProject.Name + " was updated.")
 		}
