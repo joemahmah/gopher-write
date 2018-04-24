@@ -73,9 +73,10 @@ func main(){
 	//   move operations   //
 	/////////////////////////
 	
-	router.HandleFunc("/move/story/{first:[0-9]{1,9}}/{second:[0-9]{1,9}}", StoryMoveHandler) //Swap story positions
-	router.HandleFunc("/move/chapter/intra/{suid:[0-9]{1,9}}/{first:[0-9]{1,9}}/{second:[0-9]{1,9}}", IntraChapterMoveHandler) //swap chapter positions within a story (first in front of second)
+	router.HandleFunc("/move/story/{first:[0-9]{1,9}}/{second:[0-9]{1,9}}", StoryMoveHandler) //move story positions
+	router.HandleFunc("/move/chapter/intra/{suid:[0-9]{1,9}}/{first:[0-9]{1,9}}/{second:[0-9]{1,9}}", IntraChapterMoveHandler) //move chapter positions within a story (first in front of second)
 	router.HandleFunc("/move/chapter/inter/{fsuid:[0-9]{1,9}}/{first:[0-9]{1,9}}/{ssuid:[0-9]{1,9}}/{second:[0-9]{1,9}}", InterChapterMoveHandler) //move chapter positions between stories (first in front of second)
+	router.HandleFunc("/move/section/intra/{suid:[0-9]{1,9}}/{cuid:[0-9]{1,9}}/{first:[0-9]{1,9}}/{second:[0-9]{1,9}}", IntraSectionMoveHandler) //move section positions within a chapter (first in front of second)
 
 	
 	/////////////////////////

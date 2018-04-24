@@ -40,7 +40,8 @@ function addChapterForm(){
 		form = MakeForm("chapter_form");
 	}
 	
-	form.innerHTML=form.innerHTML + "Name:<br><input id=\"form_name\" type=\"text\" onkeypress=\"ConsumeEnterKeyEvent();\"><br>";
+	form.innerHTML=form.innerHTML + "Name:<br><input id=\"form_name\" type=\"text\" onkeypress=\"ConsumeEnterKeyEvent(event);\"><br>";
+	
 	
 	document.getElementById("form_new").style.display = 'none'
 	document.getElementById("form_control").style.display = 'block'
@@ -166,7 +167,6 @@ function saveChanges(){
 		
 	}
 }
-
 
 function moveStory(first, second){var xhr = new XMLHttpRequest();
 	//save to prevent data loss.

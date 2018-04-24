@@ -243,3 +243,41 @@ func InterChapterMoveHandler(w http.ResponseWriter, r *http.Request) {
 	w.WriteHeader(http.StatusOK)
 }
 
+func IntraSectionMoveHandler(w http.ResponseWriter, r *http.Request) {
+
+	//Print log message
+	LogNet.Println("Access " + r.URL.Path + " by "+ r.RemoteAddr)
+
+	//Get the story uids
+	firstSectionIndex, _ := strconv.Atoi(mux.Vars(r)["first"])
+	secondSectionIndex, _ := strconv.Atoi(mux.Vars(r)["second"])
+	suid, _ := strconv.Atoi(mux.Vars(r)["suid"])
+	cuidRel, _ := strconv.Atoi(mux.Vars(r)["cuid"])
+	
+	//Process relative uids
+	cuid := ActiveProject.Stories[suid].Chapters[cuidRel]
+
+	if len(ActiveProject.Stories) <= suid {
+		w.WriteHeader(http.StatusInternalServerError)
+		LogError.Println("Story index out of bounds.")
+		return
+	}
+	
+	if selectedChapter, exists := ActiveProject.Chapters[cuid]; exists {
+	
+		newChapterSlice, err := moveItemInSlice(selectedChapter.Sections, firstSectionIndex, secondSectionIndex)
+	
+		if err != nil {
+			w.WriteHeader(http.StatusInternalServerError)
+			LogError.Println(err)
+			return
+		}
+	
+		selectedChapter.Sections = newChapterSlice
+	
+		w.WriteHeader(http.StatusOK)
+	} else {
+		w.WriteHeader(http.StatusNotFound)
+		LogWarning.Println("Chapter with uid " + strconv.Itoa(cuid) + " does not exist in project " + ActiveProject.Name + ".")
+	}
+}

@@ -41,7 +41,7 @@ function addSectionForm(){
 		form = MakeForm("section_form");
 	}
 	
-	form.innerHTML=form.innerHTML + "Name:<br><input id=\"form_name\" type=\"text\" onkeypress=\"ConsumeEnterKeyEvent();\"><br>";
+	form.innerHTML=form.innerHTML + "Name:<br><input id=\"form_name\" type=\"text\" onkeypress=\"ConsumeEnterKeyEvent(event);\"><br>";
 	
 	document.getElementById("form_new").style.display = 'none'
 	document.getElementById("form_control").style.display = 'block'
@@ -94,9 +94,39 @@ function updateSectionList(){
 			var storyListJSON = JSON.parse(this.responseText);
 			
 			if(storyListJSON.Names != null) {
-				//add the chars to the page
-				for (var i = 0; i < storyListJSON.Names.length; i++) {
-					sectionList.innerHTML += "<p><a href=\"/story/" + currentStoryUID + "/" + currentChapterUID + "/" + storyListJSON.UIDS[i] + "\">" + storyListJSON.Names[i] + "</a></p>";
+				//add the sections to the page
+				for (var i = 0; i <= storyListJSON.Names.length; i++){ 
+					if(i === storyListJSON.Names.length){
+						var storyElem = document.createElement("div");
+						storyElem.className = "list_elem list_elem_ghost";
+						storyElem.setAttribute("data-story-uid",currentStoryUID);
+						storyElem.setAttribute("data-chapter-uid",currentChapterUID);
+						storyElem.setAttribute("data-section-uid",i);
+						storyElem.setAttribute("draggable","false");
+						storyElem.addEventListener("drop",dropListElement);
+						storyElem.addEventListener("dragover",allowDragListElement);
+						
+						document.getElementById("section_list").appendChild(storyElem);
+					} else {
+						var storyElem = document.createElement("div");
+						storyElem.className = "list_elem";
+						storyElem.setAttribute("data-story-uid",currentStoryUID);
+						storyElem.setAttribute("data-chapter-uid",currentChapterUID);
+						storyElem.setAttribute("data-section-uid",storyListJSON.UIDS[i]);
+						storyElem.setAttribute("draggable","true");
+						storyElem.addEventListener("drop",dropListElement);
+						storyElem.addEventListener("dragover",allowDragListElement);
+						storyElem.addEventListener("dragstart",dragListElement);
+						storyElem.addEventListener("dblclick",linkListElement);
+						
+						var storyElemLink = document.createElement("span");
+						storyElem.setAttribute("draggable","true");
+						storyElemLink.innerHTML = storyListJSON.Names[i];
+						
+						storyElem.appendChild(storyElemLink);
+						
+						document.getElementById("section_list").appendChild(storyElem);
+					}
 				}
 			}
 			
@@ -144,6 +174,70 @@ function saveChanges(){
 		xhr.send(JSON.stringify(chapter));
 		
 	}
+}
+
+function moveSection(first, second){var xhr = new XMLHttpRequest();
+	//save to prevent data loss.
+	saveChanges();
+
+	var url = "/move/section/intra/" + currentStoryUID + "/" + currentChapterUID + "/" + first + "/" + second;
+	xhr.open("POST", url, true);
+	xhr.onreadystatechange = function () {
+		if (this.readyState === 4 && this.status === 200){
+			updateSectionList();
+		} else if(this.readyState === 4 && this.status !== 200){
+			showResponse("There was an error moving the section.");
+			setTimeout("hideResponse()",2000);
+		}
+	}
+	
+	xhr.send();
+}
+
+function linkListElement(e){
+	var suid = e.target.getAttribute("data-story-uid");
+	var cuid = e.target.getAttribute("data-chapter-uid");
+	var seuid = e.target.getAttribute("data-section-uid");
+	location.href = "/story/" + suid + "/" + cuid + "/" + seuid;
+}
+
+function dropListElement(e){
+	e.preventDefault();
+	
+	if(e.stopPropagation !== "undefined"){
+		e.stopPropagation();
+	}
+	
+	var firstID = parseInt(e.dataTransfer.getData("text"));
+	var secondID = parseInt(e.target.getAttribute("data-section-uid"));
+	
+	var target = e.target;
+	
+	while(isNaN(secondID)){
+		target = target.parentNode
+		secondID = parseInt(target.getAttribute("data-section-uid"));
+	}
+	
+	if(firstID !== secondID){
+		moveSection(firstID, secondID);
+	}
+}
+
+function dragListElement(e){
+	var storyUID = e.target.getAttribute("data-section-uid");
+	
+	var target = e.target;
+	
+	while(storyUID === null){
+		target = target.parentNode
+		storyUID = parseInt(target.getAttribute("data-section-uid"));
+	}
+	
+	e.dataTransfer.setData("text", storyUID);
+}
+
+function allowDragListElement(e){
+	e.preventDefault();
 }
 
 </script>
