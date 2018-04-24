@@ -1,6 +1,7 @@
 package common
 
-type Status int8
+//Status is an alias for int
+type Status = int
 
 const (
 	StatusNotStarted Status = iota
