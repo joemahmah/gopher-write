@@ -30,7 +30,8 @@ function initPage(){
 	PopulateCharacterList();
 	
 	//Update character list
-	updateCharacterList()
+	updateCharacterList();
+	populateCharacterAddModal();
 	
 	//Save changes every 30 seconds
 	window.setInterval(saveChanges, 30 * 1000);
@@ -76,6 +77,13 @@ function updateCharacterList(){
 		setTimeout(updateCharacterList,50);
 	}
 
+	
+	//get the char list
+	var characterList = document.getElementById("character_list");
+	
+	//blank the existing list
+	characterList.innerHTML = "";
+	
 	for(var i=0; i < characters.length; i++){
 		var currentChar = GetCharacter(characters[i]);
 		
@@ -92,13 +100,9 @@ function updateCharacterList(){
 			
 			storyElem.appendChild(storyElemLink);
 			
-			document.getElementById("character_list").appendChild(storyElem);
+			characterList.appendChild(storyElem);
 		}
 	}
-}
-
-function addCharacterToSectionForm(){
-
 }
 
 function toggleCharacterVisability(){
@@ -108,6 +112,51 @@ function toggleCharacterVisability(){
 	} else {
 		document.getElementById("character_list_control").style.display = "grid";
 		document.getElementById("character_list").style.display = "flex";
+	}
+}
+
+function addToCharacters(e){
+	var charuid = e.target.getAttribute("data-character-uid");
+	e.target.classList.add("ui_modal_list_elem_faded");
+	e.target.removeEventListener("dblclick", addToCharacters)
+	characters.push(charuid);
+}
+
+function populateCharacterAddModal(){
+
+	if(CharacterList === null) {
+		setTimeout(populateCharacterAddModal,50);
+		return;
+	}
+
+	
+	//get the char list
+	var modalList = document.getElementById("character_modal_list");
+	
+	//blank the existing list
+	modalList.innerHTML = "";
+	
+	//loop through all characters and populate modal
+	for(var currentChar of CharacterList.values()){
+		//TODO: make popup w/ more info on hover
+		var storyElem = document.createElement("div");
+		storyElem.className = "ui_modal_list_elem";
+		storyElem.setAttribute("data-character-uid",currentChar.uid);
+		
+		//if char alread member
+		if(characters.indexOf(currentChar.uid) === -1){
+			storyElem.addEventListener("dblclick", addToCharacters);
+		} else  {
+			storyElem.classList.add("ui_modal_list_elem_faded")
+		}
+		
+		var storyElemLink = document.createElement("span");
+		storyElemLink.innerHTML = currentChar.name;
+		
+		storyElem.appendChild(storyElemLink);
+		
+		modalList.appendChild(storyElem);
+		
 	}
 }
 
@@ -145,9 +194,7 @@ function toggleCharacterVisability(){
 		<h3>Characters</h3>
 	</div>
 	<div class="aux_list_control" id="character_list_control">
-		<span id="character_list_control_add" class="form_make_button" onclick="addCharacterToSectionForm()">Add Character</span>
-		<span id="character_list_control_add" class="form_make_button" onclick="addCharacterToSection()">Confirm</span>
-		<span id="character_list_control_add" class="form_make_button" onclick="removeCharacterToSectionForm()">Cancel</span>
+		<span id="character_list_control_add" class="form_make_button" onclick='DisplayModal("character_modal")'>Add Character</span>
 	</div>
 	<div class="aux_list" id="character_list">
 	
@@ -163,6 +210,20 @@ function toggleCharacterVisability(){
 <div class="aux_list_wrap">
 	<div class="aux_list_header" onclick="">
 		<h3>Notes</h3>
+	</div>
+</div>
+</div>
+
+
+
+<div class="ui_modal" id="character_modal">
+<div class="ui_modal_content">
+	<div id="character_modal_list">
+		
+	</div>
+	<div class="ui_modal_control">
+			<span class="form_make_button" onclick="addCharacterToSection()">Confirm</span>
+			<span class="form_make_button" onclick='HideModal("character_modal")'>Cancel</span>
 	</div>
 </div>
 </div>

@@ -82,6 +82,31 @@ function ConsumeEnterKeyEvent(e){
 	}
 }
 
+function DisplayModal(id){
+	var modal = document.getElementById(id);
+	
+	modal.style.display = "block";
+	
+	//Make so clicking on back area closes
+	window.onclick = function(e){
+		if(typeof e.stopPropagation !== "undefined"){
+			e.stopPropagation()
+		}
+		
+		if(e.target === document.getElementById(id)){
+			HideModal(id);
+		}
+	};
+}
+
+function HideModal(id){
+	var modal = document.getElementById(id);
+	
+	window.onclick = null;
+	
+	modal.style.display = "none";
+}
+
 //
 //Common
 //
