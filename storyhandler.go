@@ -318,33 +318,29 @@ func EditStoryHandler(w http.ResponseWriter, r *http.Request) {
 
 	//Make new story
 	newStory := &story.Story{}
-	
+
 	//Get the story UID
-	suid, err := strconv.Atoi(mux.Vars(r)["storyuid"])
-	
-	//check if exists
-	if suid < len(ActiveProject.Stories) {
-		selectedStory := ActiveProject.Stories[suid]
-	
-		//Decode the request
-		err = json.NewDecoder(r.Body).Decode(newStory)
-		
-		if err != nil {
-			w.WriteHeader(http.StatusInternalServerError)
-			LogError.Println(err)
-		} else {
-			w.WriteHeader(http.StatusOK)
-			
-			selectedStory.Name = newStory.Name;
-			selectedStory.Status = newStory.Status;
-			
-			//Log
-			LogInfo.Println("Story " + selectedStory.Name.PrimaryName + " of project " + ActiveProject.Name + " was updated.")
-		}
-		
-	} else {
+	suid, _ := strconv.Atoi(mux.Vars(r)["storyuid"])
+
+	selectedStory, err := ActiveProject.GetStory(suid)
+
+	if err != nil {
 		w.WriteHeader(http.StatusNotFound)
-		LogWarning.Println("Story with uid " + strconv.Itoa(suid) + " does not exist in project " + ActiveProject.Name + ".")
+		LogWarning.Println(err)
+		return
+	}
+
+	//Decode the request
+	err = json.NewDecoder(r.Body).Decode(newStory)
+
+	if err != nil {
+		w.WriteHeader(http.StatusInternalServerError)
+		LogError.Println(err)
+	} else {
+		w.WriteHeader(http.StatusOK)
+
+		selectedStory.Name = newStory.Name;
+		selectedStory.Status = newStory.Status;
 	}
 }
 
@@ -355,36 +351,27 @@ func EditChapterHandler(w http.ResponseWriter, r *http.Request) {
 
 	//Make new chapter
 	newChapter := &story.Chapter{}
-	
+
 	//Get the selectedChapter UID
 	suid, err := strconv.Atoi(mux.Vars(r)["storyuid"])
 	cuidRel, err := strconv.Atoi(mux.Vars(r)["chapteruid"])
-	
-	//Calc project CUID from relative CUID
-	cuid := ActiveProject.Stories[suid].Chapters[cuidRel]
-	
-	//check if exists
-	if selectedChapter, exists := ActiveProject.Chapters[cuid]; exists {
-	
-		//Decode the request
-		err = json.NewDecoder(r.Body).Decode(newChapter)
-		
-		if err != nil {
-			w.WriteHeader(http.StatusInternalServerError)
-			LogError.Println(err)
-		} else {
-			w.WriteHeader(http.StatusOK)
-			
-			selectedChapter.Name = newChapter.Name;
-			selectedChapter.Status = newChapter.Status;
-			
-			//Log
-			LogInfo.Println("Chapter " + selectedChapter.Name.PrimaryName + " of project " + ActiveProject.Name + " was updated.")
-		}
-		
+
+	selectedChapter, err := ActiveProject.GetChapter(suid, cuidRel)
+
+	//Decode the request
+	err = json.NewDecoder(r.Body).Decode(newChapter)
+
+	if err != nil {
+		w.WriteHeader(http.StatusInternalServerError)
+		LogError.Println(err)
 	} else {
-		w.WriteHeader(http.StatusNotFound)
-		LogWarning.Println("Chapter with uid " + strconv.Itoa(cuid) + " does not exist in project " + ActiveProject.Name + ".")
+		w.WriteHeader(http.StatusOK)
+
+		selectedChapter.Name = newChapter.Name;
+		selectedChapter.Status = newChapter.Status;
+
+		//Log
+		LogInfo.Println("Chapter " + selectedChapter.Name.PrimaryName + " of project " + ActiveProject.Name + " was updated.")
 	}
 }
 
