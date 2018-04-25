@@ -16,7 +16,9 @@
 var currentStoryUID = {{index .UIDS 0}};
 var currentChapterUID = {{index .UIDS 1}};
 var currentSectionUID = {{index .UIDS 2}};
+
 var sectStatus = {{.Section.Status}};
+var newStatus = null;
 
 var changes = false;
 
@@ -160,7 +162,7 @@ function addToCharacters(e){
 			//If unable to add
 			charactersToAdd.push(charuid); //Add to cache to try again on next save
 			showResponse("Unable to add character to section. Will try again on next save.");
-			setTimeout("hideResponse()",2000);
+			setTimeout("hideResponse()",5000);
 		}
 	}
 	
@@ -204,6 +206,30 @@ function populateCharacterAddModal(){
 	}
 }
 
+function updateStatus(){
+
+	var stat = parseInt(document.getElementById("status_text").value);
+
+	//Try to add remote
+	var xhr = new XMLHttpRequest();
+	var url = "/story/" + currentStoryUID + "/" + currentChapterUID + "/" + currentSectionUID + "/edit/status/" + stat;
+	xhr.open("POST", url, true);
+	xhr.setRequestHeader("Content-Type", "text/plain");
+	xhr.onreadystatechange = function () {
+		if (this.readyState == 4 && this.status === 200){
+			showResponse("Status updated.");
+			setTimeout("hideResponse()",2000);
+		} else if (this.readyState == 4 && this.status !== 200) {
+			//If unable to add
+			newStatus = stat; //Add to cache to try again on next save
+			showResponse("Unable to update status. Will try again on next save.");
+			setTimeout("hideResponse()",5000);
+		}
+	}
+	
+	xhr.send();
+}
+
 </script>
 
 {{template "header"}}
@@ -216,7 +242,7 @@ function populateCharacterAddModal(){
 
 <div class="status_wrap" id="status_wrap">
 	<span class="status_label" >Status: </span>
-	<select class="status_text" id="status_text" onchange="changes=true;" >
+	<select class="status_text" id="status_text" onchange="updateStatus();" >
 		<option value="0">Not Started</option>
 		<option value="1">In Progress</option>
 		<option value="2">Almost Done</option>
@@ -232,14 +258,15 @@ function populateCharacterAddModal(){
 	<textarea id="text_textarea" onchange="changes=true;">{{.Section.Text}}</textarea>
 </div>
 
-<div class="ui_grid">
+<div class="ui_grid_3">
 <div class="aux_list_wrap">
 	<div class="aux_list_header" onclick="toggleCharacterVisability()">
 		<h3>Characters</h3>
+		<div class="aux_list_control" id="character_list_control">
+			<span id="character_list_control_add" class="form_make_button" onclick='NoProp(event); DisplayModal("character_modal");'>Add Character</span>	
+		</div>
 	</div>
-	<div class="aux_list_control" id="character_list_control">
-		<span id="character_list_control_add" class="form_make_button" onclick='DisplayModal("character_modal")'>Add Character</span>
-	</div>
+	<br>
 	<div class="aux_list" id="character_list">
 	
 	</div>
@@ -262,7 +289,7 @@ function populateCharacterAddModal(){
 
 <div class="ui_modal" id="character_modal">
 <div class="ui_modal_content">
-	<div id="character_modal_list">
+	<div class="ui_modal_list" id="character_modal_list">
 		
 	</div>
 	<br>

@@ -82,6 +82,12 @@ function ConsumeEnterKeyEvent(e){
 	}
 }
 
+function NoProp(e){
+	if(typeof e.stopPropagation !== "undefined"){
+		e.stopPropagation();
+	}
+}
+
 function DisplayModal(id){
 	var modal = document.getElementById(id);
 	

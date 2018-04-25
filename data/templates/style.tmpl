@@ -157,6 +157,26 @@
 
 .aux_list {
 	display: none;
+	flex-wrap: wrap;
+}
+
+.aux_list_elem {
+   -moz-user-select: -moz-none !important;
+   -webkit-user-select: none !important;
+   -ms-user-select: none !important;
+   user-select: none !important;
+   
+   min-width: 100px;
+   width: 40%;
+   max-width: 150px;
+   height: 40px;
+   
+   border: 1px solid #555555;
+   padding: 3px;
+   margin-left: auto;
+   margin-right: auto;
+   margin-top: 5px;
+   margin-bottom: 5px;
 }
 
 .ui_modal {
@@ -173,6 +193,8 @@
 }
 
 .ui_modal_content {
+	position: relative;
+	
 	background-color: #EEEEEE;
 	margin-left: auto;
 	margin-top: 15%;
@@ -187,12 +209,44 @@
 }
 
 .ui_modal_control {
+	position: absolute;
+	
 	width: auto;
+	bottom: 5%;
+	right: 5%;
 }
 
-.ui_grid {
+.ui_modal_list {
+	display: flex;
+	flex-wrap: wrap;
+}
+
+.ui_modal_list_elem {
+   -moz-user-select: -moz-none !important;
+   -webkit-user-select: none !important;
+   -ms-user-select: none !important;
+   user-select: none !important;
+   
+   min-width: 100px;
+   width: 20%;
+   max-width: 150px;
+   height: 40px;
+   
+   border: 1px solid #555555;
+   padding: 3px;
+   margin-left: auto;
+   margin-right: auto;
+   margin-top: 5px;
+   margin-bottom: 5px;
+}
+
+.ui_modal_list_elem_faded {
+	background-color: #DDDDDD;
+}
+
+.ui_grid_3{
 	display: grid;
-	grid-template-columns: auto auto auto;
+	grid-template-columns: 33% 33% 33%;
 }
 
 </style>
