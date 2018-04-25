@@ -45,7 +45,7 @@ func main(){
 		//Story
 	router.HandleFunc("/story/{storyuid:[0-9]{1,9}}", ViewStoryHandler) //Story overview
 	router.HandleFunc("/story/new", NewStoryHandler) //new story
-	router.HandleFunc("/story/{storyuid:[0-9]{1,9}}/delete", testHandler) //delete story
+	router.HandleFunc("/story/{storyuid:[0-9]{1,9}}/delete", DeleteStoryHandler) //delete story
 	router.HandleFunc("/story/{storyuid:[0-9]{1,9}}/edit", EditStoryHandler) //edit story
 	router.HandleFunc("/story/{storyuid:[0-9]{1,9}}/json", GetJSONStoryHandler) //get story json
 	router.HandleFunc("/story/list", ListJSONStoryHandler) //Story list json
