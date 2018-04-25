@@ -538,5 +538,32 @@ func DeleteStoryHandler(w http.ResponseWriter, r *http.Request) {
 
 	suid, _ := strconv.Atoi(mux.Vars(r)["storyuid"])
 
-	
+	ActiveProject.RemoveStory(suid)
+
+	w.WriteHeader(http.StatusOK)
+}
+
+func DeleteChapterHandler(w http.ResponseWriter, r *http.Request){
+	//Print log message
+	LogNet.Println("Access " + r.URL.Path + " by "+ r.RemoteAddr)
+
+	suid, _ := strconv.Atoi(mux.Vars(r)["storyuid"])
+	cuidRel, _ := strconv.Atoi(mux.Vars(r)["chapteruid"])
+
+	ActiveProject.RemoveChapterRel(suid, cuidRel)
+
+	w.WriteHeader(http.StatusOK)
+}
+
+func DeleteSectionHandler(w http.ResponseWriter, r *http.Request){
+	//Print log message
+	LogNet.Println("Access " + r.URL.Path + " by "+ r.RemoteAddr)
+
+	suid, _ := strconv.Atoi(mux.Vars(r)["storyuid"])
+	cuidRel, _ := strconv.Atoi(mux.Vars(r)["chapteruid"])
+	seuidRel, _ := strconv.Atoi(mux.Vars(r)["sectionuid"])
+
+	ActiveProject.RemoveSectionRel(suid, cuidRel, seuidRel)
+
+	w.WriteHeader(http.StatusOK)
 }

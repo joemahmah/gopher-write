@@ -79,14 +79,19 @@ func (p *Project) AddStory(story *story.Story) {
 }
 
 func (p *Project) RemoveStory(uid int) {
+	//Rmove all chapters from the story
+	for _, elem := range p.Stories[uid].Chapters {
+		p.RemoveChapter(elem)
+	}
+
 	//Remove story and shift others
 	p.Stories = append(p.Stories[:uid], p.Stories[uid+1:]...)
-	
+
 	//Reassign story UID
 	for index, elem := range p.Stories[uid:] {
 		elem.UID = index
 	}
-	
+
 	p.StoryNext-- //Decrement next UID available
 }
 
@@ -97,17 +102,58 @@ func (p *Project) AddChapter(chapter *story.Chapter) {
 }
 
 func (p *Project) RemoveChapter(uid int) {
+
+	//Remove all sections from the chapter
+	for _, elem := range p.Chapters[uid].Sections {
+		p.RemoveSection(elem)
+	}
+
+	//remove the chapter
 	delete(p.Chapters, uid)
 }
 
-func (p *Project) AddSection(section *story.Section) {
+func (p *Project) RemoveChapterRel(suid int, cuidRel int) error {
+	story, err := p.GetStory(suid)
+
+	if err != nil {
+		return err
+	}
+
+	cuid := story.Chapters[cuidRel]
+
+	//Remove all sections from the chapter
+	for _,elem := range p.Chapters[cuid].Sections {
+		p.RemoveSection(elem)
+	}
+
+	//remove the chapter
+	delete(p.Chapters, cuid)
+
+	return nil
+}
+
+func (p *Project) AddSection(section *story.Section){
 	section.UID = p.SectionNext //Set UID to next available
 	p.SectionNext++ //Increment next UID available
 	p.Sections[section.UID] = section //Add to map 
 }
 
-func (p *Project) RemoveSection(uid int) {
+func (p *Project) RemoveSection(uid int){
 	delete(p.Sections, uid)
+}
+
+func (p *Project) RemoveSectionRel(suid int, cuidRel int, seuidRel int) error{
+	chapter, err := p.GetChapter(suid, cuidRel);
+
+	if err != nil {
+		return err
+	}
+
+	seuid := chapter.Sections[seuidRel]
+
+	delete(p.Sections, seuid)
+
+	return nil
 }
 
 func (p *Project) AddLocation(loc *location.Location) {
