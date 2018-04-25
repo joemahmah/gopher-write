@@ -533,7 +533,10 @@ func OverviewStoryHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 func DeleteStoryHandler(w http.ResponseWriter, r *http.Request) {
-	
 	//Print log message
 	LogNet.Println("Access " + r.URL.Path + " by "+ r.RemoteAddr)
+
+	suid, _ := strconv.Atoi(mux.Vars(r)["storyuid"])
+
+	
 }
