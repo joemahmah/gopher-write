@@ -1,10 +1,10 @@
 package resources
 
 type Link struct {
-	UID			int
+	UID		int
 
-	URL			string
 	Title		string
+	URL		string
 	Description	string
 }
 
