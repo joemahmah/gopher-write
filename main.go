@@ -66,10 +66,13 @@ func main(){
 	router.HandleFunc("/story/{storyuid:[0-9]{1,9}}/{chapteruid:[0-9]{1,9}}/{sectionuid:[0-9]{1,9}}/json", GetJSONSectionHandler) //get section json
 	router.HandleFunc("/story/{storyuid:[0-9]{1,9}}/{chapteruid:[0-9]{1,9}}/list", ListJSONSectionHandler) //Chapter list json
 
-		//editing
+		//editing (section)
 	router.HandleFunc("/story/{storyuid:[0-9]{1,9}}/{chapteruid:[0-9]{1,9}}/{sectionuid:[0-9]{1,9}}/edit/addchar/{charid:[0-9]{1,9}}", EditSectionAddCharHandler) //add character to section
-	router.HandleFunc("/story/{storyuid:[0-9]{1,9}}/{chapteruid:[0-9]{1,9}}/{sectionuid:[0-9]{1,9}}/edit/addloc/{locid:[0-9]{1,9}}", EditSectionAddLocationHandler) //add character to section
-	router.HandleFunc("/story/{storyuid:[0-9]{1,9}}/{chapteruid:[0-9]{1,9}}/{sectionuid:[0-9]{1,9}}/edit/status/{status:[0-4]}", EditSectionSetStatusHandler) //add character to section
+	router.HandleFunc("/story/{storyuid:[0-9]{1,9}}/{chapteruid:[0-9]{1,9}}/{sectionuid:[0-9]{1,9}}/edit/addloc/{locid:[0-9]{1,9}}", EditSectionAddLocationHandler) //add location to section
+	router.HandleFunc("/story/{storyuid:[0-9]{1,9}}/{chapteruid:[0-9]{1,9}}/{sectionuid:[0-9]{1,9}}/edit/status/{status:[0-4]}", EditSectionSetStatusHandler) //set status for section
+	router.HandleFunc("/story/{storyuid:[0-9]{1,9}}/{chapteruid:[0-9]{1,9}}/{sectionuid:[0-9]{1,9}}/edit/note}", EditSectionSetNoteHandler) //set note for section
+	router.HandleFunc("/story/{storyuid:[0-9]{1,9}}/{chapteruid:[0-9]{1,9}}/{sectionuid:[0-9]{1,9}}/edit/text}", EditSectionSetTextHandler) //set text for section
+	router.HandleFunc("/story/{storyuid:[0-9]{1,9}}/{chapteruid:[0-9]{1,9}}/{sectionuid:[0-9]{1,9}}/edit/name}", EditSectionSetNameHandler) //set name for section
 
 		//overview
 	router.HandleFunc("/story", OverviewStoryHandler) //Story list
