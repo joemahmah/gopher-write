@@ -17,10 +17,9 @@ var currentStoryUID = {{index .UIDS 0}};
 var currentChapterUID = {{index .UIDS 1}};
 var currentSectionUID = {{index .UIDS 2}};
 
-var sectStatus = {{.Section.Status}};
 var newStatus = null;
 
-var changes = false;
+var textChanged = false;
 
 var characters = {{.Section.Characters}};
 var charactersToAdd = [];
@@ -31,9 +30,11 @@ var locationsToAdd = [];
 window.onload = initPage;
 
 function initPage(){
-	//Set the sectStatus
-	setStatus();
-	
+	//Set the status
+	var statusText = document.getElementById("status_text");
+	statusText.value = {{.Section.Status}};
+
+	//Populate the js character list
 	PopulateCharacterList();
 	
 	//Update character list
@@ -44,40 +45,23 @@ function initPage(){
 	window.setInterval(saveChanges, 30 * 1000);
 }
 
-function setStatus(){
-	var statusText = document.getElementById("status_text");
-	statusText.value = sectStatus;
-}
 
 function saveChanges(){
-	//Only save changes if there is actually something to save.
-	if(changes === true){
-		//reset change sectStatus
-		changes = false;
-		
-		var name = MakeName(document.getElementById("name_text").innerHTML,false,null);
-
-		var text = document.getElementById("text_textarea").value;
-		var stat = parseInt(document.getElementById("status_text").value);
-		var section = MakeSection(name,stat,stat,characters);
-		
-		var xhr = new XMLHttpRequest();
-		var url = "/story/" + currentStoryUID + "/" + currentChapterUID + "/" + currentSectionUID + "/edit";
-		xhr.open("POST", url, true);
-		xhr.setRequestHeader("Content-Type", "application/json");
-		xhr.onreadystatechange = function () {
-			//if server returns proper, update display
-			if (this.readyState == 4 && this.status == 200){
-				showResponse("Section updated.");
-				setTimeout("hideResponse()",5000);
-			} else if (this.readyState == 4 && this.status == 500) {
-				showResponse("Unable to update.");
-				setTimeout("hideResponse()",5000);
-			}
+	//Update characters if needed
+	if(charactersToAdd.length > 0){
+		for(var character of charactersToAdd){
+			addToCharacters(character);
 		}
-		
-		xhr.send(JSON.stringify(section));
-		
+	}
+	
+	//Update status if needed
+	if(newStatus !== null){
+		updateStatus(newStatus);
+	}
+
+	//Update text if needed.
+	if(textChanged){
+		updateText()
 	}
 }
 
@@ -125,7 +109,7 @@ function toggleCharacterVisability(){
 	}
 }
 
-function addToCharacters(e){
+function procAddToCharacters(e){
 
 	if(e.stopPropagation !== "undefined"){
 		e.stopPropagation();
@@ -141,7 +125,7 @@ function addToCharacters(e){
 
 	//Set page to look like added
 	e.target.classList.add("ui_modal_list_elem_faded");
-	e.target.removeEventListener("dblclick", addToCharacters);
+	e.target.removeEventListener("dblclick", procAddToCharacters);
 	
 	//Add local
 	characters.push(charuid);
@@ -149,24 +133,7 @@ function addToCharacters(e){
 	//Update ui
 	updateCharacterList();
 	
-	//Try to add remote
-	var xhr = new XMLHttpRequest();
-	var url = "/story/" + currentStoryUID + "/" + currentChapterUID + "/" + currentSectionUID + "/edit/addchar/" + charuid;
-	xhr.open("POST", url, true);
-	xhr.setRequestHeader("Content-Type", "text/plain");
-	xhr.onreadystatechange = function () {
-		if (this.readyState == 4 && this.status === 200){
-			showResponse("Character added to section.");
-			setTimeout("hideResponse()",2000);
-		} else if (this.readyState == 4 && this.status !== 200) {
-			//If unable to add
-			charactersToAdd.push(charuid); //Add to cache to try again on next save
-			showResponse("Unable to add character to section. Will try again on next save.");
-			setTimeout("hideResponse()",5000);
-		}
-	}
-	
-	xhr.send();
+	addToCharacters(charuid);
 }
 
 function populateCharacterAddModal(){
@@ -191,7 +158,7 @@ function populateCharacterAddModal(){
 		
 		//if char alread member
 		if(characters.indexOf(currentChar.uid) === -1){
-			storyElem.addEventListener("dblclick", addToCharacters);
+			storyElem.addEventListener("dblclick", procAddToCharacters);
 		} else  {
 			storyElem.classList.add("ui_modal_list_elem_faded")
 		}
@@ -206,9 +173,18 @@ function populateCharacterAddModal(){
 	}
 }
 
-function updateStatus(){
+function procUpdateStatus(){
 
 	var stat = parseInt(document.getElementById("status_text").value);
+
+	updateStatus(stat);
+}
+
+////////////////////////////
+// Actual Update Handlers //
+////////////////////////////
+
+function updateStatus(stat){
 
 	//Try to add remote
 	var xhr = new XMLHttpRequest();
@@ -217,17 +193,70 @@ function updateStatus(){
 	xhr.setRequestHeader("Content-Type", "text/plain");
 	xhr.onreadystatechange = function () {
 		if (this.readyState == 4 && this.status === 200){
+			newStatus = null; //unflag to be updated (if flagged)
 			showResponse("Status updated.");
 			setTimeout("hideResponse()",2000);
 		} else if (this.readyState == 4 && this.status !== 200) {
 			//If unable to add
-			newStatus = stat; //Add to cache to try again on next save
+			newStatus = stat; //Flag to try again on next save
 			showResponse("Unable to update status. Will try again on next save.");
 			setTimeout("hideResponse()",5000);
 		}
 	}
 	
 	xhr.send();
+}
+
+//TODO: change to accept and send array
+function addToCharacters(charuid){
+	//Try to add remote
+	var xhr = new XMLHttpRequest();
+	var url = "/story/" + currentStoryUID + "/" + currentChapterUID + "/" + currentSectionUID + "/edit/addchar/" + charuid;
+	xhr.open("POST", url, true);
+	xhr.setRequestHeader("Content-Type", "text/plain");
+	xhr.onreadystatechange = function () {
+		if (this.readyState == 4 && this.status === 200){
+			if(charactersToAdd.includes(charuid)){ //If char alread queued to be added
+				var index = charactersToAdd.indexOf(charuid);
+				charactersToAdd.splice(charuid, 1); //unflag to try again on next save
+			}
+			showResponse("Character added to section.");
+			setTimeout("hideResponse()",2000);
+		} else if (this.readyState == 4 && this.status !== 200) {
+			//If unable to add
+			if(!charactersToAdd.includes(charuid)){ //If char not alread queued to be added
+				charactersToAdd.push(charuid); //Flag to try again on next save
+			}
+			showResponse("Unable to add character to section. Will try again on next save.");
+			setTimeout("hideResponse()",5000);
+		}
+	}
+	
+	xhr.send();
+}
+
+function updateText() {
+	var text = document.getElementById("text_textarea").value;
+	var textobj = {Data: text};
+	
+	var xhr = new XMLHttpRequest();
+	var url = "/story/" + currentStoryUID + "/" + currentChapterUID + "/" + currentSectionUID + "/edit/text";
+	xhr.open("POST", url, true);
+	xhr.setRequestHeader("Content-Type", "application/json");
+	xhr.onreadystatechange = function () {
+		//if server returns proper, update display
+		if (this.readyState == 4 && this.status == 200){
+			textChanged = false;
+			showResponse("Saved.");
+			setTimeout("hideResponse()",2000);
+		} else if (this.readyState == 4 && this.status !== 200) {
+			textChanged = true; //
+			showResponse("Unable to save text. Will try again on next save.");
+			setTimeout("hideResponse()",5000);
+		}
+	}
+	
+	xhr.send(JSON.stringify(textobj));
 }
 
 </script>
@@ -242,7 +271,7 @@ function updateStatus(){
 
 <div class="status_wrap" id="status_wrap">
 	<span class="status_label" >Status: </span>
-	<select class="status_text" id="status_text" onchange="updateStatus();" >
+	<select class="status_text" id="status_text" onchange="procUpdateStatus();" >
 		<option value="0">Not Started</option>
 		<option value="1">In Progress</option>
 		<option value="2">Almost Done</option>
@@ -255,7 +284,7 @@ function updateStatus(){
 	<div class="text_control" id="text_control">
 		<span class="button_control" onclick="saveChanges();">Save</span>
 	</div>
-	<textarea id="text_textarea" onchange="changes=true;">{{.Section.Text}}</textarea>
+	<textarea id="text_textarea" onchange="textChanged=true;">{{.Section.Text}}</textarea>
 </div>
 
 <div class="ui_grid_3">
