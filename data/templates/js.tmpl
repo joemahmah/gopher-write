@@ -64,7 +64,9 @@ function DeleteNodeById(id){
 	delete node;
 }
 
-function ConsumeEnterKeyEvent(e){
+//Consumes enter key event and runs NewEnterKeyEvent if exists
+//Also runs passed function action if optional param passed
+function ConsumeEnterKeyEvent(e, action){
 	//if not given, set e to the event 
 	e = e || window.event;
 	
@@ -77,6 +79,10 @@ function ConsumeEnterKeyEvent(e){
 		
 		if(typeof NewEnterKeyEvent === "function"){
 			NewEnterKeyEvent();
+		}
+		
+		if(typeof action !== "undefined"){
+			action();
 		}
 		
 	}

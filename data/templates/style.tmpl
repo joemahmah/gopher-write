@@ -91,9 +91,40 @@
 	
 }
 
+.name {
+	border: none;
+	background: transparent;
+	font-size: 2em;
+	font-weight: bold;
+	margin-top: .67em;
+	margin-bottom: .67em;
+	margin-left: 0em;
+	margin-right: 0em;
+}
+
 .status_text{
 	border: 0px;
 	outline: 0px;
+}
+
+.meta_bold {
+	font-weight: bold;
+}
+
+.meta_big {
+	font-size: 1.25em;
+}
+
+.meta_small {
+	font-size: .75em;
+}
+
+.meta_tiny {
+	font-size: .5em;
+}
+
+.meta_valign{
+	vertical-align: middle;
 }
 
 .form_make_button {
@@ -109,6 +140,11 @@
 	border-right: 1px solid #555577;
 	border-bottom: 1px solid #555577;
 	border-left: 1px solid #AAAACC;
+	
+   -moz-user-select: -moz-none !important;
+   -webkit-user-select: none !important;
+   -ms-user-select: none !important;
+   user-select: none !important;
 }
 
 .form_make_button_big{
@@ -147,13 +183,21 @@
 }
 
 .aux_list_header {
+	display: flex;
+	justify-content: space-between;
 	border: 1px dashed #AAAAAA;
 	border-radius: 10px;
 	padding: 10px;
 }
 
+.aux_list_header h3 {
+	display: inline-block;
+}
+
 .aux_list_control {
 	display: none;
+	margin-top: auto;
+	margin-bottom: auto;
 }
 
 .aux_list {

@@ -20,6 +20,7 @@ var currentSectionUID = {{index .UIDS 2}};
 var newStatus = null;
 var textChanged = false;
 var noteChanged = false;
+var nameChanged = false;
 
 var characters = {{.Section.Characters}};
 var charactersToAdd = [];
@@ -68,6 +69,11 @@ function saveChanges(){
 	if(noteChanged){
 		updateNote()
 	}
+	
+	//Update name if needed.
+	if(nameChanged){
+		updateName()
+	}
 }
 
 function updateCharacterList(){
@@ -105,21 +111,21 @@ function updateCharacterList(){
 }
 
 function toggleCharacterVisability(){
-	if(document.getElementById("character_list_control").style.display == "grid"){
+	if(document.getElementById("character_list_control").style.display == "inline-block"){
 		document.getElementById("character_list_control").style.display = "none";
 		document.getElementById("character_list").style.display = "none";
 	} else {
-		document.getElementById("character_list_control").style.display = "grid";
+		document.getElementById("character_list_control").style.display = "inline-block";
 		document.getElementById("character_list").style.display = "flex";
 	}
 }
 
 function toggleLocationVisability(){
-	if(document.getElementById("location_list_control").style.display == "grid"){
+	if(document.getElementById("location_list_control").style.display == "inline-block"){
 		document.getElementById("location_list_control").style.display = "none";
 		document.getElementById("location_list").style.display = "none";
 	} else {
-		document.getElementById("location_list_control").style.display = "grid";
+		document.getElementById("location_list_control").style.display = "inline-block";
 		document.getElementById("location_list").style.display = "flex";
 	}
 }
@@ -292,11 +298,11 @@ function updateNote() {
 	xhr.onreadystatechange = function () {
 		//if server returns proper, update display
 		if (this.readyState == 4 && this.status == 200){
-			textChanged = false;
+			noteChanged = false;
 			showResponse("Saved.");
 			setTimeout("hideResponse()",2000);
 		} else if (this.readyState == 4 && this.status !== 200) {
-			textChanged = true; //
+			noteChanged = true; //
 			showResponse("Unable to save note. Will try again on next save.");
 			setTimeout("hideResponse()",5000);
 		}
@@ -305,11 +311,34 @@ function updateNote() {
 	xhr.send(JSON.stringify(textobj));
 }
 
+function updateName(){
+	var name = MakeName(document.getElementById("name_text").value,false,null);
+	
+	var xhr = new XMLHttpRequest();
+	var url = "/story/" + currentStoryUID + "/" + currentChapterUID + "/" + currentSectionUID + "/edit/name";
+	xhr.open("POST", url, true);
+	xhr.setRequestHeader("Content-Type", "application/json");
+	xhr.onreadystatechange = function () {
+		//if server returns proper, update display
+		if (this.readyState == 4 && this.status == 200){
+			nameChanged = false;
+			showResponse("Saved.");
+			setTimeout("hideResponse()",2000);
+		} else if (this.readyState == 4 && this.status !== 200) {
+			nameChanged = true; //
+			showResponse("Unable to save name. Will try again on next save.");
+			setTimeout("hideResponse()",5000);
+		}
+	}
+	
+	xhr.send(JSON.stringify(name));
+}
+
 </script>
 
 {{template "header"}}
 
-<h1 id="name_text">{{.Section.Name.PrimaryName}}</h1>
+<input class="name" id="name_text" type="text" onchange="nameChanged=true;" onkeypress="ConsumeEnterKeyEvent(event, saveChanges);" value="{{.Section.Name.PrimaryName}}">
 
 <div class="meta_control">
 	<a href="/story/{{index .UIDS 0}}/{{index .UIDS 1}}">Return to chapter </a>
@@ -338,7 +367,10 @@ function updateNote() {
 	<div class="aux_list_header" onclick="toggleCharacterVisability()">
 		<h3>Characters</h3>
 		<div class="aux_list_control" id="character_list_control">
-			<span id="character_list_control_add" class="form_make_button" onclick='NoProp(event); DisplayModal("character_modal");'>Add Character</span>	
+			<span id="character_list_control_add" class="form_make_button form_make_button_round" onclick='NoProp(event); DisplayModal("character_modal");'>
+				<span class="meta_bold meta_big">+</span>
+				<span class="meta_small meta_valign">Add Character</span>
+			</span>	
 		</div>
 	</div>
 	<br>
