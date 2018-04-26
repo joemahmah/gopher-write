@@ -70,9 +70,9 @@ func main(){
 	router.HandleFunc("/story/{storyuid:[0-9]{1,9}}/{chapteruid:[0-9]{1,9}}/{sectionuid:[0-9]{1,9}}/edit/addchar/{charid:[0-9]{1,9}}", EditSectionAddCharHandler) //add character to section
 	router.HandleFunc("/story/{storyuid:[0-9]{1,9}}/{chapteruid:[0-9]{1,9}}/{sectionuid:[0-9]{1,9}}/edit/addloc/{locid:[0-9]{1,9}}", EditSectionAddLocationHandler) //add location to section
 	router.HandleFunc("/story/{storyuid:[0-9]{1,9}}/{chapteruid:[0-9]{1,9}}/{sectionuid:[0-9]{1,9}}/edit/status/{status:[0-4]}", EditSectionSetStatusHandler) //set status for section
-	router.HandleFunc("/story/{storyuid:[0-9]{1,9}}/{chapteruid:[0-9]{1,9}}/{sectionuid:[0-9]{1,9}}/edit/note}", EditSectionSetNoteHandler) //set note for section
-	router.HandleFunc("/story/{storyuid:[0-9]{1,9}}/{chapteruid:[0-9]{1,9}}/{sectionuid:[0-9]{1,9}}/edit/text}", EditSectionSetTextHandler) //set text for section
-	router.HandleFunc("/story/{storyuid:[0-9]{1,9}}/{chapteruid:[0-9]{1,9}}/{sectionuid:[0-9]{1,9}}/edit/name}", EditSectionSetNameHandler) //set name for section
+	router.HandleFunc("/story/{storyuid:[0-9]{1,9}}/{chapteruid:[0-9]{1,9}}/{sectionuid:[0-9]{1,9}}/edit/note", EditSectionSetNoteHandler) //set note for section
+	router.HandleFunc("/story/{storyuid:[0-9]{1,9}}/{chapteruid:[0-9]{1,9}}/{sectionuid:[0-9]{1,9}}/edit/text", EditSectionSetTextHandler) //set text for section
+	router.HandleFunc("/story/{storyuid:[0-9]{1,9}}/{chapteruid:[0-9]{1,9}}/{sectionuid:[0-9]{1,9}}/edit/name", EditSectionSetNameHandler) //set name for section
 
 		//overview
 	router.HandleFunc("/story", OverviewStoryHandler) //Story list
@@ -90,9 +90,19 @@ func main(){
 	/////////////////////////
 	//        server       //
 	/////////////////////////
+	
+	router.Use(LogMiddleware)
 	http.ListenAndServe(":8080", router)
 }
 
 func testHandler(w http.ResponseWriter, r *http.Request) {
 	//DO NOTHING
+}
+
+//Logging middleware
+func LogMiddleware(h http.Handler) http.Handler {
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		LogNet.Println("Access " + r.URL.Path + " by " + r.RemoteAddr)
+		h.ServeHTTP(w, r)
+	})
 }

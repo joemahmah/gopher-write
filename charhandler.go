@@ -11,9 +11,6 @@ import (
 
 func NewCharHandler(w http.ResponseWriter, r *http.Request) {
 	
-	//Print log message
-	LogNet.Println("Access " + r.URL.Path + " by "+ r.RemoteAddr)
-	
 	//Make new char
 	newChar := &character.Character{}
 	
@@ -32,9 +29,6 @@ func NewCharHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 func ViewCharHandler(w http.ResponseWriter, r *http.Request) {
-	
-	//Print log message
-	LogNet.Println("Access " + r.URL.Path + " by "+ r.RemoteAddr)
 	
 	//Get the char UID
 	cid, err := strconv.Atoi(mux.Vars(r)["cid"])
@@ -88,9 +82,6 @@ func ViewCharHandler(w http.ResponseWriter, r *http.Request) {
 
 func GetJSONCharHandler(w http.ResponseWriter, r *http.Request) {
 	
-	//Print log message
-	LogNet.Println("Access " + r.URL.Path + " by "+ r.RemoteAddr)
-
 	//Get the char UID
 	cid, err := strconv.Atoi(mux.Vars(r)["cid"])
 	
@@ -112,9 +103,6 @@ func GetJSONCharHandler(w http.ResponseWriter, r *http.Request) {
 
 func EditCharHandler(w http.ResponseWriter, r *http.Request) {
 	
-	//Print log message
-	LogNet.Println("Access " + r.URL.Path + " by "+ r.RemoteAddr)
-
 	//Make new story
 	newChar := &character.Character{}
 	
@@ -149,9 +137,6 @@ func EditCharHandler(w http.ResponseWriter, r *http.Request) {
 
 func ListJSONCharHandler(w http.ResponseWriter, r *http.Request) {
 	
-	//Print log message
-	LogNet.Println("Access " + r.URL.Path + " by "+ r.RemoteAddr)
-
 	//Slices to store data
 	var names []string
 	var uids []int
@@ -172,9 +157,6 @@ func ListJSONCharHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 func OverviewCharHandler(w http.ResponseWriter, r *http.Request) {
-	
-	//Print log message
-	LogNet.Println("Access " + r.URL.Path + " by "+ r.RemoteAddr)
 	
 	//Parse template
 	tmpl, err := template.ParseFiles("data/templates/overviewChar.tmpl", "data/templates/style.tmpl", "data/templates/header.tmpl", "data/templates/js.tmpl")

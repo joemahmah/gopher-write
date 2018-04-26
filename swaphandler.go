@@ -96,9 +96,6 @@ func insertItemIntoSlice(slice []int, item int, moveBeforeIndex int) ([]int, err
 
 func StoryMoveHandler(w http.ResponseWriter, r *http.Request) {
 	
-	//Print log message
-	LogNet.Println("Access " + r.URL.Path + " by "+ r.RemoteAddr)
-	
 	//Get the story uids
 	firstStoryIndex, _ := strconv.Atoi(mux.Vars(r)["first"])
 	secondStoryIndex, _ := strconv.Atoi(mux.Vars(r)["second"])
@@ -173,9 +170,6 @@ func StoryMoveHandler(w http.ResponseWriter, r *http.Request) {
 
 func IntraChapterMoveHandler(w http.ResponseWriter, r *http.Request) {
 
-	//Print log message
-	LogNet.Println("Access " + r.URL.Path + " by "+ r.RemoteAddr)
-
 	//Get the story uids
 	firstChapterIndex, _ := strconv.Atoi(mux.Vars(r)["first"])
 	secondChapterIndex, _ := strconv.Atoi(mux.Vars(r)["second"])
@@ -201,9 +195,6 @@ func IntraChapterMoveHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 func InterChapterMoveHandler(w http.ResponseWriter, r *http.Request) {
-
-	//Print log message
-	LogNet.Println("Access " + r.URL.Path + " by "+ r.RemoteAddr)
 
 	//Get the story uids
 	firstChapterIndex, _ := strconv.Atoi(mux.Vars(r)["first"])
@@ -244,9 +235,6 @@ func InterChapterMoveHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 func IntraSectionMoveHandler(w http.ResponseWriter, r *http.Request) {
-
-	//Print log message
-	LogNet.Println("Access " + r.URL.Path + " by "+ r.RemoteAddr)
 
 	//Get the story uids
 	firstSectionIndex, _ := strconv.Atoi(mux.Vars(r)["first"])

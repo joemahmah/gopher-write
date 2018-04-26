@@ -11,9 +11,6 @@ import (
 
 func NewStoryHandler(w http.ResponseWriter, r *http.Request) {
 	
-	//Print log message
-	LogNet.Println("Access " + r.URL.Path + " by "+ r.RemoteAddr)
-	
 	//Make new story
 	newStory := &story.Story{}
 	
@@ -33,9 +30,6 @@ func NewStoryHandler(w http.ResponseWriter, r *http.Request) {
 
 
 func NewChapterHandler(w http.ResponseWriter, r *http.Request) {
-
-	//Print log message
-	LogNet.Println("Access " + r.URL.Path + " by "+ r.RemoteAddr)
 
 	//Make new chapter
 	newChapter := &story.Chapter{}
@@ -75,9 +69,6 @@ func NewChapterHandler(w http.ResponseWriter, r *http.Request) {
 
 func NewSectionHandler(w http.ResponseWriter, r *http.Request) {
 
-	//Print log message
-	LogNet.Println("Access " + r.URL.Path + " by "+ r.RemoteAddr)
-
 	//Make new section
 	newSection := &story.Section{}
 
@@ -116,9 +107,6 @@ func NewSectionHandler(w http.ResponseWriter, r *http.Request) {
 
 func ViewStoryHandler(w http.ResponseWriter, r *http.Request) {
 
-	//Print log message
-	LogNet.Println("Access " + r.URL.Path + " by "+ r.RemoteAddr)
-
 	//Get the selectedStory	UID
 	suid, err := strconv.Atoi(mux.Vars(r)["storyuid"])
 
@@ -156,9 +144,6 @@ func ViewStoryHandler(w http.ResponseWriter, r *http.Request) {
 
 func ViewChapterHandler(w http.ResponseWriter, r *http.Request) {
 
-	//Print log message
-	LogNet.Println("Access " + r.URL.Path + " by "+ r.RemoteAddr)
-
 	//Get the selected chapter UID
 	suid, err := strconv.Atoi(mux.Vars(r)["storyuid"])
 	cuidRel, err := strconv.Atoi(mux.Vars(r)["chapteruid"])
@@ -192,9 +177,6 @@ func ViewChapterHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 func ViewSectionHandler(w http.ResponseWriter, r *http.Request) {
-
-	//Print log message
-	LogNet.Println("Access " + r.URL.Path + " by "+ r.RemoteAddr)
 
 	//Get the selected chapter UID
 	suid, err := strconv.Atoi(mux.Vars(r)["storyuid"])
@@ -232,9 +214,6 @@ func ViewSectionHandler(w http.ResponseWriter, r *http.Request) {
 
 func GetJSONStoryHandler(w http.ResponseWriter, r *http.Request) {
 	
-	//Print log message
-	LogNet.Println("Access " + r.URL.Path + " by "+ r.RemoteAddr)
-
 	//Get the char UID
 	suid, _ := strconv.Atoi(mux.Vars(r)["storyuid"])
 
@@ -257,9 +236,6 @@ func GetJSONStoryHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 func GetJSONChapterHandler(w http.ResponseWriter, r *http.Request) {
-
-	//Print log message
-	LogNet.Println("Access " + r.URL.Path + " by "+ r.RemoteAddr)
 
 	//Get the char UID
 	suid, _ := strconv.Atoi(mux.Vars(r)["storyuid"])
@@ -285,9 +261,6 @@ func GetJSONChapterHandler(w http.ResponseWriter, r *http.Request) {
 
 func GetJSONSectionHandler(w http.ResponseWriter, r *http.Request) {
 
-	//Print log message
-	LogNet.Println("Access " + r.URL.Path + " by "+ r.RemoteAddr)
-
 	//Get the char UID
 	suid, err := strconv.Atoi(mux.Vars(r)["storyuid"])
 	cuidRel, err := strconv.Atoi(mux.Vars(r)["chapteruid"])
@@ -312,9 +285,6 @@ func GetJSONSectionHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 func EditStoryHandler(w http.ResponseWriter, r *http.Request) {
-
-	//Print log message
-	LogNet.Println("Access " + r.URL.Path + " by "+ r.RemoteAddr)
 
 	//Make new story
 	newStory := &story.Story{}
@@ -346,9 +316,6 @@ func EditStoryHandler(w http.ResponseWriter, r *http.Request) {
 
 func EditChapterHandler(w http.ResponseWriter, r *http.Request) {
 
-	//Print log message
-	LogNet.Println("Access " + r.URL.Path + " by "+ r.RemoteAddr)
-
 	//Make new chapter
 	newChapter := &story.Chapter{}
 
@@ -376,9 +343,6 @@ func EditChapterHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 func EditSectionHandler(w http.ResponseWriter, r *http.Request) {
-
-	//Print log message
-	LogNet.Println("Access " + r.URL.Path + " by "+ r.RemoteAddr)
 
 	//Make new section
 	newSection := &story.Section{}
@@ -423,9 +387,6 @@ func EditSectionHandler(w http.ResponseWriter, r *http.Request) {
 
 func ListJSONStoryHandler(w http.ResponseWriter, r *http.Request) {
 	
-	//Print log message
-	LogNet.Println("Access " + r.URL.Path + " by "+ r.RemoteAddr)
-
 	//Slices to store data
 	var names []string
 	var uids []int
@@ -447,9 +408,6 @@ func ListJSONStoryHandler(w http.ResponseWriter, r *http.Request) {
 
 func ListJSONChapterHandler(w http.ResponseWriter, r *http.Request) {
 	
-	//Print log message
-	LogNet.Println("Access " + r.URL.Path + " by "+ r.RemoteAddr)
-
 	//Get the selectedStory	UID
 	suid, err := strconv.Atoi(mux.Vars(r)["storyuid"])
 	
@@ -474,9 +432,6 @@ func ListJSONChapterHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 func ListJSONSectionHandler(w http.ResponseWriter, r *http.Request) {
-	
-	//Print log message
-	LogNet.Println("Access " + r.URL.Path + " by "+ r.RemoteAddr)
 	
 	//Get the selected Chapter UID
 	suid, err := strconv.Atoi(mux.Vars(r)["storyuid"])
@@ -508,9 +463,6 @@ func ListJSONSectionHandler(w http.ResponseWriter, r *http.Request) {
 
 func OverviewStoryHandler(w http.ResponseWriter, r *http.Request) {
 	
-	//Print log message
-	LogNet.Println("Access " + r.URL.Path + " by "+ r.RemoteAddr)
-	
 	//Parse template
 	tmpl, err := template.ParseFiles("data/templates/overviewStories.tmpl", "data/templates/style.tmpl", "data/templates/header.tmpl", "data/templates/js.tmpl")
 	
@@ -533,9 +485,7 @@ func OverviewStoryHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 func DeleteStoryHandler(w http.ResponseWriter, r *http.Request) {
-	//Print log message
-	LogNet.Println("Access " + r.URL.Path + " by "+ r.RemoteAddr)
-
+	
 	suid, _ := strconv.Atoi(mux.Vars(r)["storyuid"])
 
 	ActiveProject.RemoveStory(suid)
@@ -544,9 +494,7 @@ func DeleteStoryHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 func DeleteChapterHandler(w http.ResponseWriter, r *http.Request){
-	//Print log message
-	LogNet.Println("Access " + r.URL.Path + " by "+ r.RemoteAddr)
-
+	
 	suid, _ := strconv.Atoi(mux.Vars(r)["storyuid"])
 	cuidRel, _ := strconv.Atoi(mux.Vars(r)["chapteruid"])
 
@@ -556,9 +504,7 @@ func DeleteChapterHandler(w http.ResponseWriter, r *http.Request){
 }
 
 func DeleteSectionHandler(w http.ResponseWriter, r *http.Request){
-	//Print log message
-	LogNet.Println("Access " + r.URL.Path + " by "+ r.RemoteAddr)
-
+	
 	suid, _ := strconv.Atoi(mux.Vars(r)["storyuid"])
 	cuidRel, _ := strconv.Atoi(mux.Vars(r)["chapteruid"])
 	seuidRel, _ := strconv.Atoi(mux.Vars(r)["sectionuid"])

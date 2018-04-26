@@ -10,8 +10,6 @@ import (
 
 func EditSectionAddCharHandler(w http.ResponseWriter, r *http.Request){
 
-	LogNet.Println("Access " + r.URL.Path + " by " + r.RemoteAddr)
-
 	//Get the uids
 	suid, _ := strconv.Atoi(mux.Vars(r)["storyuid"])
 	cuidRel, _ := strconv.Atoi(mux.Vars(r)["chapteruid"])
@@ -37,8 +35,6 @@ func EditSectionAddCharHandler(w http.ResponseWriter, r *http.Request){
 }
 
 func EditSectionAddLocationHandler(w http.ResponseWriter, r *http.Request){
-
-	LogNet.Println("Access " + r.URL.Path + " by " + r.RemoteAddr)
 
 	//Get the uids
 	suid, _ := strconv.Atoi(mux.Vars(r)["storyuid"])
@@ -66,8 +62,6 @@ func EditSectionAddLocationHandler(w http.ResponseWriter, r *http.Request){
 
 func EditSectionSetStatusHandler(w http.ResponseWriter, r *http.Request){
 
-	LogNet.Println("Access " + r.URL.Path + " by " + r.RemoteAddr)
-
 	//Get the uids
 	suid, _ := strconv.Atoi(mux.Vars(r)["storyuid"])
 	cuidRel, _ := strconv.Atoi(mux.Vars(r)["chapteruid"])
@@ -93,8 +87,6 @@ func EditSectionSetStatusHandler(w http.ResponseWriter, r *http.Request){
 }
 
 func EditSectionSetNoteHandler(w http.ResponseWriter, r *http.Request){
-
-	LogNet.Println("Access " + r.URL.Path + " by " + r.RemoteAddr)
 
 	//Get the uids
 	suid, _ := strconv.Atoi(mux.Vars(r)["storyuid"])
@@ -129,8 +121,6 @@ func EditSectionSetNoteHandler(w http.ResponseWriter, r *http.Request){
 
 func EditSectionSetTextHandler(w http.ResponseWriter, r *http.Request){
 
-	LogNet.Println("Access " + r.URL.Path + " by " + r.RemoteAddr)
-
 	//Get the uids
 	suid, _ := strconv.Atoi(mux.Vars(r)["storyuid"])
 	cuidRel, _ := strconv.Atoi(mux.Vars(r)["chapteruid"])
@@ -163,8 +153,6 @@ func EditSectionSetTextHandler(w http.ResponseWriter, r *http.Request){
 }
 
 func EditSectionSetNameHandler(w http.ResponseWriter, r *http.Request){
-
-	LogNet.Println("Access " + r.URL.Path + " by " + r.RemoteAddr)
 
 	//Get the uids
 	suid, _ := strconv.Atoi(mux.Vars(r)["storyuid"])
