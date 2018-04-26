@@ -18,8 +18,8 @@ var currentChapterUID = {{index .UIDS 1}};
 var currentSectionUID = {{index .UIDS 2}};
 
 var newStatus = null;
-
 var textChanged = false;
+var noteChanged = false;
 
 var characters = {{.Section.Characters}};
 var charactersToAdd = [];
@@ -62,6 +62,11 @@ function saveChanges(){
 	//Update text if needed.
 	if(textChanged){
 		updateText()
+	}
+	
+	//Update note if needed.
+	if(noteChanged){
+		updateNote()
 	}
 }
 
@@ -106,6 +111,23 @@ function toggleCharacterVisability(){
 	} else {
 		document.getElementById("character_list_control").style.display = "grid";
 		document.getElementById("character_list").style.display = "flex";
+	}
+}
+
+function toggleLocationVisability(){
+	if(document.getElementById("location_list_control").style.display == "grid"){
+		document.getElementById("location_list_control").style.display = "none";
+		document.getElementById("location_list").style.display = "none";
+	} else {
+		document.getElementById("location_list_control").style.display = "grid";
+		document.getElementById("location_list").style.display = "flex";
+	}
+}
+function toggleNoteVisability(){
+	if(document.getElementById("note_wrap").style.display == "block"){
+		document.getElementById("note_wrap").style.display = "none";
+	} else {
+		document.getElementById("note_wrap").style.display = "block";
 	}
 }
 
@@ -259,6 +281,30 @@ function updateText() {
 	xhr.send(JSON.stringify(textobj));
 }
 
+function updateNote() {
+	var text = document.getElementById("note_textarea").value;
+	var textobj = {Data: text};
+	
+	var xhr = new XMLHttpRequest();
+	var url = "/story/" + currentStoryUID + "/" + currentChapterUID + "/" + currentSectionUID + "/edit/note";
+	xhr.open("POST", url, true);
+	xhr.setRequestHeader("Content-Type", "application/json");
+	xhr.onreadystatechange = function () {
+		//if server returns proper, update display
+		if (this.readyState == 4 && this.status == 200){
+			textChanged = false;
+			showResponse("Saved.");
+			setTimeout("hideResponse()",2000);
+		} else if (this.readyState == 4 && this.status !== 200) {
+			textChanged = true; //
+			showResponse("Unable to save note. Will try again on next save.");
+			setTimeout("hideResponse()",5000);
+		}
+	}
+	
+	xhr.send(JSON.stringify(textobj));
+}
+
 </script>
 
 {{template "header"}}
@@ -302,14 +348,25 @@ function updateText() {
 </div>
 
 <div class="aux_list_wrap">
-	<div class="aux_list_header" onclick="">
+	<div class="aux_list_header" onclick="toggleLocationVisability()">
 		<h3>Locations</h3>
+	</div>
+	<br>
+	<div class="aux_list" id="location_list">
+	
 	</div>
 </div>
 
 <div class="aux_list_wrap">
-	<div class="aux_list_header" onclick="">
+	<div class="aux_list_header" onclick="toggleNoteVisability()">
 		<h3>Notes</h3>
+	</div>
+	<br>
+	<div class="aux_text_wrap" id="note_wrap">
+		<textarea id="note_textarea" onchange="noteChanged=true;">{{.Section.Note}}</textarea>
+		<div class="text_control" id="text_control">
+			<span class="button_control" onclick="saveChanges();">Save</span>
+		</div>
 	</div>
 </div>
 </div>
