@@ -270,13 +270,17 @@ function Chapter(UID, Name, Sections, Status){
 	this.Name = Name;
 	this.Sections = Sections;
 	this.Status = Status;
+	this.Note = Note;
 }
 
-function MakeChapter(name, stat, sections){
+function MakeChapter(name, stat, sections, note){
 	var chapter = new Chapter(0, name, null, stat);
 
 	if(sections != null && sections.length >= 1){
 		chapter.Sections = sections;
+	}
+	if(typeof note !== "undefined"){
+		chapter.Note = note;
 	}
 
 	return chapter;
@@ -287,13 +291,17 @@ function Story(UID, Name, Chapters, Status){
 	this.Name = Name;
 	this.Chapters = Chapters;
 	this.Status = Status;
+	this.Note = Note;
 }
 
-function MakeStory(name, stat, chapters){
+function MakeStory(name, stat, chapters,note){
 	var story = new Story(0, name, null, stat);
 
 	if(chapters != null && chapters.length >= 1){
 		story.Chapters = chapters;
+	}
+	if(typeof note !== "undefined"){
+		story.Note = note;
 	}
 
 	return story;

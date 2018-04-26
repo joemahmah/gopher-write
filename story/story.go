@@ -11,6 +11,7 @@ type Story struct {
 	Name		common.Name
 	Chapters	[]int
 	Status		common.Status
+	Note		string
 }
 
 func (s *Story) SwapChapters(first int, second int) error {
