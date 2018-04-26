@@ -184,3 +184,127 @@ func EditSectionSetNameHandler(w http.ResponseWriter, r *http.Request){
 	//Set the name (name gets dereferenced and copied)
 	section.Name = *inputData
 }
+
+func EditChapterSetNameHandler(w http.ResponseWriter, r *http.Request){
+
+	//Get the uids
+	suid, _ := strconv.Atoi(mux.Vars(r)["storyuid"])
+	cuidRel, _ := strconv.Atoi(mux.Vars(r)["chapteruid"])
+
+	//Get the chapter
+	chapter, err := ActiveProject.GetChapter(suid, cuidRel)
+	
+	if err != nil {
+		w.WriteHeader(http.StatusNotFound)
+		LogWarning.Println(err)
+		return
+	}
+	
+	inputData := &common.Name{}
+	
+	err = json.NewDecoder(r.Body).Decode(inputData)
+	
+	if err != nil {
+		w.WriteHeader(http.StatusInternalServerError)
+		LogWarning.Println(err)
+		return
+	}
+	
+	//Send ok
+	w.WriteHeader(http.StatusOK)
+	
+	//Set the name
+	chapter.Name = *inputData
+}
+
+func EditChapterSetStatusHandler(w http.ResponseWriter, r *http.Request){
+
+	//Get the uids
+	suid, _ := strconv.Atoi(mux.Vars(r)["storyuid"])
+	cuidRel, _ := strconv.Atoi(mux.Vars(r)["chapteruid"])
+
+	//Get the status number
+	status, _ := strconv.Atoi(mux.Vars(r)["status"])
+
+	//Get the chapter
+	chapter, err := ActiveProject.GetChapter(suid, cuidRel)
+	
+	if err != nil {
+		w.WriteHeader(http.StatusNotFound)
+		LogWarning.Println(err)
+		return
+	}
+	
+	if err != nil {
+		w.WriteHeader(http.StatusInternalServerError)
+		LogWarning.Println(err)
+		return
+	}
+	
+	//Send ok
+	w.WriteHeader(http.StatusOK)
+	
+	//Set the status
+	chapter.Status = status
+}
+
+func EditStorySetNameHandler(w http.ResponseWriter, r *http.Request){
+
+	//Get the uids
+	suid, _ := strconv.Atoi(mux.Vars(r)["storyuid"])
+
+	//Get the story
+	story, err := ActiveProject.GetStory(suid)
+	
+	if err != nil {
+		w.WriteHeader(http.StatusNotFound)
+		LogWarning.Println(err)
+		return
+	}
+	
+	inputData := &common.Name{}
+	
+	err = json.NewDecoder(r.Body).Decode(inputData)
+	
+	if err != nil {
+		w.WriteHeader(http.StatusInternalServerError)
+		LogWarning.Println(err)
+		return
+	}
+	
+	//Send ok
+	w.WriteHeader(http.StatusOK)
+	
+	//Set the name
+	story.Name = *inputData
+}
+
+func EditStorySetStatusHandler(w http.ResponseWriter, r *http.Request){
+
+	//Get the uids
+	suid, _ := strconv.Atoi(mux.Vars(r)["storyuid"])
+
+	//Get the status number
+	status, _ := strconv.Atoi(mux.Vars(r)["status"])
+
+	//Get the story
+	story, err := ActiveProject.GetStory(suid)
+	
+	if err != nil {
+		w.WriteHeader(http.StatusNotFound)
+		LogWarning.Println(err)
+		return
+	}
+	
+	if err != nil {
+		w.WriteHeader(http.StatusInternalServerError)
+		LogWarning.Println(err)
+		return
+	}
+	
+	//Send ok
+	w.WriteHeader(http.StatusOK)
+	
+	//Set the status
+	story.Status = status
+}
