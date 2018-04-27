@@ -135,9 +135,11 @@ func main(){
 		} 
 	}()
 	
+	//A channel to flag done (primarily used to block main thread)
+	done := make(chan bool, 1)
+	
 	//use a goroutine to handle signals
 	sig := make(chan os.Signal, 1)
-	done := make(chan bool, 1)
 	
 	signal.Notify(sig, os.Interrupt, syscall.SIGINT, syscall.SIGTERM) //bind signals to sig channel
 	
@@ -145,9 +147,13 @@ func main(){
 		<-sig //wait for signal
 		LogInfo.Println("Signal received. Shutting down...") //inform of shutdown
 		SaveAndExit(server) //shutdown
-		done <- true //Shouldn't reach here, but if so let program quit
+		done <- true //Shouldn't reach here, but if so, let program quit
 	}()
 	
+	LogInfo.Println("Waiting for interrupt signal or net command...")
+	LogInfo.Println("To quit, either send a request to '/settings/quit' or send a signal to terminate.")
+	LogInfo.Println("Both methods should ensure proper shutdown.")
+	LogInfo.Println("NOTE: ctrl-c in a cygwin terminal may not have proper shutdown.")
 	<- done //Intended to block
 }
 
@@ -173,10 +179,6 @@ func SaveAndExit(server *http.Server){
 //Dummy handler
 func testHandler(w http.ResponseWriter, r *http.Request) {
 	//DO NOTHING
-	err := SaveProjectList("./data/projects/projectList.json")
-	if err != nil{
-		LogInfo.Println(err)
-	}
 }
 
 //Logging middleware
