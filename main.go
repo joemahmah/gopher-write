@@ -3,6 +3,9 @@ package main
 import (
 	"github.com/gorilla/mux"
 	"net/http"
+	"os"
+	"os/signal"
+	"syscall"
 )
 
 func main(){
@@ -111,10 +114,63 @@ func main(){
 	//        server       //
 	/////////////////////////
 	
+	//Have the router add access log middleware
 	router.Use(LogMiddleware)
-	http.ListenAndServe(":8080", router)
+	
+	//Create the server
+	server := &http.Server{
+		Addr: ":8080",
+		Handler: router,
+	}
+	
+	//use a goroutine to handle the server
+	go func() {
+		//Listen and serve
+		err := server.ListenAndServe()
+	
+		//Report errors
+		if err != nil && err != http.ErrServerClosed {
+			LogError.Println(err)
+			SaveAndExit(server)
+		} 
+	}()
+	
+	//use a goroutine to handle signals
+	sig := make(chan os.Signal, 1)
+	done := make(chan bool, 1)
+	
+	signal.Notify(sig, os.Interrupt, syscall.SIGINT, syscall.SIGTERM) //bind signals to sig channel
+	
+	go func() {
+		<-sig //wait for signal
+		LogInfo.Println("Signal received. Shutting down...") //inform of shutdown
+		SaveAndExit(server) //shutdown
+		done <- true //Shouldn't reach here, but if so let program quit
+	}()
+	
+	<- done //Intended to block
 }
 
+func SaveAndExit(server *http.Server){
+	//Shutdown server
+	err := server.Shutdown(nil)
+	
+	if err != nil {
+		LogError.Println(err)
+	}
+	
+	//Save Project
+	projectPath := "./data/projects/" + ActiveProject.SaveName + ".json"
+	SaveProject(ActiveProject, projectPath)
+	
+	//Save Project List
+	SaveProjectList("./data/projects/projectList.json")
+
+	//Exit Program
+	os.Exit(0)
+}
+
+//Dummy handler
 func testHandler(w http.ResponseWriter, r *http.Request) {
 	//DO NOTHING
 	err := SaveProjectList("./data/projects/projectList.json")
