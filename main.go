@@ -76,10 +76,12 @@ func main(){
 
 		//editing (chapter)
 	router.HandleFunc("/story/{storyuid:[0-9]{1,9}}/{chapteruid:[0-9]{1,9}}/edit/status/{status:[0-4]}", EditChapterSetStatusHandler) //set status for section
+	router.HandleFunc("/story/{storyuid:[0-9]{1,9}}/{chapteruid:[0-9]{1,9}}/edit/note", EditChapterSetNoteHandler) //set name for section
 	router.HandleFunc("/story/{storyuid:[0-9]{1,9}}/{chapteruid:[0-9]{1,9}}/edit/name", EditChapterSetNameHandler) //set name for section
 
 		//editing (story)
 	router.HandleFunc("/story/{storyuid:[0-9]{1,9}}/edit/status/{status:[0-4]}", EditStorySetStatusHandler) //set status for section
+	router.HandleFunc("/story/{storyuid:[0-9]{1,9}}/edit/note", EditStorySetNoteHandler) //set name for section
 	router.HandleFunc("/story/{storyuid:[0-9]{1,9}}/edit/name", EditStorySetNameHandler) //set name for section
 
 		//overview

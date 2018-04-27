@@ -102,6 +102,8 @@ function updateChapterList(){
 						storyElem.setAttribute("draggable","false");
 						storyElem.addEventListener("drop",dropListElement);
 						storyElem.addEventListener("dragover",allowDragListElement);
+						storyElem.addEventListener("dragenter",changeSelectedElementBG);
+						storyElem.addEventListener("dragleave",clearSelectedElementBG);
 						
 						document.getElementById("chapter_list").appendChild(storyElem);
 					} else {
@@ -114,6 +116,8 @@ function updateChapterList(){
 						storyElem.addEventListener("dragover",allowDragListElement);
 						storyElem.addEventListener("dragstart",dragListElement);
 						storyElem.addEventListener("dblclick",linkListElement);
+						storyElem.addEventListener("dragenter",changeSelectedElementBG);
+						storyElem.addEventListener("dragleave",clearSelectedElementBG);
 						
 						var storyElemLink = document.createElement("span");
 						storyElem.setAttribute("draggable","true");
@@ -199,6 +203,8 @@ function dropListElement(e){
 		e.stopPropagation();
 	}
 	
+	e.target.style.background="none";
+	
 	var firstID = parseInt(e.dataTransfer.getData("text"));
 	var secondID = parseInt(e.target.getAttribute("data-chapter-uid"));
 	
@@ -229,6 +235,16 @@ function dragListElement(e){
 
 function allowDragListElement(e){
 	e.preventDefault();
+}
+
+function changeSelectedElementBG(e){
+	e.preventDefault();
+	e.target.style.background="#DDEEDD";
+}
+
+function clearSelectedElementBG(e){
+	e.preventDefault();
+	e.target.style.background="transparent";
 }
 
 </script>

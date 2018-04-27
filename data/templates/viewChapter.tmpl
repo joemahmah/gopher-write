@@ -15,22 +15,24 @@
 
 var currentStoryUID = {{index .UIDS 0}};
 var currentChapterUID = {{index .UIDS 1}};
-var chapStatus = {{.Chapter.Status}};
 
-var changes = false;
+var newStatus = null;
+var noteChanged = false;
+var nameChanged = false;
 
 window.onload = initPage;
 
 function initPage(){
-	//Set the chapter status
-	setStatus();
+	//Set the status
+	var statusText = document.getElementById("status_text");
+	statusText.value = {{.Chapter.Status}};
 	
 	//Update the section list
 	updateSectionList();
 
-	//Save changes every second
+	//Save changes every three seconds
 	//User shouldn't be editing a lot, so catching their change as quick as possible is good.
-	window.setInterval(saveChanges, 1000);
+	window.setInterval(saveChanges, 3000);
 }
 
 function addSectionForm(){
@@ -105,6 +107,8 @@ function updateSectionList(){
 						storyElem.setAttribute("draggable","false");
 						storyElem.addEventListener("drop",dropListElement);
 						storyElem.addEventListener("dragover",allowDragListElement);
+						storyElem.addEventListener("dragenter",changeSelectedElementBG);
+						storyElem.addEventListener("dragleave",clearSelectedElementBG);
 						
 						document.getElementById("section_list").appendChild(storyElem);
 					} else {
@@ -118,6 +122,8 @@ function updateSectionList(){
 						storyElem.addEventListener("dragover",allowDragListElement);
 						storyElem.addEventListener("dragstart",dragListElement);
 						storyElem.addEventListener("dblclick",linkListElement);
+						storyElem.addEventListener("dragenter",changeSelectedElementBG);
+						storyElem.addEventListener("dragleave",clearSelectedElementBG);
 						
 						var storyElemLink = document.createElement("span");
 						storyElem.setAttribute("draggable","true");
@@ -145,34 +151,22 @@ function setStatus(){
 	statusText.value = chapStatus;
 }
 
+
 function saveChanges(){
-	//Only save changes if there is actually something to save.
-	if(changes === true){
-		//reset change chapter status
-		changes = false;
-		
-		//Get and create the name
-		var name = MakeName(document.getElementById("name_text").innerHTML,false,null);
-		//Create a chapter object with the new status and/or name
-		var chapter = MakeChapter(name,parseInt(document.getElementById("status_text").value),null);
-		
-		var xhr = new XMLHttpRequest();
-		var url = "/story/" + currentStoryUID + "/" + currentChapterUID + "/edit";
-		xhr.open("POST", url, true);
-		xhr.setRequestHeader("Content-Type", "application/json");
-		xhr.onreadystatechange = function () {
-			//if server returns proper, update display
-			if (this.readyState == 4 && this.status == 200){
-				showResponse("Chapter updated.");
-				setTimeout("hideResponse()",2000);
-			} else if (this.readyState == 4 && this.status == 500) {
-				showResponse("Unable to update.");
-				setTimeout("hideResponse()",2000);
-			}
-		}
-		
-		xhr.send(JSON.stringify(chapter));
-		
+	
+	//Update status if needed
+	if(newStatus !== null){
+		updateStatus(newStatus);
+	}
+	
+	//Update note if needed.
+	if(noteChanged){
+		updateNote()
+	}
+	
+	//Update name if needed.
+	if(nameChanged){
+		updateName()
 	}
 }
 
@@ -208,6 +202,8 @@ function dropListElement(e){
 		e.stopPropagation();
 	}
 	
+	e.target.style.background="none";
+	
 	var firstID = parseInt(e.dataTransfer.getData("text"));
 	var secondID = parseInt(e.target.getAttribute("data-section-uid"));
 	
@@ -240,11 +236,113 @@ function allowDragListElement(e){
 	e.preventDefault();
 }
 
+function changeSelectedElementBG(e){
+	e.preventDefault();
+	e.target.style.background="#DDEEDD";
+}
+
+function clearSelectedElementBG(e){
+	e.preventDefault();
+	e.target.style.background="transparent";
+}
+
+function procUpdateStatus(){
+
+	var stat = parseInt(document.getElementById("status_text").value);
+
+	updateStatus(stat);
+}
+
+function toggleNoteVisability(){
+	if(document.getElementById("note_wrap").style.display == "block"){
+		document.getElementById("note_wrap").style.display = "none";
+		document.getElementById("note_header_arrow").innerHTML = "▼";
+	} else {
+		document.getElementById("note_wrap").style.display = "block";
+		document.getElementById("note_header_arrow").innerHTML = "▲";
+	}
+}
+
+////////////////////////////
+// Actual Update Handlers //
+////////////////////////////
+
+function updateStatus(stat){
+
+	//Try to add remote
+	var xhr = new XMLHttpRequest();
+	var url = "/story/" + currentStoryUID + "/" + currentChapterUID + "/edit/status/" + stat;
+	xhr.open("POST", url, true);
+	xhr.setRequestHeader("Content-Type", "text/plain");
+	xhr.onreadystatechange = function () {
+		if (this.readyState == 4 && this.status === 200){
+			newStatus = null; //unflag to be updated (if flagged)
+			showResponse("Status updated.");
+			setTimeout("hideResponse()",2000);
+		} else if (this.readyState == 4 && this.status !== 200) {
+			//If unable to add
+			newStatus = stat; //Flag to try again on next save
+			showResponse("Unable to update status. Will try again on next save.");
+			setTimeout("hideResponse()",5000);
+		}
+	}
+	
+	xhr.send();
+}
+
+function updateNote() {
+	var text = document.getElementById("note_textarea").value;
+	var textobj = {Data: text};
+	
+	var xhr = new XMLHttpRequest();
+	var url = "/story/" + currentStoryUID + "/" + currentChapterUID + "/edit/note";
+	xhr.open("POST", url, true);
+	xhr.setRequestHeader("Content-Type", "application/json");
+	xhr.onreadystatechange = function () {
+		//if server returns proper, update display
+		if (this.readyState == 4 && this.status == 200){
+			noteChanged = false;
+			showResponse("Saved.");
+			setTimeout("hideResponse()",2000);
+		} else if (this.readyState == 4 && this.status !== 200) {
+			noteChanged = true; //
+			showResponse("Unable to save note. Will try again on next save.");
+			setTimeout("hideResponse()",5000);
+		}
+	}
+	
+	xhr.send(JSON.stringify(textobj));
+}
+
+function updateName(){
+	var name = MakeName(document.getElementById("name_text").value,false,null);
+	
+	var xhr = new XMLHttpRequest();
+	var url = "/story/" + currentStoryUID + "/" + currentChapterUID + "/edit/name";
+	xhr.open("POST", url, true);
+	xhr.setRequestHeader("Content-Type", "application/json");
+	xhr.onreadystatechange = function () {
+		//if server returns proper, update display
+		if (this.readyState == 4 && this.status == 200){
+			nameChanged = false;
+			showResponse("Saved.");
+			setTimeout("hideResponse()",2000);
+		} else if (this.readyState == 4 && this.status !== 200) {
+			nameChanged = true; //
+			showResponse("Unable to save name. Will try again on next save.");
+			setTimeout("hideResponse()",5000);
+		}
+	}
+	
+	xhr.send(JSON.stringify(name));
+}
+
 </script>
 
 {{template "header"}}
 
-<h1 id="name_text">{{.Chapter.Name.PrimaryName}}</h1>
+
+<input class="name" id="name_text" type="text" onchange="nameChanged=true;" onkeypress="ConsumeEnterKeyEvent(event, saveChanges);" value="{{.Chapter.Name.PrimaryName}}">
 
 <div class="meta_control">
 	<a href="/story/{{index .UIDS 0}}">Return to story</a>
@@ -252,13 +350,26 @@ function allowDragListElement(e){
 
 <div class="status_wrap" id="status_wrap">
 	<span class="status_label" >Status: </span>
-	<select class="status_text" id="status_text" onchange="changes=true;" >
+	<select class="status_text" id="status_text" onchange="procUpdateStatus();" >
 		<option value="0">Not Started</option>
 		<option value="1">In Progress</option>
 		<option value="2">Almost Done</option>
 		<option value="3">Done</option>
 		<option value="4">Unknown</option>
 	</select>
+</div>
+
+<div class="note_wrap">
+	<div class="note_header" onclick="toggleNoteVisability()">
+		Notes 
+		<span class="meta_tiny" id="note_header_arrow">▼</span>
+	</div>
+	<div class="text_wrap meta_hidden" id="note_wrap">
+		<div class="text_control" id="text_control">
+			<span class="button_control" onclick="saveChanges();">Save</span>
+		</div>
+		<textarea id="note_textarea" onchange="noteChanged=true;">{{.Chapter.Note}}</textarea>
+	</div>
 </div>
 
 <hr>

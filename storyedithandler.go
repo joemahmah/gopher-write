@@ -185,6 +185,11 @@ func EditSectionSetNameHandler(w http.ResponseWriter, r *http.Request){
 	section.Name = *inputData
 }
 
+
+/////////////
+// CHAPTER //
+/////////////
+
 func EditChapterSetNameHandler(w http.ResponseWriter, r *http.Request){
 
 	//Get the uids
@@ -235,6 +240,33 @@ func EditChapterSetStatusHandler(w http.ResponseWriter, r *http.Request){
 		return
 	}
 	
+	//Send ok
+	w.WriteHeader(http.StatusOK)
+	
+	//Set the status
+	chapter.Status = status
+}
+
+func EditChapterSetNoteHandler(w http.ResponseWriter, r *http.Request){
+
+	//Get the uids
+	suid, _ := strconv.Atoi(mux.Vars(r)["storyuid"])
+	cuidRel, _ := strconv.Atoi(mux.Vars(r)["chapteruid"])
+	
+	//Get the chapter
+	chapter, err := ActiveProject.GetChapter(suid, cuidRel)
+	
+	if err != nil {
+		w.WriteHeader(http.StatusNotFound)
+		LogWarning.Println(err)
+		return
+	}
+	
+	inputData := &DataTransferText{}
+	
+	err = json.NewDecoder(r.Body).Decode(inputData)
+	
+	
 	if err != nil {
 		w.WriteHeader(http.StatusInternalServerError)
 		LogWarning.Println(err)
@@ -244,9 +276,13 @@ func EditChapterSetStatusHandler(w http.ResponseWriter, r *http.Request){
 	//Send ok
 	w.WriteHeader(http.StatusOK)
 	
-	//Set the status
-	chapter.Status = status
+	//Set the note
+	chapter.Note = inputData.Data
 }
+
+/////////////
+//  STORY  //
+/////////////
 
 func EditStorySetNameHandler(w http.ResponseWriter, r *http.Request){
 
@@ -296,6 +332,32 @@ func EditStorySetStatusHandler(w http.ResponseWriter, r *http.Request){
 		return
 	}
 	
+	//Send ok
+	w.WriteHeader(http.StatusOK)
+	
+	//Set the status
+	story.Status = status
+}
+
+func EditStorySetNoteHandler(w http.ResponseWriter, r *http.Request){
+
+	//Get the uids
+	suid, _ := strconv.Atoi(mux.Vars(r)["storyuid"])
+
+	//Get the story
+	story, err := ActiveProject.GetStory(suid)
+	
+	if err != nil {
+		w.WriteHeader(http.StatusNotFound)
+		LogWarning.Println(err)
+		return
+	}
+	
+	inputData := &DataTransferText{}
+	
+	err = json.NewDecoder(r.Body).Decode(inputData)
+	
+	
 	if err != nil {
 		w.WriteHeader(http.StatusInternalServerError)
 		LogWarning.Println(err)
@@ -305,6 +367,6 @@ func EditStorySetStatusHandler(w http.ResponseWriter, r *http.Request){
 	//Send ok
 	w.WriteHeader(http.StatusOK)
 	
-	//Set the status
-	story.Status = status
+	//Set the note
+	story.Note = inputData.Data
 }
