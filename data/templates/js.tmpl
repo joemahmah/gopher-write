@@ -266,7 +266,7 @@ function MakeSection(name, text, stat, chars, locs, note){
 	return sect;
 }
 
-function Chapter(UID, Name, Sections, Status){
+function Chapter(UID, Name, Sections, Status, Note){
 	this.UID = UID;
 	this.Name = Name;
 	this.Sections = Sections;
@@ -287,7 +287,7 @@ function MakeChapter(name, stat, sections, note){
 	return chapter;
 }
 
-function Story(UID, Name, Chapters, Status){
+function Story(UID, Name, Chapters, Status, Note){
 	this.UID = UID;
 	this.Name = Name;
 	this.Chapters = Chapters;

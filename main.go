@@ -10,6 +10,16 @@ func main(){
 	//Init logs
 	InitLogs()
 
+	//Load projects
+	err := LoadProjectList("./data/projects/projectList.json")
+
+	//If unable to load projects
+	if err != nil {
+		LogError.Println("Unable to load projects, quitting.")
+		LogError.Println(err)
+		//return
+	}
+
 	//create router
 	router := mux.NewRouter()
 
@@ -22,11 +32,11 @@ func main(){
 	/////////////////////////
 	//      project io     //
 	/////////////////////////
-	router.HandleFunc("/project/load/{project:[0-9]{14}.[0-9]{6}}", LoadProjectHandler)
-	router.HandleFunc("/project/save", SaveProjectHandler)
-	router.HandleFunc("/project/new/{project}", NewProjectHandler)
-	router.HandleFunc("/project/list", testHandler) //List projects
-
+	router.HandleFunc("/project/load/{project:[0-9]{14}.[0-9]{6}}", LoadProjectHandler) //Load project
+	router.HandleFunc("/project/save", SaveProjectHandler) //Save project
+	router.HandleFunc("/project/new/{project}", NewProjectHandler) //Create new project
+	router.HandleFunc("/project/list", ListJSONProjectHandler) //List projects
+	router.HandleFunc("/project", OverviewProjectHandler) //Overview project
 	
 	/////////////////////////
 	//      char manip     //
@@ -107,6 +117,10 @@ func main(){
 
 func testHandler(w http.ResponseWriter, r *http.Request) {
 	//DO NOTHING
+	err := SaveProjectList("./data/projects/projectList.json")
+	if err != nil{
+		LogInfo.Println(err)
+	}
 }
 
 //Logging middleware
@@ -116,3 +130,4 @@ func LogMiddleware(h http.Handler) http.Handler {
 		h.ServeHTTP(w, r)
 	})
 }
+

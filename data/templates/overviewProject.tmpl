@@ -1,0 +1,82 @@
+<html>
+
+<head>
+	<meta charset="utf-8">
+	<title>Story List | gopher-write</title>
+	
+	{{template "css"}}
+</head>
+
+<body>
+
+{{template "js"}}
+
+<script language="javascript">
+
+//Set story list to update on load
+window.onload = updateProjectList;
+
+function updateProjectList(){
+	var xhr = new XMLHttpRequest();
+	var url = "/project/list";
+	xhr.open("POST", url, true);
+	xhr.onreadystatechange = function () {
+		//if server returns JSON, update display
+		if (this.readyState === 4 && this.status === 200){
+			//get the char list
+			var projectList = document.getElementById("project_list");
+			
+			//convert json into object
+			var projectListJSON = JSON.parse(this.responseText);
+			
+			if(projectListJSON.Data != null) {
+				projectList.innerHTML = "";
+			
+				var data = projectListJSON.Data;
+
+				//add the projects to the page
+				for (var i = 0; i < data.length; i++) {
+					var storyElem = document.createElement("div");
+					storyElem.className = "list_elem";
+					storyElem.setAttribute("data-path",data[i].S2);
+					storyElem.addEventListener("dblclick",linkListElement);
+						
+					var storyElemLink = document.createElement("span");
+					storyElemLink.innerHTML = data[i].S1;
+						
+					storyElem.appendChild(storyElemLink);
+						
+					projectList.appendChild(storyElem);
+				}
+			}
+		} else if (this.readyState === 4 && this.status !== 200){
+			alert(this.status);
+		}
+	}
+	
+	xhr.send();
+}
+
+function linkListElement(e){
+	var path = e.target.getAttribute("data-path");
+	location.href = "/project/load/" + path;
+}
+
+</script>
+
+{{template "header"}}
+
+<h1 class="name">Projects</h1>
+
+<div class="">
+	<span class="form_make_button meta_big">Import Project</span>
+	<span class="form_make_button meta_big">Export Project</span>
+</div>
+
+<div class="list" id="project_list">
+
+</div>
+
+</body>
+
+</html>

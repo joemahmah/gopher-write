@@ -4,6 +4,8 @@ import (
 	"net/http"
 	"github.com/gorilla/mux"
 	"time"
+	"html/template"
+	"encoding/json"
 )
 
 func LoadProjectHandler(w http.ResponseWriter, r *http.Request) {
@@ -63,6 +65,48 @@ func NewProjectHandler(w http.ResponseWriter, r *http.Request) {
 	} else {
 		w.WriteHeader(http.StatusOK)
 		LogInfo.Println("Created project " + ActiveProject.Name + " (" + projectPath + ")")
+		ProjectList[projectSaveName] = projectName
 	}
 	
+}
+
+func OverviewProjectHandler(w http.ResponseWriter, r *http.Request) {
+	//Parse template
+	tmpl, err := template.ParseFiles("data/templates/overviewProject.tmpl", "data/templates/style.tmpl", "data/templates/header.tmpl", "data/templates/js.tmpl")
+
+	//check for errors
+	if err != nil {
+		w.WriteHeader(http.StatusInternalServerError)
+		LogError.Println(err)
+		return
+	}
+
+	//serve template
+	err = tmpl.Execute(w, nil)
+
+	//report errors
+	if err != nil {
+		w.WriteHeader(http.StatusInternalServerError)
+		LogError.Println(err)
+	}
+}
+
+//Provides JSON containing an array of pairs with the pairs
+//being (name, location) of projects
+func ListJSONProjectHandler(w http.ResponseWriter, r *http.Request) {
+	//var to hold names/paths
+	var data DataTransferDualStringSlice
+
+	//Assign to data
+	for path, name := range ProjectList {
+		data.Data = append(data.Data, DualString{S1: name, S2: path})
+	}
+
+	//Encode
+	err := json.NewEncoder(w).Encode(data)
+
+	if err != nil {
+		w.WriteHeader(http.StatusInternalServerError)
+		LogError.Println(err)
+	}
 }

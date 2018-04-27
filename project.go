@@ -11,7 +11,11 @@ import (
 	"errors"
 )
 
+//The active project
 var ActiveProject *Project = MakeProject("","")
+
+//The project list (map location->name)
+var ProjectList map[string]string = make(map[string]string)
 
 type Project struct {
 		Name			string
@@ -289,3 +293,50 @@ func SaveProject(project *Project, path string) error {
 	return json.NewEncoder(projectBufferedWriter).Encode(project)
 	
 }
+
+///////////////////////////////////////////////////////////
+//               Project List Save/Load                  //
+///////////////////////////////////////////////////////////
+
+func LoadProjectList(path string) error {
+
+	//Attempt to open the file at the path given
+	projectListFile, err := os.Open(path)
+
+	//Check for errors
+	if err != nil {
+		return err
+	}
+
+	//Close projectlist file
+	defer projectListFile.Close()
+
+	//Buffer the file
+	projectListBufferedFile := bufio.NewReader(projectListFile)
+
+	//Decode the file and return errors
+	return json.NewDecoder(projectListBufferedFile).Decode(&ProjectList)
+}
+
+func SaveProjectList(path string) error {
+	//Open the file (create if needed)
+	projectListFile, err := os.OpenFile(path, os.O_RDWR|os.O_CREATE, 0660)
+
+	//Check for errors
+	if err != nil {
+		return err
+	}
+
+	//Close projectlist file
+	defer projectListFile.Close()
+
+	//Make a buffer
+	projectListBufferedWriter := bufio.NewWriter(projectListFile)
+
+	//Flush the buffer
+	defer projectListBufferedWriter.Flush()
+
+	//Encode and return errors
+	return json.NewEncoder(projectListBufferedWriter).Encode(&ProjectList)
+}
+
