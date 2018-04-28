@@ -29,3 +29,16 @@ type DataTransferDualStringSlice struct {
 	Data	[]DualString
 }
 
+type DualStringMonoBool struct {
+	S1	string
+	S2	string
+	B	bool
+}
+
+type DataTransferDualStringMonoBool struct {
+	Data	DualStringMonoBool
+}
+
+type DataTransferDualStringMonoBoolSlice struct {
+	Data	[]DualStringMonoBool
+}

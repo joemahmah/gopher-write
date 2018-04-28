@@ -95,11 +95,15 @@ func OverviewProjectHandler(w http.ResponseWriter, r *http.Request) {
 //being (name, location) of projects
 func ListJSONProjectHandler(w http.ResponseWriter, r *http.Request) {
 	//var to hold names/paths
-	var data DataTransferDualStringSlice
+	var data DataTransferDualStringMonoBoolSlice
 
 	//Assign to data
 	for path, name := range ProjectList {
-		data.Data = append(data.Data, DualString{S1: name, S2: path})
+		isActiveProj := false
+		if ActiveProject.SaveName == path {
+			isActiveProj = true
+		}
+		data.Data = append(data.Data, DualStringMonoBool{S1: name, S2: path, B: isActiveProj})
 	}
 
 	//Encode
