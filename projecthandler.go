@@ -6,7 +6,12 @@ import (
 	"time"
 	"html/template"
 	"encoding/json"
+	"sort"
 )
+
+//Vars to make sure the project list json doesn't need to be regenerated all the time
+var projectListHasChanged bool = false
+var projectListDataTransferSlice []DualStringMonoBool = nil
 
 func LoadProjectHandler(w http.ResponseWriter, r *http.Request) {
 	projectName := mux.Vars(r)["project"]
@@ -24,6 +29,7 @@ func LoadProjectHandler(w http.ResponseWriter, r *http.Request) {
 	} else {
 		w.WriteHeader(http.StatusOK)
 		LogInfo.Println("Loaded project " + ActiveProject.Name + " (" + projectPath + ")")
+		projectListHasChanged = true
 	}
 	
 }
@@ -65,7 +71,7 @@ func NewProjectHandler(w http.ResponseWriter, r *http.Request) {
 	} else {
 		w.WriteHeader(http.StatusOK)
 		LogInfo.Println("Created project " + ActiveProject.Name + " (" + projectPath + ")")
-		ProjectList[projectSaveName] = projectName
+		ProjectList[projectSaveName] = projectName //Add to project list
 	}
 	
 }
@@ -97,13 +103,25 @@ func ListJSONProjectHandler(w http.ResponseWriter, r *http.Request) {
 	//var to hold names/paths
 	var data DataTransferDualStringMonoBoolSlice
 
-	//Assign to data
-	for path, name := range ProjectList {
-		isActiveProj := false
-		if ActiveProject.SaveName == path {
-			isActiveProj = true
+	if projectListHasChanged || projectListDataTransferSlice == nil { //If need to update cached data
+		//Assign to data
+		for path, name := range ProjectList {
+			isActiveProj := false
+			if ActiveProject.SaveName == path {
+				isActiveProj = true
+			}
+			data.Data = append(data.Data, DualStringMonoBool{S1: name, S2: path, B: isActiveProj})
 		}
-		data.Data = append(data.Data, DualStringMonoBool{S1: name, S2: path, B: isActiveProj})
+		
+		//Sort the data (to ensure it will always be the same)
+		sort.Slice(data.Data, func(i int, j int) bool {
+			return data.Data[i].S2 < data.Data[j].S2
+		})
+	
+		projectListHasChanged = false;
+		projectListDataTransferSlice = data.Data
+	} else {
+		data.Data = projectListDataTransferSlice
 	}
 
 	//Encode

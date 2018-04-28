@@ -37,14 +37,26 @@ function updateProjectList(){
 				//add the projects to the page
 				for (var i = 0; i < data.length; i++) {
 					var storyElem = document.createElement("div");
-					storyElem.className = "list_elem";
+					storyElem.classList.add("list_elem");
 					storyElem.setAttribute("data-path",data[i].S2);
 					storyElem.addEventListener("dblclick",linkListElement);
 						
-					var storyElemLink = document.createElement("span");
-					storyElemLink.innerHTML = data[i].S1;
+					var storyElemName = document.createElement("span");
+					storyElemName.innerHTML = data[i].S1;
 						
-					storyElem.appendChild(storyElemLink);
+					storyElem.appendChild(storyElemName);
+					
+					//If project is active project
+					if(data[i].B){
+						storyElem.classList.add("list_elem_active");
+						
+						var activeText = document.createElement("span");
+						activeText.classList.add("meta_small");
+						activeText.innerHTML = "Active Project";
+						
+						storyElem.appendChild(document.createElement("br")); //Add line break
+						storyElem.appendChild(activeText); //Add active text
+					}
 						
 					projectList.appendChild(storyElem);
 				}
@@ -58,8 +70,23 @@ function updateProjectList(){
 }
 
 function linkListElement(e){
-	var path = e.target.getAttribute("data-path");
-	location.href = "/project/load/" + path;
+	//Send request
+	var xhr = new XMLHttpRequest();
+	var url = "/project/load/" + e.target.getAttribute("data-path");
+	xhr.open("POST", url, true);
+	xhr.setRequestHeader("Content-Type", "text/plain");
+	xhr.onreadystatechange = function () {
+		if (this.readyState == 4 && this.status === 200){ //if loaded
+			showResponse("Project loaded.");
+			setTimeout("hideResponse()",2000);
+			updateProjectList(); //update project list (active project)
+		} else if (this.readyState == 4 && this.status !== 200) { //if not loaded
+			showResponse("Unable to load project.");
+			setTimeout("hideResponse()",5000);
+		}
+	}
+	
+	xhr.send();
 }
 
 </script>
