@@ -3,17 +3,20 @@
 <style>
 
 .nav-wrap {
+	display: flex;
+	flex-wrap: wrap;
 	min-height: 50px;
 }
 
 .nav-list {
+	display: flex;
+	flex-wrap: wrap;
 	list-style-type: none;
 	margin: 0;
 	padding: 0;
 }
 
 .nav-list li {
-	float: left;
 	min-width: 80px;
 }
 
@@ -23,8 +26,8 @@
 }
 
 .nav-dropdown {
+	display: flex;
 	position: relative;
-	display: inline-block;
 }
 
 .nav-dropdown:hover .nav-dropdown-minor {
@@ -41,9 +44,12 @@
 .nav-dropdown-minor {
 	display: none;
 	position: absolute;
+	top: 50px;
 	min-width: 120px;
-	box-shadow: 0px 8px 16px 0px rgba(0,0,0,.2);
-	z-index: 1;
+	
+	background-color: #FFFFFF;
+	box-shadow: 0px 8px 16px 0px rgba(0,0,0,.6);
+	z-index: 20;
 }
 
 .nav-dropdown-minor-elem {
@@ -53,6 +59,17 @@
 	text-decoration: none;
 	display: block;
 	cursor: pointer;
+}
+
+.nav-title {
+	font-size: 1.25em;
+	font-weight: bold;
+	margin-top: .67em;
+	margin-bottom: .67em;
+	margin-left: 0em;
+	margin-right: 0em;
+	
+	vertical-align: middle;
 }
 
 .text_wrap textarea {
