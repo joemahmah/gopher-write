@@ -226,7 +226,7 @@ func GetJSONStoryHandler(w http.ResponseWriter, r *http.Request) {
 	}
 
 	//Encode and send off
-	r.Header.Set("Content-Type","application/json")
+	w.Header().Set("Content-Type","application/json")
 	err = json.NewEncoder(w).Encode(selectedStory)
 
 	if err != nil {
@@ -250,7 +250,7 @@ func GetJSONChapterHandler(w http.ResponseWriter, r *http.Request) {
 	}
 
 	//Encode and send off
-	r.Header.Set("Content-Type","application/json")
+	w.Header().Set("Content-Type","application/json")
 	err = json.NewEncoder(w).Encode(selectedChapter)
 
 	if err != nil {
@@ -275,7 +275,7 @@ func GetJSONSectionHandler(w http.ResponseWriter, r *http.Request) {
 	}
 
 	//Encode and send off
-	r.Header.Set("Content-Type","application/json")
+	w.Header().Set("Content-Type","application/json")
 	err = json.NewEncoder(w).Encode(selectedSection)
 
 	if err != nil {
@@ -398,6 +398,7 @@ func ListJSONStoryHandler(w http.ResponseWriter, r *http.Request) {
 	}
 	
 	//Encode and send off
+	w.Header().Set("Content-Type","application/json")
 	err := json.NewEncoder(w).Encode(struct{Names []string; UIDS []int}{Names: names, UIDS: uids})
 	
 	if err != nil {
@@ -423,6 +424,7 @@ func ListJSONChapterHandler(w http.ResponseWriter, r *http.Request) {
 	}
 	
 	//Encode and send off
+	w.Header().Set("Content-Type","application/json")
 	err = json.NewEncoder(w).Encode(struct{Names []string; UIDS []int}{Names: names, UIDS: uids})
 	
 	if err != nil {
@@ -452,6 +454,7 @@ func ListJSONSectionHandler(w http.ResponseWriter, r *http.Request) {
 	}
 	
 	//Encode and send off
+	w.Header().Set("Content-Type","application/json")
 	err = json.NewEncoder(w).Encode(struct{Names []string; UIDS []int}{Names: names, UIDS: uids})
 	
 	if err != nil {

@@ -40,6 +40,8 @@ func main(){
 	router.HandleFunc("/project/new", NewProjectHandler) //Create new project
 	router.HandleFunc("/project/list", ListJSONProjectHandler) //List projects
 	router.HandleFunc("/project", OverviewProjectHandler) //Overview project
+	router.HandleFunc("/project/import", ImportProjectHandler) //import project
+	router.HandleFunc("/project/export", ExportProjectHandler) //export current project
 	
 	/////////////////////////
 	//      char manip     //

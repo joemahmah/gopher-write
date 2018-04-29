@@ -92,7 +92,7 @@ func GetJSONCharHandler(w http.ResponseWriter, r *http.Request) {
 	} 
 	
 	//Encode and send off
-	r.Header.Set("Content-Type","application/json")
+	w.Header().Set("Content-Type","application/json")
 	err = json.NewEncoder(w).Encode(ActiveProject.Characters[cid])
 
 	if err != nil {
@@ -148,6 +148,7 @@ func ListJSONCharHandler(w http.ResponseWriter, r *http.Request) {
 	}
 	
 	//Encode and send off
+	w.Header().Set("Content-Type","application/json")
 	err := json.NewEncoder(w).Encode(struct{Names []string; UIDS []int}{Names: names, UIDS: uids})
 	
 	if err != nil {

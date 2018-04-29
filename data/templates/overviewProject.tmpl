@@ -88,6 +88,50 @@ function linkListElement(e){
 	
 	xhr.send();
 }
+var file;
+
+function importProject(){
+	var files = document.getElementById("project_import_input").files;
+	
+	//check if one file uploaded
+	if(files.length !== 1){
+		showResponse("Select a single file to import.");
+		setTimeout("hideResponse()",5000);
+		return;
+	}
+	
+	//get the file
+	file = files[0];
+	
+	//Make a file reader
+	var fileReader = new FileReader();
+	
+	//Make the request
+	var xhr = new XMLHttpRequest();
+	var url = "/project/import"
+	xhr.open("POST", url, true);
+	xhr.setRequestHeader("Content-Type", "application/json");
+	xhr.onreadystatechange = function () {
+		if (this.readyState == 4 && this.status == 200){
+			showResponse("Project created.");
+			setTimeout("hideResponse()",2000);
+			HideModal("project_import_modal"); //Hide the modal
+			updateProjectList(); //Update the project list
+			document.getElementById("project_new_input").value = ""; //Clear name
+		} else if (this.readyState == 4 && this.status !== 200) {
+			showResponse("Unable to create project.");
+			setTimeout("hideResponse()",5000);
+		}
+	}
+	
+	//Set the filereader to send the file
+	fileReader.onload = function(e){
+		xhr.send(e.target.result);
+	}
+	
+	//Read the file
+	fileReader.readAsBinaryString(file)
+}
 
 function addProject(){
 	var projectName = document.getElementById("project_new_input").value;
@@ -113,6 +157,11 @@ function addProject(){
 	xhr.send(JSON.stringify(textobj));
 }
 
+function exportProject(){
+	window.location = "/project/export";
+	return;
+}
+
 </script>
 
 {{template "header"}}
@@ -121,8 +170,9 @@ function addProject(){
 
 <div class="project_wrap">
 	<div class="project_control">
-		<span class="form_make_button meta_big" onclick='DisplayModal("project_new_modal")'>New Project</span>
-		<span class="form_make_button meta_big">Import Project</span>
+		<span class="form_make_button meta_big" onclick='DisplayModal("project_new_modal");'>New Project</span>
+		<span class="form_make_button meta_big" onclick='DisplayModal("project_import_modal");'>Import Project</span>
+		<span class="form_make_button meta_big" onclick="exportProject();">Export Active Project</span>
 	</div>
 </div>
 
@@ -140,6 +190,19 @@ function addProject(){
 	<div class="ui_modal_control">
 			<span class="form_make_button form_make_button_big form_make_button_round form_make_button_right" onclick="addProject();">Create Project</span>
 			<span class="form_make_button form_make_button_big form_make_button_round form_make_button_right" onclick='HideModal("project_new_modal");'>Close</span>
+	</div>
+</div>
+</div>
+
+<div class="ui_modal" id="project_import_modal">
+<div class="ui_modal_content">
+	<div class="ui_modal_form">
+		<input id="project_import_input" type="file" multiple="false">
+	</div>
+	<br>
+	<div class="ui_modal_control">
+			<span class="form_make_button form_make_button_big form_make_button_round form_make_button_right" onclick="importProject();">Import Project</span>
+			<span class="form_make_button form_make_button_big form_make_button_round form_make_button_right" onclick='HideModal("project_import_modal");'>Close</span>
 	</div>
 </div>
 </div>
