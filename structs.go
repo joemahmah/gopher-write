@@ -42,3 +42,16 @@ type DataTransferDualStringMonoBool struct {
 type DataTransferDualStringMonoBoolSlice struct {
 	Data	[]DualStringMonoBool
 }
+
+type MonoStringMonoInt struct {
+	S	string
+	I	int
+}
+
+type DataTransferMonoStringMonoInt struct {
+	Data	MonoStringMonoInt
+}
+
+type DataTransferMonoStringMonoIntSlice struct {
+	Data	[]MonoStringMonoInt
+}

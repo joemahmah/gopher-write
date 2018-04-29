@@ -7,6 +7,7 @@ import (
 	"github.com/joemahmah/gopher-write/character"
 	"encoding/json"
 	"html/template"
+	"sort"
 )
 
 func NewCharHandler(w http.ResponseWriter, r *http.Request) {
@@ -137,19 +138,21 @@ func EditCharHandler(w http.ResponseWriter, r *http.Request) {
 
 func ListJSONCharHandler(w http.ResponseWriter, r *http.Request) {
 	
-	//Slices to store data
-	var names []string
-	var uids []int
+	var charList DataTransferMonoStringMonoIntSlice
 	
 	//Fill slices
 	for _,elem := range ActiveProject.Characters{
-		names = append(names, elem.Name.PrimaryName)
-		uids = append(uids, elem.UID)
+		charList.Data = append(charList.Data, MonoStringMonoInt{S: elem.Name.PrimaryName, I: elem.UID})
 	}
+	
+	//Sort the data (to ensure it will always be the same)
+	sort.Slice(charList.Data, func(i int, j int) bool {
+		return charList.Data[i].I < charList.Data[j].I
+	})
 	
 	//Encode and send off
 	w.Header().Set("Content-Type","application/json")
-	err := json.NewEncoder(w).Encode(struct{Names []string; UIDS []int}{Names: names, UIDS: uids})
+	err := json.NewEncoder(w).Encode(charList)
 	
 	if err != nil {
 		w.WriteHeader(http.StatusInternalServerError)
@@ -178,4 +181,137 @@ func OverviewCharHandler(w http.ResponseWriter, r *http.Request) {
 		w.WriteHeader(http.StatusInternalServerError)
 		LogError.Println(err)
 	}
+}
+
+//////////////////////
+// Editing Handlers //
+//////////////////////
+
+
+func EditCharSetDescriptionHandler(w http.ResponseWriter, r *http.Request){
+
+	//Get the uid
+	cuid, _ := strconv.Atoi(mux.Vars(r)["cuid"])
+	
+	//Get the character
+	character, err := ActiveProject.GetCharacter(cuid)
+	
+	if err != nil {
+		w.WriteHeader(http.StatusNotFound)
+		LogWarning.Println(err)
+		return
+	}
+	
+	inputData := &DataTransferText{}
+	
+	err = json.NewDecoder(r.Body).Decode(inputData)
+	
+	
+	if err != nil {
+		w.WriteHeader(http.StatusInternalServerError)
+		LogWarning.Println(err)
+		return
+	}
+	
+	//Send ok
+	w.WriteHeader(http.StatusOK)
+	
+	//Set the note
+	character.Description = inputData.Data
+}
+
+func EditCharSetMotivationHandler(w http.ResponseWriter, r *http.Request){
+
+	//Get the uid
+	cuid, _ := strconv.Atoi(mux.Vars(r)["cuid"])
+	
+	//Get the character
+	character, err := ActiveProject.GetCharacter(cuid)
+	
+	if err != nil {
+		w.WriteHeader(http.StatusNotFound)
+		LogWarning.Println(err)
+		return
+	}
+	
+	inputData := &DataTransferText{}
+	
+	err = json.NewDecoder(r.Body).Decode(inputData)
+	
+	
+	if err != nil {
+		w.WriteHeader(http.StatusInternalServerError)
+		LogWarning.Println(err)
+		return
+	}
+	
+	//Send ok
+	w.WriteHeader(http.StatusOK)
+	
+	//Set the note
+	character.Motivation = inputData.Data
+}
+
+func EditCharSetGoalHandler(w http.ResponseWriter, r *http.Request){
+
+	//Get the uid
+	cuid, _ := strconv.Atoi(mux.Vars(r)["cuid"])
+	
+	//Get the character
+	character, err := ActiveProject.GetCharacter(cuid)
+	
+	if err != nil {
+		w.WriteHeader(http.StatusNotFound)
+		LogWarning.Println(err)
+		return
+	}
+	
+	inputData := &DataTransferText{}
+	
+	err = json.NewDecoder(r.Body).Decode(inputData)
+	
+	
+	if err != nil {
+		w.WriteHeader(http.StatusInternalServerError)
+		LogWarning.Println(err)
+		return
+	}
+	
+	//Send ok
+	w.WriteHeader(http.StatusOK)
+	
+	//Set the note
+	character.Goal = inputData.Data
+}
+
+func EditCharSetRoleHandler(w http.ResponseWriter, r *http.Request){
+
+	//Get the uid
+	cuid, _ := strconv.Atoi(mux.Vars(r)["cuid"])
+	
+	//Get the character
+	character, err := ActiveProject.GetCharacter(cuid)
+	
+	if err != nil {
+		w.WriteHeader(http.StatusNotFound)
+		LogWarning.Println(err)
+		return
+	}
+	
+	inputData := &DataTransferText{}
+	
+	err = json.NewDecoder(r.Body).Decode(inputData)
+	
+	
+	if err != nil {
+		w.WriteHeader(http.StatusInternalServerError)
+		LogWarning.Println(err)
+		return
+	}
+	
+	//Send ok
+	w.WriteHeader(http.StatusOK)
+	
+	//Set the note
+	character.Role = inputData.Data
 }

@@ -119,13 +119,18 @@ function processChar(){
 		if (this.readyState == 4 && this.status == 200){
 			removeCharForm(); //remove form
 			updateCharList(); //update char list
+			showResponse("Character added.");
+			setTimeout("hideResponse()",2000);
 		} else if (this.readyState == 4 && this.status == 500) {
-			//flag error
+			showResponse("There was an error adding the character.");
+			setTimeout("hideResponse()",2000);
 		}
 	}
 	
 	xhr.send(JSON.stringify(character));
 }
+
+var dat
 
 function updateCharList(){
 	var xhr = new XMLHttpRequest();
@@ -137,17 +142,33 @@ function updateCharList(){
 			//get the char list
 			var charList = document.getElementById("char_list");
 			
-			//blank the existing list
-			charList.innerHTML = "";
-			
 			//convert json into object
-			var charListJSON = JSON.parse(this.responseText);
+			var data = JSON.parse(this.responseText).Data;
 			
-			if(charListJSON.Names != null) {
+			if(data != null) {
+				//blank the existing list
+				charList.innerHTML = "";
+				
 				//add the chars to the page
-				for (var i = 0; i < charListJSON.Names.length; i++) {
-					charList.innerHTML += "<p><a href=\"/char/" + charListJSON.UIDS[i] + "/view\">" + charListJSON.Names[i] + "</a></p>";
+				for (var i = 0; i < data.length; i++) {
+					var charElem = document.createElement("div");
+					charElem.className = "list_elem";
+					charElem.setAttribute("data-char-uid",data[i].I); //set to char uid
+					charElem.setAttribute("draggable","true");
+					charElem.addEventListener("dblclick",linkListElement);
+					
+					var charElemName = document.createElement("span");
+					charElem.setAttribute("draggable","true");
+					charElemName.innerHTML = data[i].S; //set to char name
+					
+					charElem.appendChild(charElemName);
+					
+					charList.appendChild(charElem);
+					
 				}
+			} else {
+				showResponse("There are not any characters in this project.");
+				setTimeout("hideResponse()",2000);
 			}
 			
 		}
@@ -156,11 +177,16 @@ function updateCharList(){
 	xhr.send();	
 }
 
+function linkListElement(e){
+	var cuid = e.target.getAttribute("data-char-uid");
+	location.href = "/char/" + cuid;
+}
+
 </script>
 
 {{template "header"}}
 
-<h1>Characters</h1>
+<h1 class="name">Characters</h1>
 
 <div class="charnew" id="charnew">
 	<div id="form_new">

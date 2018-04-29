@@ -11,6 +11,9 @@ type Character struct {
 	Name		common.Name //The primary name of the character
 	Aliases		[]common.Name //Aliases the character goes by
 	Description	string //A brief description of the character
+	Motivation	string //What drives the character
+	Goal		string //What the character aims to do
+	Role		string //The purpose of the character
 	//more
 	Age			common.Age //The age of the character
 }

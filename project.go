@@ -215,7 +215,7 @@ func (p *Project) GetChapter(suid int, cuidRel int) (*story.Chapter, error) {
 		return nil, err
 	}
 	
-	if chapter, exists := ActiveProject.Chapters[cuid]; exists {
+	if chapter, exists := p.Chapters[cuid]; exists {
 		return chapter, nil
 	} else {
 		return nil, errors.New("Chapter does not exist.")
@@ -236,11 +236,19 @@ func (p *Project) GetSection(suid int, cuidRel int, seuidRel int) (*story.Sectio
 		return nil, err
 	}
 	
-	if section, exists := ActiveProject.Sections[seuid]; exists {
+	if section, exists := p.Sections[seuid]; exists {
 		return section, nil
 	} else {
 		return nil, errors.New("Section does not exist.")
 	
+	}
+}
+
+func (p *Project) GetCharacter(cuid int) (*character.Character, error) {
+	if character, exists := p.Characters[cuid]; exists {
+		return character, nil
+	} else {
+		return nil, errors.New("Character does not exist.")
 	}
 }
 

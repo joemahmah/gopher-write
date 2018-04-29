@@ -47,9 +47,13 @@ func main(){
 	//      char manip     //
 	/////////////////////////
 	router.HandleFunc("/char/new", NewCharHandler) //new char
-	router.HandleFunc("/char/{cid:[0-9]{1,9}}/view", ViewCharHandler) //view char
+	router.HandleFunc("/char/{cid:[0-9]{1,9}}", ViewCharHandler) //view char
 	router.HandleFunc("/char/{cid:[0-9]{1,9}}/json", GetJSONCharHandler) //get char json
 	router.HandleFunc("/char/{cid:[0-9]{1,9}}/edit", EditCharHandler) //edit char
+	router.HandleFunc("/char/{cid:[0-9]{1,9}}/edit/description", EditCharSetDescriptionHandler) //edit char
+	router.HandleFunc("/char/{cid:[0-9]{1,9}}/edit/motivation", EditCharSetMotivationHandler) //edit char
+	router.HandleFunc("/char/{cid:[0-9]{1,9}}/edit/goal", EditCharSetGoalHandler) //edit char
+	router.HandleFunc("/char/{cid:[0-9]{1,9}}/edit/role", EditCharSetRoleHandler) //edit char
 	router.HandleFunc("/char/list",ListJSONCharHandler) //Char list json
 	router.HandleFunc("/char", OverviewCharHandler) //Char overview
 
