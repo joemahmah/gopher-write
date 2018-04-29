@@ -89,20 +89,59 @@ function linkListElement(e){
 	xhr.send();
 }
 
+function addProject(){
+	var projectName = document.getElementById("project_new_input").value;
+	var textobj = {Data: projectName};
+	
+	var xhr = new XMLHttpRequest();
+	var url = "/project/new"
+	xhr.open("POST", url, true);
+	xhr.setRequestHeader("Content-Type", "application/json");
+	xhr.onreadystatechange = function () {
+		if (this.readyState == 4 && this.status == 200){
+			showResponse("Project created.");
+			setTimeout("hideResponse()",2000);
+			HideModal("project_new_modal"); //Hide the modal
+			updateProjectList(); //Update the project list
+			document.getElementById("project_new_input").value = ""; //Clear name
+		} else if (this.readyState == 4 && this.status !== 200) {
+			showResponse("Unable to create project.");
+			setTimeout("hideResponse()",5000);
+		}
+	}
+	
+	xhr.send(JSON.stringify(textobj));
+}
+
 </script>
 
 {{template "header"}}
 
 <h1 class="name">Projects</h1>
 
-<div class="">
-	<span class="form_make_button meta_big">New Project</span>
-	<span class="form_make_button meta_big">Import Project</span>
-	<span class="form_make_button meta_big">Export Project</span>
+<div class="project_wrap">
+	<div class="project_control">
+		<span class="form_make_button meta_big" onclick='DisplayModal("project_new_modal")'>New Project</span>
+		<span class="form_make_button meta_big">Import Project</span>
+	</div>
 </div>
 
 <div class="list" id="project_list">
 
+</div>
+
+<div class="ui_modal" id="project_new_modal">
+<div class="ui_modal_content">
+	<div class="ui_modal_form">
+		<label>Project Name: </label>
+		<input id="project_new_input" type="text">
+	</div>
+	<br>
+	<div class="ui_modal_control">
+			<span class="form_make_button form_make_button_big form_make_button_round form_make_button_right" onclick="addProject();">Create Project</span>
+			<span class="form_make_button form_make_button_big form_make_button_round form_make_button_right" onclick='HideModal("project_new_modal");'>Close</span>
+	</div>
+</div>
 </div>
 
 </body>

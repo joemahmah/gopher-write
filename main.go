@@ -37,7 +37,7 @@ func main(){
 	/////////////////////////
 	router.HandleFunc("/project/load/{project:[0-9]{14}.[0-9]{6}}", LoadProjectHandler) //Load project
 	router.HandleFunc("/project/save", SaveProjectHandler) //Save project
-	router.HandleFunc("/project/new/{project}", NewProjectHandler) //Create new project
+	router.HandleFunc("/project/new", NewProjectHandler) //Create new project
 	router.HandleFunc("/project/list", ListJSONProjectHandler) //List projects
 	router.HandleFunc("/project", OverviewProjectHandler) //Overview project
 	

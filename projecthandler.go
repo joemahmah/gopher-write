@@ -53,7 +53,21 @@ func SaveProjectHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 func NewProjectHandler(w http.ResponseWriter, r *http.Request) {
-	projectName := mux.Vars(r)["project"]
+	//Get the JSON sent
+	inputData := &DataTransferText{}
+	
+	err := json.NewDecoder(r.Body).Decode(inputData)
+	
+	if err != nil {
+		w.WriteHeader(http.StatusInternalServerError)
+		LogError.Println(err)
+		return
+	}
+	
+	//Extract the project name
+	projectName := inputData.Data
+	
+	//Create save name and save path
 	projectSaveName := time.Now().Format("20060102150405.000000")
 	projectPath := "./data/projects/" + projectSaveName + ".json"
 	
@@ -62,8 +76,8 @@ func NewProjectHandler(w http.ResponseWriter, r *http.Request) {
 	//Print log message
 	LogNet.Println("Access " + r.URL.Path + " by "+ r.RemoteAddr)
 	
-	//load project
-	err := SaveProject(ActiveProject, projectPath)
+	//save the new project
+	err = SaveProject(ActiveProject, projectPath)
 	
 	if err != nil {
 		w.WriteHeader(http.StatusInternalServerError)
@@ -72,6 +86,7 @@ func NewProjectHandler(w http.ResponseWriter, r *http.Request) {
 		w.WriteHeader(http.StatusOK)
 		LogInfo.Println("Created project " + ActiveProject.Name + " (" + projectPath + ")")
 		ProjectList[projectSaveName] = projectName //Add to project list
+		projectListHasChanged = true //Flag list as having changed
 	}
 	
 }
@@ -103,7 +118,7 @@ func ListJSONProjectHandler(w http.ResponseWriter, r *http.Request) {
 	//var to hold names/paths
 	var data DataTransferDualStringMonoBoolSlice
 
-	if projectListHasChanged || projectListDataTransferSlice == nil { //If need to update cached data
+	if projectListHasChanged || (projectListDataTransferSlice == nil) { //If need to update cached data
 		//Assign to data
 		for path, name := range ProjectList {
 			isActiveProj := false
