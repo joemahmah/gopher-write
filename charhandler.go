@@ -5,6 +5,7 @@ import (
 	"github.com/gorilla/mux"
 	"strconv"
 	"github.com/joemahmah/gopher-write/character"
+	"github.com/joemahmah/gopher-write/common"
 	"encoding/json"
 	"html/template"
 	"sort"
@@ -187,6 +188,37 @@ func OverviewCharHandler(w http.ResponseWriter, r *http.Request) {
 // Editing Handlers //
 //////////////////////
 
+func EditCharSetNameHandler(w http.ResponseWriter, r *http.Request){
+	//Get the uid
+	cuid, _ := strconv.Atoi(mux.Vars(r)["cuid"])
+
+	//Get the character
+	character, err := ActiveProject.GetCharacter(cuid)
+	
+	if err != nil {
+		w.WriteHeader(http.StatusNotFound)
+		LogWarning.Println(err)
+		return
+	}
+	
+	inputData := &common.Name{}
+	
+	err = json.NewDecoder(r.Body).Decode(inputData)
+	
+	
+	if err != nil {
+		w.WriteHeader(http.StatusInternalServerError)
+		LogWarning.Println(err)
+		return
+	}
+	
+	//Send ok
+	w.WriteHeader(http.StatusOK)
+	
+	//Set the note
+	character.Name = *inputData
+	
+}
 
 func EditCharSetDescriptionHandler(w http.ResponseWriter, r *http.Request){
 
