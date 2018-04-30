@@ -14,7 +14,10 @@
 <script language="javascript">
 
 var currentCharUID = {{.UID}};
-var changes = false;
+var descriptionChanged = false;
+var roleChanged = false;
+var motivationChanged = false;
+var goalChanged = false;
 var character;
 
 window.onload = initPage;
@@ -52,6 +55,25 @@ function addChronoAgeInput(){
 }
 
 function saveChanges(){
+	
+	if(descriptionChanged){
+		updateDescription();
+	}
+	
+	if(roleChanged){
+		updateRole();
+	}
+
+	if(goalChanged){
+		updateGoal();
+	}
+
+	if(motivationChanged){
+		updateMotivation();
+	}
+
+
+	/*
 	//Only save changes if there is actually something to save.
 	if(changes === true){
 		//reset change sectStatus
@@ -69,7 +91,7 @@ function saveChanges(){
 		}
 		//Aliases
 		var aliasArray = null;
-		/*var aliases = document.getElementsByClassName("form_alias");
+	*/	/*var aliases = document.getElementsByClassName("form_alias");
 		if (aliases.length == 0) { //if no aliases
 			//set to null
 			var aliasArray = null;
@@ -81,7 +103,7 @@ function saveChanges(){
 				aliasArray[i] = MakeName(aliases[i].value, true, null); //make new name object and assign to array
 			}	
 		}*/
-		
+	/*	
 		//Make the character
 		var character = MakeCharacter(name, description, age, aliasArray);
 	
@@ -103,6 +125,7 @@ function saveChanges(){
 		xhr.send(JSON.stringify(character));
 		
 	}
+	*/
 }
 
 function toggleRoleVisability(){
@@ -127,6 +150,94 @@ function toggleMotivationVisability(){
 	} else {
 		document.getElementById("motivation_wrap").style.display = "block";
 	}
+}
+
+//////////////////////
+// Update Functions //
+//////////////////////
+
+function updateDescription(){
+	var text = document.getElementById("text_textarea").value;
+	var textObj = {Data: text};
+
+	var xhr = new XMLHttpRequest();
+	var url = "/char/" + currentCharUID + "/edit/description";
+	xhr.open("POST", url, true);
+	xhr.setRequestHeader("Content-Type", "application/json");
+	xhr.onreadystatechange = function () {
+		if(this.readyState === 4 && this.status === 200){
+			descriptionChanged = false;
+			showResponse("Saved.");
+			setTimeout("hideResponse()", 2000);
+		} else if (this.readyState === 4 && this.status !== 200){
+			showResponse("Unable to update description. Will try again on the next save.");
+			setTimeout("hideResponse()", 2000);
+		}
+	}
+	xhr.send(JSON.stringify(textObj));
+}
+
+function updateRole(){
+	var text = document.getElementById("role_textarea").value;
+	var textObj = {Data: text};
+
+	var xhr = new XMLHttpRequest();
+	var url = "/char/" + currentCharUID + "/edit/role";
+	xhr.open("POST", url, true);
+	xhr.setRequestHeader("Content-Type", "application/json");
+	xhr.onreadystatechange = function () {
+		if(this.readyState === 4 && this.status === 200){
+			descriptionChanged = false;
+			showResponse("Saved.");
+			setTimeout("hideResponse()", 2000);
+		} else if (this.readyState === 4 && this.status !== 200){
+			showResponse("Unable to update role. Will try again on the next save.");
+			setTimeout("hideResponse()", 2000);
+		}
+	}
+	xhr.send(JSON.stringify(textObj));
+}
+
+function updateGoal(){
+	var text = document.getElementById("goal_textarea").value;
+	var textObj = {Data: text};
+
+	var xhr = new XMLHttpRequest();
+	var url = "/char/" + currentCharUID + "/edit/goal";
+	xhr.open("POST", url, true);
+	xhr.setRequestHeader("Content-Type", "application/json");
+	xhr.onreadystatechange = function () {
+		if(this.readyState === 4 && this.status === 200){
+			descriptionChanged = false;
+			showResponse("Saved.");
+			setTimeout("hideResponse()", 2000);
+		} else if (this.readyState === 4 && this.status !== 200){
+			showResponse("Unable to update goal. Will try again on the next save.");
+			setTimeout("hideResponse()", 2000);
+		}
+	}
+	xhr.send(JSON.stringify(textObj));
+}
+
+function updateMotivation(){
+	var text = document.getElementById("motivation_textarea").value;
+	var textObj = {Data: text};
+
+	var xhr = new XMLHttpRequest();
+	var url = "/char/" + currentCharUID + "/edit/motivation";
+	xhr.open("POST", url, true);
+	xhr.setRequestHeader("Content-Type", "application/json");
+	xhr.onreadystatechange = function () {
+		if(this.readyState === 4 && this.status === 200){
+			descriptionChanged = false;
+			showResponse("Saved.");
+			setTimeout("hideResponse()", 2000);
+		} else if (this.readyState === 4 && this.status !== 200){
+			showResponse("Unable to update motivation. Will try again on the next save.");
+			setTimeout("hideResponse()", 2000);
+		}
+	}
+	xhr.send(JSON.stringify(textObj));
 }
 
 </script>
@@ -175,7 +286,7 @@ function toggleMotivationVisability(){
 	<div class="text_control" id="text_control">
 		<span class="button_control" onclick="saveChanges();">Save</span>
 	</div>
-	<textarea id="text_textarea" onchange="changes=true;">{{.Description}}</textarea>
+	<textarea id="text_textarea" onchange="descriptionChanged=true;">{{.Description}}</textarea>
 </div>
 
 <div class="ui_grid_3">
