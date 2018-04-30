@@ -19,6 +19,7 @@ var roleChanged = false;
 var motivationChanged = false;
 var goalChanged = false;
 var nameChanged = false;
+var ageChanged = false;
 var character;
 
 window.onload = initPage;
@@ -40,7 +41,7 @@ function addChronoAgeInput(){
 	chronoAgeInput.type = "number";
 	chronoAgeInput.className = "age_text";
 	chronoAgeInput.value = document.getElementById("age_bio_text").value;
-	chronoAgeInput.onchange = function(){changes=true;};
+	chronoAgeInput.onchange = function(){ageChanged=true; saveChanges();};
 	
 	//Target insert location
 	var chronoAgeTarget = document.getElementById("age_chrono_target");
@@ -76,6 +77,10 @@ function saveChanges(){
 	if(nameChanged){
 		updateName();
 	}
+	
+	if(ageChanged){
+		updateAge();
+	}
 }
 
 function toggleRoleVisability(){
@@ -107,14 +112,22 @@ function toggleMotivationVisability(){
 //////////////////////
 
 function updateAge(){
-	var age = MakeAge(document.getElementById("age_bio_text").value,document.getElementById("age_chrono_text").value);
+	//Get the chrono age (and set to null if not exists)
+	var chronoAgeInput = document.getElementById("age_chrono_text");
+	var chronoAge = null;
+	if(chronoAgeInput){
+		chronoAge = parseInt(chronoAgeInput.value);
+	}
+	
+	//Make the age
+	var age = MakeAge(parseInt(document.getElementById("age_bio_text").value), chronoAge);
 	var xhr = new XMLHttpRequest();
 	var url = "/char/" + currentCharUID + "/edit/age";
 	xhr.open("POST", url, true);
 	xhr.setRequestHeader("Content-Type", "application/json");
 	xhr.onreadystatechange = function () {
 		if(this.readyState === 4 && this.status === 200){
-			nameChanged = false;
+			ageChanged = false;
 			showResponse("Saved.");
 			setTimeout("hideResponse()", 2000);
 		} else if (this.readyState === 4 && this.status !== 200){
@@ -238,36 +251,21 @@ function updateMotivation(){
 </div>
 
 <div class="profile" id="profile">
-
 	<div class="age_wrap" id="age_wrap">
 		{{if ageEq .}}
 			<span class="age_label" id="age_label">Age</span><br>
-			<input type="number" class="age_text" id="age_bio_text" value="{{.Age.BioAge}}" onchange="changes=true;"></input>
+			<input type="number" class="age_text" id="age_bio_text" value="{{.Age.BioAge}}" onchange="ageChanged=true; saveChanges();"></input>
 		{{else}}
 			<span class="age_label" id="age_label">Biological Age (Chronological age)</span><br>
-			<input type="number" class="age_text" id="age_bio_text" value="{{.Age.BioAge}}" onchange="changes=true;"></input> (
+			<input type="number" class="age_text" id="age_bio_text" value="{{.Age.BioAge}}" onchange="ageChanged=true; saveChanges();"></input> (
 		{{end}}
 		
 		{{if ageEq .}}
 			<span type="number" class="form_make_button" id="age_chrono_target" onclick="addChronoAgeInput();" > Split Age</span><br>
 		{{else}}
-			<input type="number" class="age_text" id="age_chrono_text" value="{{.Age.ChronoAge}}" onchange="changes=true;"></input> )<br>
+			<input type="number" class="age_text" id="age_chrono_text" value="{{.Age.ChronoAge}}" onchange="ageChanged=true; saveChanges();"></input> )<br>
 		{{end}}
 	</div>
-	
-	<!--
-	<div class="status_wrap" id="status_wrap">
-		<span class="status_label" >Status: </span>
-		<select class="status_text" id="status_text" onchange="changes=true;" >
-			<option value="0">Not Started</option>
-			<option value="1">In Progress</option>
-			<option value="2">Almost Done</option>
-			<option value="3">Done</option>
-			<option value="4">Unknown</option>
-		</select>
-	</div>
-	-->
-
 </div>
 
 <div class="text_wrap" id="text_wrap">
