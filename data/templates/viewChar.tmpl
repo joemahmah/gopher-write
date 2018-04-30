@@ -14,16 +14,12 @@
 <script language="javascript">
 
 var currentCharUID = {{.UID}};
-var sectStatus = 5;
-
 var changes = false;
+var character;
 
 window.onload = initPage;
 
 function initPage(){
-	//Set the character status
-	//setStatus();
-
 	//Save changes every 30 seconds
 	window.setInterval(saveChanges, 30 * 1000);
 }
@@ -32,11 +28,6 @@ function initPage(){
 //to allow enter to save changes.
 function NewEnterKeyEvent(){
 	saveChanges();
-}
-
-function setStatus(){
-	var statusText = document.getElementById("status_text");
-	statusText.value = sectStatus;
 }
 
 function addChronoAgeInput(){
@@ -114,12 +105,35 @@ function saveChanges(){
 	}
 }
 
+function toggleRoleVisability(){
+	if(document.getElementById("role_wrap").style.display == "block"){
+		document.getElementById("role_wrap").style.display = "none";
+	} else {
+		document.getElementById("role_wrap").style.display = "block";
+	}
+}
+
+function toggleGoalVisability(){
+	if(document.getElementById("goal_wrap").style.display == "block"){
+		document.getElementById("goal_wrap").style.display = "none";
+	} else {
+		document.getElementById("goal_wrap").style.display = "block";
+	}
+}
+
+function toggleMotivationVisability(){
+	if(document.getElementById("motivation_wrap").style.display == "block"){
+		document.getElementById("motivation_wrap").style.display = "none";
+	} else {
+		document.getElementById("motivation_wrap").style.display = "block";
+	}
+}
+
 </script>
 	
 {{template "header"}}
 
-<h1 id="name_text">{{.Name.PrimaryName}}</h1>
-
+<input class="name" id="name_text" type="text" onchange="nameChanged=true;" onkeypress="ConsumeEnterKeyEvent(event);" value="{{.Name.PrimaryName}}">
 <div class="meta_control">
 	<a href="/char">Return to character list </a>
 </div>
@@ -162,6 +176,47 @@ function saveChanges(){
 		<span class="button_control" onclick="saveChanges();">Save</span>
 	</div>
 	<textarea id="text_textarea" onchange="changes=true;">{{.Description}}</textarea>
+</div>
+
+<div class="ui_grid_3">
+<div class="aux_list_wrap meta_noselect">
+	<div class="aux_list_header" onclick="toggleRoleVisability()">
+		<h3>Role</h3>
+	</div>
+	<br>
+	<div class="aux_text_wrap" id="role_wrap">
+		<textarea id="role_textarea" onchange="roleChanged=true;">{{.Role}}</textarea>
+		<div class="text_control" id="text_control">
+			<span class="button_control" onclick="saveChanges();">Save</span>
+		</div>
+	</div>
+</div>
+
+<div class="aux_list_wrap meta_noselect">
+	<div class="aux_list_header" onclick="toggleGoalVisability()">
+		<h3>Goal</h3>
+	</div>
+	<br>
+	<div class="aux_text_wrap" id="goal_wrap">
+		<textarea id="goal_textarea" onchange="goalChanged=true;">{{.Goal}}</textarea>
+		<div class="text_control" id="text_control">
+			<span class="button_control" onclick="saveChanges();">Save</span>
+		</div>
+	</div>
+</div>
+
+<div class="aux_list_wrap meta_noselect">
+	<div class="aux_list_header" onclick="toggleMotivationVisability()">
+		<h3>Motivation</h3>
+	</div>
+	<br>
+	<div class="aux_text_wrap" id="motivation_wrap">
+		<textarea id="motivation_textarea" onchange="motivationChanged=true;">{{.Motivation}}</textarea>
+		<div class="text_control" id="text_control">
+			<span class="button_control" onclick="saveChanges();">Save</span>
+		</div>
+	</div>
+</div>
 </div>
 
 <h3>Aliases</h3>
