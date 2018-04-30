@@ -190,7 +190,7 @@ func OverviewCharHandler(w http.ResponseWriter, r *http.Request) {
 
 func EditCharSetAgeHandler(w http.ResponseWriter, r *http.Request){
 	//Get the uid
-	cuid, _ := strconv.Atoi(mux.Vars(r)["cuid"])
+	cuid, _ := strconv.Atoi(mux.Vars(r)["cid"])
 
 	//Get the character
 	character, err := ActiveProject.GetCharacter(cuid)
@@ -222,7 +222,7 @@ func EditCharSetAgeHandler(w http.ResponseWriter, r *http.Request){
 
 func EditCharSetNameHandler(w http.ResponseWriter, r *http.Request){
 	//Get the uid
-	cuid, _ := strconv.Atoi(mux.Vars(r)["cuid"])
+	cuid, _ := strconv.Atoi(mux.Vars(r)["cid"])
 
 	//Get the character
 	character, err := ActiveProject.GetCharacter(cuid)
@@ -255,7 +255,7 @@ func EditCharSetNameHandler(w http.ResponseWriter, r *http.Request){
 func EditCharSetDescriptionHandler(w http.ResponseWriter, r *http.Request){
 
 	//Get the uid
-	cuid, _ := strconv.Atoi(mux.Vars(r)["cuid"])
+	cuid, _ := strconv.Atoi(mux.Vars(r)["cid"])
 	
 	//Get the character
 	character, err := ActiveProject.GetCharacter(cuid)
@@ -287,7 +287,7 @@ func EditCharSetDescriptionHandler(w http.ResponseWriter, r *http.Request){
 func EditCharSetMotivationHandler(w http.ResponseWriter, r *http.Request){
 
 	//Get the uid
-	cuid, _ := strconv.Atoi(mux.Vars(r)["cuid"])
+	cuid, _ := strconv.Atoi(mux.Vars(r)["cid"])
 	
 	//Get the character
 	character, err := ActiveProject.GetCharacter(cuid)
@@ -319,7 +319,7 @@ func EditCharSetMotivationHandler(w http.ResponseWriter, r *http.Request){
 func EditCharSetGoalHandler(w http.ResponseWriter, r *http.Request){
 
 	//Get the uid
-	cuid, _ := strconv.Atoi(mux.Vars(r)["cuid"])
+	cuid, _ := strconv.Atoi(mux.Vars(r)["uid"])
 	
 	//Get the character
 	character, err := ActiveProject.GetCharacter(cuid)
@@ -351,7 +351,7 @@ func EditCharSetGoalHandler(w http.ResponseWriter, r *http.Request){
 func EditCharSetRoleHandler(w http.ResponseWriter, r *http.Request){
 
 	//Get the uid
-	cuid, _ := strconv.Atoi(mux.Vars(r)["cuid"])
+	cuid, _ := strconv.Atoi(mux.Vars(r)["uid"])
 	
 	//Get the character
 	character, err := ActiveProject.GetCharacter(cuid)
