@@ -188,6 +188,38 @@ func OverviewCharHandler(w http.ResponseWriter, r *http.Request) {
 // Editing Handlers //
 //////////////////////
 
+func EditCharSetAgeHandler(w http.ResponseWriter, r *http.Request){
+	//Get the uid
+	cuid, _ := strconv.Atoi(mux.Vars(r)["cuid"])
+
+	//Get the character
+	character, err := ActiveProject.GetCharacter(cuid)
+	
+	if err != nil {
+		w.WriteHeader(http.StatusNotFound)
+		LogWarning.Println(err)
+		return
+	}
+	
+	inputData := &common.Age{}
+	
+	err = json.NewDecoder(r.Body).Decode(inputData)
+	
+	
+	if err != nil {
+		w.WriteHeader(http.StatusInternalServerError)
+		LogWarning.Println(err)
+		return
+	}
+	
+	//Send ok
+	w.WriteHeader(http.StatusOK)
+	
+	//Set the note
+	character.Age = *inputData
+	
+}
+
 func EditCharSetNameHandler(w http.ResponseWriter, r *http.Request){
 	//Get the uid
 	cuid, _ := strconv.Atoi(mux.Vars(r)["cuid"])

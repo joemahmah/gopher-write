@@ -106,6 +106,25 @@ function toggleMotivationVisability(){
 // Update Functions //
 //////////////////////
 
+function updateAge(){
+	var age = MakeAge(document.getElementById("age_bio_text").value,document.getElementById("age_chrono_text").value);
+	var xhr = new XMLHttpRequest();
+	var url = "/char/" + currentCharUID + "/edit/age";
+	xhr.open("POST", url, true);
+	xhr.setRequestHeader("Content-Type", "application/json");
+	xhr.onreadystatechange = function () {
+		if(this.readyState === 4 && this.status === 200){
+			nameChanged = false;
+			showResponse("Saved.");
+			setTimeout("hideResponse()", 2000);
+		} else if (this.readyState === 4 && this.status !== 200){
+			showResponse("Unable to update age. Will try again on the next save.");
+			setTimeout("hideResponse()", 2000);
+		}
+	}
+	xhr.send(JSON.stringify(age));
+}
+
 function updateName(){
 	var name = MakeName(document.getElementById("name_text").value,false,null);
 	var xhr = new XMLHttpRequest();

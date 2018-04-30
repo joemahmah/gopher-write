@@ -145,7 +145,7 @@ function Age(BioAge, ChronoAge){
 function MakeAge(bioAge, chronoAge){
 	var age = new Age(bioAge, bioAge);
 	
-	if(typeof chronoAge !== "undefined"){
+	if(typeof chronoAge !== "undefined" && chronoAge !== null){
 		age.ChronoAge = chronoAge;
 	}
 	
