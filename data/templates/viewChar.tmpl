@@ -18,6 +18,7 @@ var descriptionChanged = false;
 var roleChanged = false;
 var motivationChanged = false;
 var goalChanged = false;
+var nameChanged = false;
 var character;
 
 window.onload = initPage;
@@ -72,60 +73,9 @@ function saveChanges(){
 		updateMotivation();
 	}
 
-
-	/*
-	//Only save changes if there is actually something to save.
-	if(changes === true){
-		//reset change sectStatus
-		changes = false;
-		
-		//Name
-		var name = MakeName(document.getElementById("name_text").innerHTML,false,null);
-		//Description
-		var description = document.getElementById("text_textarea").value;
-		//Age
-		if(document.getElementById("age_chrono_text") != null){
-			var age = MakeAge(parseInt(document.getElementById("age_bio_text").value),parseInt(document.getElementById("age_chrono_text").value));
-		} else {
-			var age = MakeAge(parseInt(document.getElementById("age_bio_text").value));
-		}
-		//Aliases
-		var aliasArray = null;
-	*/	/*var aliases = document.getElementsByClassName("form_alias");
-		if (aliases.length == 0) { //if no aliases
-			//set to null
-			var aliasArray = null;
-		} else { //otherwise
-			//make array
-			var aliasArray = []
-			//assign values
-			for(var i=0; i<aliases.length; i++){
-				aliasArray[i] = MakeName(aliases[i].value, true, null); //make new name object and assign to array
-			}	
-		}*/
-	/*	
-		//Make the character
-		var character = MakeCharacter(name, description, age, aliasArray);
-	
-		var xhr = new XMLHttpRequest();
-		var url = "/char/" + currentCharUID + "/edit";
-		xhr.open("POST", url, true);
-		xhr.setRequestHeader("Content-Type", "application/json");
-		xhr.onreadystatechange = function () {
-			//if server returns proper, update display
-			if (this.readyState == 4 && this.status == 200){
-				showResponse("Character updated.");
-				setTimeout("hideResponse()",5000);
-			} else if (this.readyState == 4 && this.status == 500) {
-				showResponse("Unable to update.");
-				setTimeout("hideResponse()",5000);
-			}
-		}
-		
-		xhr.send(JSON.stringify(character));
-		
+	if(nameChanged){
+		updateName();
 	}
-	*/
 }
 
 function toggleRoleVisability(){
@@ -155,6 +105,25 @@ function toggleMotivationVisability(){
 //////////////////////
 // Update Functions //
 //////////////////////
+
+function updateName(){
+	var name = MakeName(document.getElementById("name_text").value,false,null);
+	var xhr = new XMLHttpRequest();
+	var url = "/char/" + currentCharUID + "/edit/name";
+	xhr.open("POST", url, true);
+	xhr.setRequestHeader("Content-Type", "application/json");
+	xhr.onreadystatechange = function () {
+		if(this.readyState === 4 && this.status === 200){
+			nameChanged = false;
+			showResponse("Saved.");
+			setTimeout("hideResponse()", 2000);
+		} else if (this.readyState === 4 && this.status !== 200){
+			showResponse("Unable to update name. Will try again on the next save.");
+			setTimeout("hideResponse()", 2000);
+		}
+	}
+	xhr.send(JSON.stringify(name));
+}
 
 function updateDescription(){
 	var text = document.getElementById("text_textarea").value;
@@ -187,7 +156,7 @@ function updateRole(){
 	xhr.setRequestHeader("Content-Type", "application/json");
 	xhr.onreadystatechange = function () {
 		if(this.readyState === 4 && this.status === 200){
-			descriptionChanged = false;
+			roleChanged = false;
 			showResponse("Saved.");
 			setTimeout("hideResponse()", 2000);
 		} else if (this.readyState === 4 && this.status !== 200){
@@ -208,7 +177,7 @@ function updateGoal(){
 	xhr.setRequestHeader("Content-Type", "application/json");
 	xhr.onreadystatechange = function () {
 		if(this.readyState === 4 && this.status === 200){
-			descriptionChanged = false;
+			goalChanged = false;
 			showResponse("Saved.");
 			setTimeout("hideResponse()", 2000);
 		} else if (this.readyState === 4 && this.status !== 200){
@@ -229,7 +198,7 @@ function updateMotivation(){
 	xhr.setRequestHeader("Content-Type", "application/json");
 	xhr.onreadystatechange = function () {
 		if(this.readyState === 4 && this.status === 200){
-			descriptionChanged = false;
+			motivationChanged = false;
 			showResponse("Saved.");
 			setTimeout("hideResponse()", 2000);
 		} else if (this.readyState === 4 && this.status !== 200){
