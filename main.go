@@ -56,7 +56,9 @@ func main(){
 	router.HandleFunc("/char/{cid:[0-9]{1,9}}/edit/role", EditCharSetRoleHandler) //edit char role
 	router.HandleFunc("/char/{cid:[0-9]{1,9}}/edit/name", EditCharSetNameHandler) //edit char name
 	router.HandleFunc("/char/{cid:[0-9]{1,9}}/edit/age", EditCharSetAgeHandler) //edit char age
-	router.HandleFunc("/char/{cid:[0-9]{1,9}}/edit/addalias", EditCharAddAliasHandler) //edit char age
+	router.HandleFunc("/char/{cid:[0-9]{1,9}}/edit/addalias", EditCharAddAliasHandler) //add alias
+	router.HandleFunc("/char/{cid:[0-9]{1,9}}/edit/removealias", EditCharRemoveAliasHandler) //remove alias
+	router.HandleFunc("/char/{cid:[0-9]{1,9}}/aliaslist", AliasListJSONCharHandler) //edit char age
 	router.HandleFunc("/char/list",ListJSONCharHandler) //Char list json
 	router.HandleFunc("/char", OverviewCharHandler) //Char overview
 

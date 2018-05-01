@@ -163,6 +163,10 @@
 	cursor: pointer;
 }
 
+.meta_height_40px {
+	height: 40px !important;
+}
+
 .note_header {
 	font-size: 1.25em;
 	font-weight: bold;
@@ -194,10 +198,14 @@
 	border-bottom: 1px solid #555577;
 	border-left: 1px solid #AAAACC;
 	
-   -moz-user-select: -moz-none !important;
-   -webkit-user-select: none !important;
-   -ms-user-select: none !important;
-   user-select: none !important;
+	-moz-user-select: -moz-none !important;
+	-webkit-user-select: none !important;
+	-ms-user-select: none !important;
+	user-select: none !important;
+}
+
+.form_make_button:hover {
+	background-color: #EEEEEE;
 }
 
 .form_make_button_big{
@@ -218,25 +226,30 @@
 }
 
 .list_elem {
-   -moz-user-select: -moz-none !important;
-   -webkit-user-select: none !important;
-   -ms-user-select: none !important;
-   user-select: none !important;
+	-moz-user-select: -moz-none !important;
+	-webkit-user-select: none !important;
+	-ms-user-select: none !important;
+	user-select: none !important;
+	
+	width: 200px;
+	height: 80px;
+	
+	border: 1px solid #555555;
+	padding: 3px;
+	margin: 5px;
+	
+	display: flex;
+	justify-content: space-between;
+	flex-wrap: wrap;
    
-   width: 200px;
-   height: 80px;
-   
-   border: 1px solid #555555;
-   padding: 3px;
-   margin: 5px;
 }
 
-.list_elem:hover {
+.list_elem_color:hover {
 	background-color: #EEEEEE !important;
 }
 
 .list_elem_ghost {
-   border: 0px;
+	border: 0px;
 }
 .list_elem_ghost:hover {
 	background-color: transparent !important;
@@ -248,6 +261,19 @@
 
 .list_elem_active:hover {
 	background-color: #BBEEBB !important;
+}
+
+.list_elem_btn {
+	border: 1px dashed;
+	margin-left: 3px;
+	margin-right: 3px;
+	
+	padding-left: 2px;
+	padding-right: 2px;
+}
+
+.list_elem_btn:hover {
+	background-color: #EEEEEE;
 }
 
 .aux_list_wrap{

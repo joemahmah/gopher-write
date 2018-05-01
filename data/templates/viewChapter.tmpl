@@ -113,7 +113,8 @@ function updateSectionList(){
 						document.getElementById("section_list").appendChild(storyElem);
 					} else {
 						var storyElem = document.createElement("div");
-						storyElem.className = "list_elem";
+						storyElem.classList.add("list_elem");
+						storyElem.classList.add("list_elem_color");
 						storyElem.setAttribute("data-story-uid",currentStoryUID);
 						storyElem.setAttribute("data-chapter-uid",currentChapterUID);
 						storyElem.setAttribute("data-section-uid",storyListJSON.UIDS[i]);
@@ -192,6 +193,16 @@ function linkListElement(e){
 	var suid = e.target.getAttribute("data-story-uid");
 	var cuid = e.target.getAttribute("data-chapter-uid");
 	var seuid = e.target.getAttribute("data-section-uid");
+	var target = e.target;
+	
+	//get info from ancestors if needed
+	while(!suid){
+		target = target.parentNode;
+		suid = target.getAttribute("data-story-uid");
+		cuid = target.getAttribute("data-chapter-uid");
+		seuid = target.getAttribute("data-section-uid");
+	}
+	
 	location.href = "/story/" + suid + "/" + cuid + "/" + seuid;
 }
 

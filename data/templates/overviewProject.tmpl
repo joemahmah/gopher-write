@@ -23,21 +23,23 @@ function updateProjectList(){
 	xhr.onreadystatechange = function () {
 		//if server returns JSON, update display
 		if (this.readyState === 4 && this.status === 200){
-			//get the char list
+			//get the project list
 			var projectList = document.getElementById("project_list");
 			
+			//clear the project list
+			projectList.innerHTML = "";
+				
 			//convert json into object
 			var projectListJSON = JSON.parse(this.responseText);
 			
 			if(projectListJSON.Data != null) {
-				projectList.innerHTML = "";
-			
 				var data = projectListJSON.Data;
 
 				//add the projects to the page
 				for (var i = 0; i < data.length; i++) {
 					var storyElem = document.createElement("div");
 					storyElem.classList.add("list_elem");
+					storyElem.classList.add("list_elem_color");
 					storyElem.setAttribute("data-path",data[i].S2);
 					storyElem.addEventListener("dblclick",linkListElement);
 						

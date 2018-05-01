@@ -1,5 +1,9 @@
 package main
 
+import (
+	"github.com/joemahmah/gopher-write/common"
+)
+
 type DataTransferText struct {
 	Data	string
 }
@@ -54,4 +58,17 @@ type DataTransferMonoStringMonoInt struct {
 
 type DataTransferMonoStringMonoIntSlice struct {
 	Data	[]MonoStringMonoInt
+}
+
+type MonoIntMonoName struct {
+	I		int
+	Name	common.Name
+}
+
+type DataTransferMonoIntMonoName struct {
+	Data	MonoIntMonoName
+}
+
+type DataTransferMonoIntMonoNameSlice struct {
+	Data	[]MonoIntMonoName
 }

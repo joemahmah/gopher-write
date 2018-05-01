@@ -25,6 +25,9 @@ var character;
 window.onload = initPage;
 
 function initPage(){
+	//Get the aliases
+	updateAliasList();
+
 	//Save changes every 30 seconds
 	window.setInterval(saveChanges, 30 * 1000);
 }
@@ -105,6 +108,96 @@ function toggleMotivationVisability(){
 	} else {
 		document.getElementById("motivation_wrap").style.display = "block";
 	}
+}
+
+function updateAliasList(){
+	var xhr = new XMLHttpRequest();
+	var url = "/char/" + currentCharUID + "/aliaslist";
+	xhr.open("POST", url, true);
+	xhr.onreadystatechange = function () {
+		//if server returns JSON, update display
+		if (this.readyState === 4 && this.status === 200){
+			//get the alias list
+			var aliasList = document.getElementById("alias_list");
+			
+			//Clear the alias list
+			aliasList.innerHTML = "";
+			
+			//convert json into object
+			var aliasListJSON = JSON.parse(this.responseText);
+			
+			if(aliasListJSON.Data != null) {
+				
+				var data = aliasListJSON.Data;
+			
+				//add the stories to the page
+				for (var i = 0; i < data.length; i++) {
+					var aliasElem = document.createElement("div");
+					aliasElem.classList.add("list_elem");
+					aliasElem.classList.add("meta_height_40px");
+					aliasElem.setAttribute("data-alias-uid",data[i].I);
+					
+					//Get Primary Name
+					var aliasElemName = document.createElement("span");
+					aliasElemName.innerHTML = data[i].Name.PrimaryName;
+					
+					//Get auxilary names
+					//TODO
+					
+					//Control buttons
+					var aliasElemControl = document.createElement("div");
+					aliasElemControl.classList.add("list_elem_btn_wrap");
+					
+					var aliasElemRemove = document.createElement("span");
+					aliasElemRemove.classList.add("list_elem_btn");
+					aliasElemRemove.innerHTML = "X";
+					aliasElemRemove.addEventListener("click",removeAlias);
+					
+					var aliasElemEdit = document.createElement("span");
+					aliasElemEdit.classList.add("list_elem_btn");
+					aliasElemEdit.innerHTML = "✏";
+					aliasElemEdit.addEventListener("click",editAlias);
+					
+					aliasElemControl.appendChild(aliasElemEdit);
+					aliasElemControl.appendChild(aliasElemRemove);
+					
+					//Add name and buttons
+					aliasElem.appendChild(aliasElemName);
+					aliasElem.appendChild(aliasElemControl)
+					
+					aliasList.appendChild(aliasElem);
+				}
+			}
+			
+		}
+	}
+	
+	xhr.send();
+}
+
+function removeAlias(e){
+	//Get the alias UID stored in the list element (grandparent) node
+	var aliasUID = parseInt(e.target.parentNode.parentNode.getAttribute("data-alias-uid"));
+	
+	var xhr = new XMLHttpRequest();
+	var url = "/char/" + currentCharUID + "/edit/removealias";
+	xhr.open("POST", url, true);
+	xhr.setRequestHeader("Content-Type", "application/json");
+	xhr.onreadystatechange = function () {
+		if(this.readyState === 4 && this.status === 200){
+			updateAliasList();
+			showResponse("Alias removed.");
+			setTimeout("hideResponse()", 2000);
+		} else if (this.readyState === 4 && this.status !== 200){
+			showResponse("Unable to remove alias.");
+			setTimeout("hideResponse()", 2000);
+		}
+	}
+	xhr.send(JSON.stringify({Data: aliasUID}));
+}
+
+function editAlias(e){
+	alert("TODO");
 }
 
 //////////////////////
@@ -241,7 +334,6 @@ function updateMotivation(){
 	xhr.send(JSON.stringify(textObj));
 }
 
-var a;
 function addAlias(){
 	//Get the primary name for the alias
 	var primaryName = document.getElementById("alias_input").value;
@@ -264,9 +356,15 @@ function addAlias(){
 			showResponse("Saved.");
 			setTimeout("hideResponse()", 2000);
 			
+			//update alias list
+			updateAliasList();
+			
 			//Clear add alias form
 			document.getElementById("alias_input").value = "";
 			document.getElementById("alias_alt_list").innerHTML = "";
+			
+			//Close the modal
+			HideModal("alias_modal")
 		} else if (this.readyState === 4 && this.status !== 200){
 			showResponse("Unable to add alias.");
 			setTimeout("hideResponse()", 2000);
@@ -378,9 +476,9 @@ function removeAltNameAlias(){
 </div>
 
 <h3 class="subheader meta_mouse_hand" onclick='DisplayModal("alias_modal");'>Aliases <span>+</span></h3>
-{{range .Aliases}}
-	<p>{{.PrimaryName}}</p>
-{{end}}
+<div class="list" id="alias_list">
+	
+</div>
 
 
 <div class="ui_modal" id="alias_modal">

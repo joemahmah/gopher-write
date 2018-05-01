@@ -411,3 +411,68 @@ func EditCharAddAliasHandler(w http.ResponseWriter, r *http.Request){
 	character.Aliases = append(character.Aliases, *inputData)
 	
 }
+
+func EditCharRemoveAliasHandler(w http.ResponseWriter, r *http.Request){
+	//Get the uid
+	cuid, _ := strconv.Atoi(mux.Vars(r)["cid"])
+
+	//Get the character
+	character, err := ActiveProject.GetCharacter(cuid)
+	
+	if err != nil {
+		w.WriteHeader(http.StatusNotFound)
+		LogWarning.Println(err)
+		return
+	}
+	
+	inputData := &DataTransferInt{}
+	
+	err = json.NewDecoder(r.Body).Decode(inputData)
+	
+	
+	if err != nil {
+		w.WriteHeader(http.StatusInternalServerError)
+		LogWarning.Println(err)
+		return
+	}
+	
+	//Send ok
+	w.WriteHeader(http.StatusOK)
+	
+	//Get the uid needed to be removed
+	uidToRemove := inputData.Data
+	
+	//Set the note
+	character.Aliases = append(character.Aliases[:uidToRemove], character.Aliases[uidToRemove+1:]...)
+	
+}
+
+func AliasListJSONCharHandler(w http.ResponseWriter, r *http.Request) {
+	//Get the uid
+	cuid, _ := strconv.Atoi(mux.Vars(r)["cid"])
+
+	//Get the character
+	character, err := ActiveProject.GetCharacter(cuid)
+	
+	if err != nil {
+		w.WriteHeader(http.StatusNotFound)
+		LogWarning.Println(err)
+		return
+	}
+	
+	var data DataTransferMonoIntMonoNameSlice
+	
+	//Assign to data
+	for index, alias := range character.Aliases {
+		data.Data = append(data.Data, MonoIntMonoName{I: index, Name: alias})
+	}
+
+	//Encode
+	w.Header().Set("Content-Type","application/json")
+	err = json.NewEncoder(w).Encode(data)
+
+	if err != nil {
+		w.WriteHeader(http.StatusInternalServerError)
+		LogError.Println(err)
+	}
+}

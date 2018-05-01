@@ -69,14 +69,11 @@ function updateStoryList(){
 			//get the char list
 			var storyList = document.getElementById("story_list");
 			
-			//blank the existing list
-			storyList.innerHTML = "";
-			
 			//convert json into object
 			var storyListJSON = JSON.parse(this.responseText);
 			
 			if(storyListJSON.Names != null) {
-				document.getElementById("story_list").innerHTML = "";
+				storyList.innerHTML = "";
 			
 				//add the stories to the page
 				for (var i = 0; i <= storyListJSON.Names.length; i++) {
@@ -91,7 +88,7 @@ function updateStoryList(){
 						document.getElementById("story_list").appendChild(storyElem);
 					} else {
 						var storyElem = document.createElement("div");
-						storyElem.className = "list_elem";
+						storyElem.className = "list_elem list_elem_color";
 						storyElem.setAttribute("data-story-uid",storyListJSON.UIDS[i]);
 						storyElem.setAttribute("draggable","true");
 						storyElem.addEventListener("drop",dropListElement);
@@ -105,7 +102,7 @@ function updateStoryList(){
 						
 						storyElem.appendChild(storyElemLink);
 						
-						document.getElementById("story_list").appendChild(storyElem);
+						storyList.appendChild(storyElem);
 					}
 				}
 			}

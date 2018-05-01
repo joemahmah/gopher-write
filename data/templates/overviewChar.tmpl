@@ -152,7 +152,7 @@ function updateCharList(){
 				//add the chars to the page
 				for (var i = 0; i < data.length; i++) {
 					var charElem = document.createElement("div");
-					charElem.className = "list_elem";
+					charElem.className = "list_elem list_elem_color";
 					charElem.setAttribute("data-char-uid",data[i].I); //set to char uid
 					charElem.setAttribute("draggable","true");
 					charElem.addEventListener("dblclick",linkListElement);
@@ -179,6 +179,14 @@ function updateCharList(){
 
 function linkListElement(e){
 	var cuid = e.target.getAttribute("data-char-uid");
+	var target = e.target;
+	
+	//Go to parent node if needed.
+	while(!cuid){
+		target = target.parentNode
+		cuid = target.getAttribute("data-char-uid");
+	}
+	
 	location.href = "/char/" + cuid;
 }
 
