@@ -96,16 +96,38 @@ function updateCharacterList(){
 		if(currentChar === null){
 			
 		} else {
-			//TODO: make popup w/ more info on hover
-			var storyElem = document.createElement("div");
-			storyElem.className = "aux_list_elem";
+		
+			//Make containing node
+			var charElem = document.createElement("div");
+			charElem.classList.add("aux_list_elem");
+			charElem.setAttribute("data-char-uid", currentChar.uid)
 			
-			var storyElemLink = document.createElement("span");
-			storyElemLink.innerHTML = currentChar.name;
+			//Get name
+			var charElemName = document.createElement("span");
+			charElemName.innerHTML = currentChar.name;
 			
-			storyElem.appendChild(storyElemLink);
+			//Control buttons
+			var charElemControl = document.createElement("div");
+			charElemControl.classList.add("list_elem_btn_wrap");
 			
-			characterList.appendChild(storyElem);
+			var charElemRemove = document.createElement("span");
+			charElemRemove.classList.add("list_elem_btn");
+			charElemRemove.innerHTML = "X";
+			charElemRemove.addEventListener("click",removeCharacter);
+			
+			var charElemLink = document.createElement("span");
+			charElemLink.classList.add("list_elem_btn");
+			charElemLink.innerHTML = "⎘";
+			charElemLink.addEventListener("click",linkCharacter);
+			
+			charElemControl.appendChild(charElemLink);
+			charElemControl.appendChild(charElemRemove);
+			
+			//Add name and buttons
+			charElem.appendChild(charElemName);
+			charElem.appendChild(charElemControl)
+			
+			characterList.appendChild(charElem);
 		}
 	}
 }
@@ -207,6 +229,15 @@ function procUpdateStatus(){
 	var stat = parseInt(document.getElementById("status_text").value);
 
 	updateStatus(stat);
+}
+
+
+function removeCharacter(e){
+
+}
+
+function linkCharacter(e){
+
 }
 
 ////////////////////////////
