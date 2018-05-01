@@ -241,6 +241,67 @@ function updateMotivation(){
 	xhr.send(JSON.stringify(textObj));
 }
 
+var a;
+function addAlias(){
+	//Get the primary name for the alias
+	var primaryName = document.getElementById("alias_input").value;
+	var alternateNames = [];
+	
+	//Get all alternate names for the alias
+	for(var name of document.getElementById("alias_alt_list").getElementsByClassName("alias_alt")){
+		alternateNames.push(name.value);
+	}
+	
+	//Make a name object
+	var name = MakeName(primaryName, true, alternateNames);
+	
+	var xhr = new XMLHttpRequest();
+	var url = "/char/" + currentCharUID + "/edit/addalias";
+	xhr.open("POST", url, true);
+	xhr.setRequestHeader("Content-Type", "application/json");
+	xhr.onreadystatechange = function () {
+		if(this.readyState === 4 && this.status === 200){
+			showResponse("Saved.");
+			setTimeout("hideResponse()", 2000);
+			
+			//Clear add alias form
+			document.getElementById("alias_input").value = "";
+			document.getElementById("alias_alt_list").innerHTML = "";
+		} else if (this.readyState === 4 && this.status !== 200){
+			showResponse("Unable to add alias.");
+			setTimeout("hideResponse()", 2000);
+		}
+	}
+	xhr.send(JSON.stringify(name));
+}
+
+
+//Adds an alternate name field to the form
+function addAltNameAlias(){
+	var altNameList = document.getElementById("alias_alt_list");
+	
+	var newAltName = document.createElement("input");
+	newAltName.classList.add("alias_alt");
+	
+	altNameList.appendChild(newAltName);
+}
+
+//Adds an alternate name field to the form
+function removeAltNameAlias(){
+	var altNameList = document.getElementById("alias_alt_list");
+	var altNames = altNameList.getElementsByClassName("alias_alt")
+	
+	//If not exist, no need to remove
+	if(altNames.length == 0){
+		return;
+	}
+	
+	var lastAltName = altNames[altNames.length - 1]; //Get last alt name input
+	
+	altNameList.removeChild(lastAltName);
+}
+
+
 </script>
 	
 {{template "header"}}
@@ -316,12 +377,35 @@ function updateMotivation(){
 </div>
 </div>
 
-<h3>Aliases</h3>
+<h3 class="subheader meta_mouse_hand" onclick='DisplayModal("alias_modal");'>Aliases <span>+</span></h3>
 {{range .Aliases}}
 	<p>{{.PrimaryName}}</p>
 {{end}}
-	
-	
+
+
+<div class="ui_modal" id="alias_modal">
+<div class="ui_modal_content">
+	<div class="ui_modal_form_small">
+		<label>Alias: </label>
+		<input id="alias_input" type="text">
+		<br>
+		
+		<label>Alternate Names (Nicknames, Name Fragments)</label>
+		<span class="form_make_button form_make_button_round" onclick="addAltNameAlias();">Add</span>
+		<span class="form_make_button form_make_button_round" onclick="removeAltNameAlias();">Remove</span>
+		<hr>
+		<div id="alias_alt_list" class="ui_modal_form_list">
+			
+		</div>
+	</div>
+	<br>
+	<div class="ui_modal_control">
+			<span class="form_make_button form_make_button_big form_make_button_round form_make_button_right" onclick='NoProp(event); addAlias();'>Add Alias</span>
+			<span class="form_make_button form_make_button_big form_make_button_round form_make_button_right" onclick='NoProp(event); HideModal("alias_modal")'>Close</span>
+	</div>
+</div>
+</div>
+
 </body>
 
 </html>

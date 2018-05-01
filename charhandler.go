@@ -379,3 +379,35 @@ func EditCharSetRoleHandler(w http.ResponseWriter, r *http.Request){
 	//Set the note
 	character.Role = inputData.Data
 }
+
+func EditCharAddAliasHandler(w http.ResponseWriter, r *http.Request){
+	//Get the uid
+	cuid, _ := strconv.Atoi(mux.Vars(r)["cid"])
+
+	//Get the character
+	character, err := ActiveProject.GetCharacter(cuid)
+	
+	if err != nil {
+		w.WriteHeader(http.StatusNotFound)
+		LogWarning.Println(err)
+		return
+	}
+	
+	inputData := &common.Name{}
+	
+	err = json.NewDecoder(r.Body).Decode(inputData)
+	
+	
+	if err != nil {
+		w.WriteHeader(http.StatusInternalServerError)
+		LogWarning.Println(err)
+		return
+	}
+	
+	//Send ok
+	w.WriteHeader(http.StatusOK)
+	
+	//Set the note
+	character.Aliases = append(character.Aliases, *inputData)
+	
+}
