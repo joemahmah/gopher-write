@@ -79,6 +79,29 @@ function processSection(){
 
 }
 
+function removeSection(e){
+	var uid = e.target.getAttribute("data-section-uid");
+	var target = e.target;
+
+	while(!uid){
+		target = target.parentNode;
+		uid = target.getAttribute("data-section-uid");
+	}
+
+	var xhr = new XMLHttpRequest();
+	var url = "/story/" + currentStoryUID + "/" + currentChapterUID + "/" + uid + "/delete";
+	xhr.open("POST", url, true);
+	xhr.onreadystatechange = function() {
+		if(this.readyState === 4 && this.status === 200){
+			//report deleted
+			updateSectionList();
+		} else if(this.readyState === 4 && this.status !== 200){
+			//report not deleted
+		}
+	}
+	xhr.send();
+}
+
 function updateSectionList(){
 	var xhr = new XMLHttpRequest();
 	var url = "/story/" + currentStoryUID + "/" + currentChapterUID + "/list";
@@ -129,7 +152,12 @@ function updateSectionList(){
 						var storyElemLink = document.createElement("span");
 						storyElem.setAttribute("draggable","true");
 						storyElemLink.innerHTML = storyListJSON.Names[i];
-						
+						//Control buttons
+						var sectionElemRemove = document.createElement("span");
+						sectionElemRemove.classList.add("list_elem_btn");
+						sectionElemRemove.innerHTML = "X";
+						sectionElemRemove.addEventListener("dblclick",removeStory);
+
 						storyElem.appendChild(storyElemLink);
 						
 						document.getElementById("section_list").appendChild(storyElem);
