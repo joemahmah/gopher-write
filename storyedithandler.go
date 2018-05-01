@@ -34,6 +34,32 @@ func EditSectionAddCharHandler(w http.ResponseWriter, r *http.Request){
 	}
 }
 
+func EditSectionRemoveCharHandler(w http.ResponseWriter, r *http.Request){
+
+	//Get the uids
+	suid, _ := strconv.Atoi(mux.Vars(r)["storyuid"])
+	cuidRel, _ := strconv.Atoi(mux.Vars(r)["chapteruid"])
+	seuidRel, _ := strconv.Atoi(mux.Vars(r)["sectionuid"])
+
+	//Get the id of the character to be added
+	index, _ := strconv.Atoi(mux.Vars(r)["charindex"])
+
+	//Get the section
+	section, err := ActiveProject.GetSection(suid, cuidRel, seuidRel)
+	
+	if err != nil {
+		w.WriteHeader(http.StatusNotFound)
+		LogWarning.Println(err)
+	} else {
+		//Send ok
+		w.WriteHeader(http.StatusOK)
+
+		//Add character
+		section.Characters = append(section.Characters[:index], section.Characters[index+1:]...)
+	
+	}
+}
+
 func EditSectionAddLocationHandler(w http.ResponseWriter, r *http.Request){
 
 	//Get the uids

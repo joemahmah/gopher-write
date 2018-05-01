@@ -101,6 +101,7 @@ function updateCharacterList(){
 			var charElem = document.createElement("div");
 			charElem.classList.add("aux_list_elem");
 			charElem.setAttribute("data-char-uid", currentChar.uid)
+			charElem.setAttribute("data-char-index", i)
 			
 			//Get name
 			var charElemName = document.createElement("span");
@@ -162,28 +163,20 @@ function toggleNoteVisability(){
 
 function procAddToCharacters(e){
 
-	if(e.stopPropagation !== "undefined"){
-		e.stopPropagation();
-	}
-
 	var charuid = parseInt(e.target.getAttribute("data-character-uid"));
 	var target = e.target;
 
-	while(isNaN(charuid)){
+	console.log(charuid);
+	while(!charuid && charuid !== 0){
 		target = target.parentNode;
-		charuid = parseInt(e.target.getAttribute("data-character-uid"));	
+		charuid = parseInt(target.getAttribute("data-character-uid"));	
 	}
 
 	//Set page to look like added
-	e.target.classList.add("ui_modal_list_elem_faded");
-	e.target.removeEventListener("dblclick", procAddToCharacters);
+	target.classList.add("ui_modal_list_elem_faded");
+	target.removeEventListener("dblclick", procAddToCharacters);
 	
-	//Add local
-	characters.push(charuid);
-
-	//Update ui
-	updateCharacterList();
-	
+	//Attempt to add remote
 	addToCharacters(charuid);
 }
 
@@ -205,7 +198,7 @@ function populateCharacterAddModal(){
 		//TODO: make popup w/ more info on hover
 		var storyElem = document.createElement("div");
 		storyElem.className = "ui_modal_list_elem";
-		storyElem.setAttribute("data-character-uid",currentChar.uid);
+		storyElem.setAttribute("data-character-uid", currentChar.uid);
 		
 		//if char alread member
 		if(characters.indexOf(currentChar.uid) === -1){
@@ -233,11 +226,45 @@ function procUpdateStatus(){
 
 
 function removeCharacter(e){
-
+	var index = e.target.getAttribute("data-char-index");
+	var target = e.target;
+	
+	while(!index){
+		target = target.parentNode;
+		index = target.getAttribute("data-char-index");
+	}
+	
+	var xhr = new XMLHttpRequest();
+	var url = "/story/" + currentStoryUID + "/" + currentChapterUID + "/" + currentSectionUID + "/edit/removechar/" + index;
+	xhr.open("POST", url, true);
+	xhr.setRequestHeader("Content-Type", "text/plain");
+	xhr.onreadystatechange = function () {
+		if (this.readyState == 4 && this.status === 200){
+			showResponse("Character removed.");
+			setTimeout("hideResponse()",2000);
+			characters.splice(index, 1);
+			updateCharacterList();
+			populateCharacterAddModal();
+		} else if (this.readyState == 4 && this.status !== 200) {
+			showResponse("Unable to remove character from section.");
+			setTimeout("hideResponse()",5000);
+		}
+	}
+	
+	xhr.send();
+	
 }
 
 function linkCharacter(e){
-
+	var cuid = e.target.getAttribute("data-char-uid");
+	var target = e.target;
+	
+	while(!cuid){
+		target = target.parentNode;
+		cuid = target.getAttribute("data-char-uid");
+	}
+	
+	window.location = "/char/" + cuid; 
 }
 
 ////////////////////////////
@@ -282,6 +309,10 @@ function addToCharacters(charuid){
 			}
 			showResponse("Character added to section.");
 			setTimeout("hideResponse()",2000);
+			
+			//Add local and update
+			characters.push(charuid);
+			updateCharacterList();
 		} else if (this.readyState == 4 && this.status !== 200) {
 			//If unable to add
 			if(!charactersToAdd.includes(charuid)){ //If char not alread queued to be added
