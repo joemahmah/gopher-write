@@ -31,6 +31,17 @@ var locationsToAdd = [];
 window.onload = initPage;
 
 function initPage(){
+	
+	//If characters is null, make empty array
+	if(characters === null){
+		characters = [];
+	}
+	
+	//If locations is null, make empty array
+	if(locations === null){
+		locations = [];
+	}
+
 	//Set the status
 	var statusText = document.getElementById("status_text");
 	statusText.value = {{.Section.Status}};
@@ -88,7 +99,7 @@ function updateCharacterList(){
 	
 	//blank the existing list
 	characterList.innerHTML = "";
-	
+		
 	for(var i=0; i < characters.length; i++){
 		var currentChar = GetCharacter(characters[i]);
 		
@@ -145,11 +156,9 @@ function toggleCharacterVisability(){
 }
 
 function toggleLocationVisability(){
-	if(document.getElementById("location_list_control").style.display == "inline-block"){
-		document.getElementById("location_list_control").style.display = "none";
+	if(document.getElementById("location_list").style.display == "flex"){
 		document.getElementById("location_list").style.display = "none";
 	} else {
-		document.getElementById("location_list_control").style.display = "inline-block";
 		document.getElementById("location_list").style.display = "flex";
 	}
 }
@@ -402,7 +411,7 @@ function updateName(){
 
 {{template "header"}}
 
-<input class="name" id="name_text" type="text" onchange="nameChanged=true;" onkeypress="ConsumeEnterKeyEvent(event, saveChanges);" value="{{.Section.Name.PrimaryName}}">
+<input class="name" id="name_text" type="text" onkeypress="nameChanged=true; ConsumeEnterKeyEvent(event, saveChanges);" value="{{.Section.Name.PrimaryName}}">
 
 <div class="meta_control">
 	<a href="/story/{{index .UIDS 0}}/{{index .UIDS 1}}">Return to chapter </a>

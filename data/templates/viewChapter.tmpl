@@ -400,7 +400,7 @@ function updateName(){
 {{template "header"}}
 
 
-<input class="name" id="name_text" type="text" onchange="nameChanged=true;" onkeypress="ConsumeEnterKeyEvent(event, saveChanges);" value="{{.Chapter.Name.PrimaryName}}">
+<input class="name" id="name_text" type="text" onkeypress="nameChanged=true; ConsumeEnterKeyEvent(event, saveChanges);" value="{{.Chapter.Name.PrimaryName}}">
 
 <div class="meta_control">
 	<a href="/story/{{index .UIDS 0}}">Return to story</a>

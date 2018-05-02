@@ -405,7 +405,7 @@ function removeAltNameAlias(){
 	
 {{template "header"}}
 
-<input class="name" id="name_text" type="text" onchange="nameChanged=true;" onkeypress="ConsumeEnterKeyEvent(event);" value="{{.Name.PrimaryName}}">
+<input class="name" id="name_text" type="text" onkeypress="nameChanged=true; ConsumeEnterKeyEvent(event);" value="{{.Name.PrimaryName}}">
 <div class="meta_control">
 	<a href="/char">Return to character list </a>
 </div>

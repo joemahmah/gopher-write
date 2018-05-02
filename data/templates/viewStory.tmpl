@@ -151,6 +151,12 @@ function updateChapterList(){
 	xhr.send();
 }
 
+//Have ConsumeEnterKeyEvent hook this function
+//to allow enter to save changes.
+function NewEnterKeyEvent(){
+	saveChanges();
+}
+
 function setStatus(){
 	var statusText = document.getElementById("status_text");
 	statusText.value = chapStatus;
