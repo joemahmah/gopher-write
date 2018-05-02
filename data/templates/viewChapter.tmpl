@@ -80,6 +80,16 @@ function processSection(){
 }
 
 function removeSection(e){
+	//Stop click from linking to page
+	if(e.stopPropagation){
+		e.stopPropagation();
+	}
+
+	//Abort if user does not confirm
+	if(!window.confirm("Are you sure you want to delete this section? You will not be able to undo this action!")){
+		return;
+	}
+	
 	var uid = e.target.getAttribute("data-section-uid");
 	var target = e.target;
 
@@ -93,10 +103,12 @@ function removeSection(e){
 	xhr.open("POST", url, true);
 	xhr.onreadystatechange = function() {
 		if(this.readyState === 4 && this.status === 200){
-			//report deleted
+			showResponse("Section removed.");
+			setTimeout("hideResponse()",2000);
 			updateSectionList();
 		} else if(this.readyState === 4 && this.status !== 200){
-			//report not deleted
+			showResponse("Unable to remove section.");
+			setTimeout("hideResponse()",2000);
 		}
 	}
 	xhr.send();
@@ -116,51 +128,59 @@ function updateSectionList(){
 			sectionList.innerHTML = "";
 			
 			//convert json into object
-			var storyListJSON = JSON.parse(this.responseText);
+			var sectionListJSON = JSON.parse(this.responseText);
 			
-			if(storyListJSON.Names != null) {
+			if(sectionListJSON.Names != null) {
 				//add the sections to the page
-				for (var i = 0; i <= storyListJSON.Names.length; i++){ 
-					if(i === storyListJSON.Names.length){
-						var storyElem = document.createElement("div");
-						storyElem.className = "list_elem list_elem_ghost";
-						storyElem.setAttribute("data-story-uid",currentStoryUID);
-						storyElem.setAttribute("data-chapter-uid",currentChapterUID);
-						storyElem.setAttribute("data-section-uid",i);
-						storyElem.setAttribute("draggable","false");
-						storyElem.addEventListener("drop",dropListElement);
-						storyElem.addEventListener("dragover",allowDragListElement);
-						storyElem.addEventListener("dragenter",changeSelectedElementBG);
-						storyElem.addEventListener("dragleave",clearSelectedElementBG);
+				for (var i = 0; i <= sectionListJSON.Names.length; i++){ 
+					if(i === sectionListJSON.Names.length){
+						var sectionElem = document.createElement("div");
+						sectionElem.className = "list_elem list_elem_ghost";
+						sectionElem.setAttribute("data-story-uid",currentStoryUID);
+						sectionElem.setAttribute("data-chapter-uid",currentChapterUID);
+						sectionElem.setAttribute("data-section-uid",i);
+						sectionElem.setAttribute("draggable","false");
+						sectionElem.addEventListener("drop",dropListElement);
+						sectionElem.addEventListener("dragover",allowDragListElement);
+						sectionElem.addEventListener("dragenter",changeSelectedElementBG);
+						sectionElem.addEventListener("dragleave",clearSelectedElementBG);
 						
-						document.getElementById("section_list").appendChild(storyElem);
+						sectionList.appendChild(sectionElem);
 					} else {
-						var storyElem = document.createElement("div");
-						storyElem.classList.add("list_elem");
-						storyElem.classList.add("list_elem_color");
-						storyElem.setAttribute("data-story-uid",currentStoryUID);
-						storyElem.setAttribute("data-chapter-uid",currentChapterUID);
-						storyElem.setAttribute("data-section-uid",storyListJSON.UIDS[i]);
-						storyElem.setAttribute("draggable","true");
-						storyElem.addEventListener("drop",dropListElement);
-						storyElem.addEventListener("dragover",allowDragListElement);
-						storyElem.addEventListener("dragstart",dragListElement);
-						storyElem.addEventListener("dblclick",linkListElement);
-						storyElem.addEventListener("dragenter",changeSelectedElementBG);
-						storyElem.addEventListener("dragleave",clearSelectedElementBG);
+						var sectionElem = document.createElement("div");
+						sectionElem.classList.add("list_elem");
+						sectionElem.classList.add("list_elem_color");
+						sectionElem.setAttribute("data-story-uid",currentStoryUID);
+						sectionElem.setAttribute("data-chapter-uid",currentChapterUID);
+						sectionElem.setAttribute("data-section-uid",sectionListJSON.UIDS[i]);
+						sectionElem.setAttribute("draggable","true");
+						sectionElem.addEventListener("drop",dropListElement);
+						sectionElem.addEventListener("dragover",allowDragListElement);
+						sectionElem.addEventListener("dragstart",dragListElement);
+						sectionElem.addEventListener("dblclick",linkListElement);
+						sectionElem.addEventListener("dragenter",changeSelectedElementBG);
+						sectionElem.addEventListener("dragleave",clearSelectedElementBG);
 						
-						var storyElemLink = document.createElement("span");
-						storyElem.setAttribute("draggable","true");
-						storyElemLink.innerHTML = storyListJSON.Names[i];
+						var sectionElemName = document.createElement("span");
+						sectionElemName.innerHTML = sectionListJSON.Names[i];
+						
 						//Control buttons
+						var sectionElemControl = document.createElement("div");
+						sectionElemControl.classList.add("list_elem_btn_wrap");
+						
 						var sectionElemRemove = document.createElement("span");
 						sectionElemRemove.classList.add("list_elem_btn");
+						sectionElemRemove.classList.add("list_elem_btn_red");
 						sectionElemRemove.innerHTML = "X";
-						sectionElemRemove.addEventListener("dblclick",removeStory);
-
-						storyElem.appendChild(storyElemLink);
+						sectionElemRemove.addEventListener("dblclick", removeSection);
 						
-						document.getElementById("section_list").appendChild(storyElem);
+						sectionElemControl.appendChild(sectionElemRemove);
+						
+						//Add to section elem
+						sectionElem.appendChild(sectionElemName);
+						sectionElem.appendChild(sectionElemControl)
+						
+						sectionList.appendChild(sectionElem);
 					}
 				}
 			}

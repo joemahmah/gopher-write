@@ -83,49 +83,62 @@ function updateChapterList(){
 		//if server returns JSON, update display
 		if (this.readyState === 4 && this.status === 200){
 			//get the char list
-			var storyList = document.getElementById("chapter_list");
+			var chapterList = document.getElementById("chapter_list");
 			
 			//blank the existing list
-			storyList.innerHTML = "";
+			chapterList.innerHTML = "";
 			
 			//convert json into object
-			var storyListJSON = JSON.parse(this.responseText);
+			var chapterListJSON = JSON.parse(this.responseText);
 			
-			if(storyListJSON.Names != null) {
+			if(chapterListJSON.Names != null) {
 				//add the chapters to the page
-				for (var i = 0; i <= storyListJSON.Names.length; i++) {
-					if(i === storyListJSON.Names.length){
-						var storyElem = document.createElement("div");
-						storyElem.className = "list_elem list_elem_ghost";
-						storyElem.setAttribute("data-story-uid",currentStoryUID);
-						storyElem.setAttribute("data-chapter-uid",i);
-						storyElem.setAttribute("draggable","false");
-						storyElem.addEventListener("drop",dropListElement);
-						storyElem.addEventListener("dragover",allowDragListElement);
-						storyElem.addEventListener("dragenter",changeSelectedElementBG);
-						storyElem.addEventListener("dragleave",clearSelectedElementBG);
+				for (var i = 0; i <= chapterListJSON.Names.length; i++) {
+					if(i === chapterListJSON.Names.length){
+						var chapterElem = document.createElement("div");
+						chapterElem.className = "list_elem list_elem_ghost";
+						chapterElem.setAttribute("data-story-uid",currentStoryUID);
+						chapterElem.setAttribute("data-chapter-uid",i);
+						chapterElem.setAttribute("draggable","false");
+						chapterElem.addEventListener("drop",dropListElement);
+						chapterElem.addEventListener("dragover",allowDragListElement);
+						chapterElem.addEventListener("dragenter",changeSelectedElementBG);
+						chapterElem.addEventListener("dragleave",clearSelectedElementBG);
 						
-						document.getElementById("chapter_list").appendChild(storyElem);
+						document.getElementById("chapter_list").appendChild(chapterElem);
 					} else {
-						var storyElem = document.createElement("div");
-						storyElem.className = "list_elem list_elem_color";
-						storyElem.setAttribute("data-story-uid",currentStoryUID);
-						storyElem.setAttribute("data-chapter-uid",storyListJSON.UIDS[i]);
-						storyElem.setAttribute("draggable","true");
-						storyElem.addEventListener("drop",dropListElement);
-						storyElem.addEventListener("dragover",allowDragListElement);
-						storyElem.addEventListener("dragstart",dragListElement);
-						storyElem.addEventListener("dblclick",linkListElement);
-						storyElem.addEventListener("dragenter",changeSelectedElementBG);
-						storyElem.addEventListener("dragleave",clearSelectedElementBG);
+						var chapterElem = document.createElement("div");
+						chapterElem.className = "list_elem list_elem_color";
+						chapterElem.setAttribute("data-story-uid",currentStoryUID);
+						chapterElem.setAttribute("data-chapter-uid",chapterListJSON.UIDS[i]);
+						chapterElem.setAttribute("draggable","true");
+						chapterElem.addEventListener("drop",dropListElement);
+						chapterElem.addEventListener("dragover",allowDragListElement);
+						chapterElem.addEventListener("dragstart",dragListElement);
+						chapterElem.addEventListener("dblclick",linkListElement);
+						chapterElem.addEventListener("dragenter",changeSelectedElementBG);
+						chapterElem.addEventListener("dragleave",clearSelectedElementBG);
 						
-						var storyElemLink = document.createElement("span");
-						storyElem.setAttribute("draggable","true");
-						storyElemLink.innerHTML = storyListJSON.Names[i];
+						var chapterElemName = document.createElement("span");
+						chapterElemName.innerHTML = chapterListJSON.Names[i];
 						
-						storyElem.appendChild(storyElemLink);
+						//Control buttons
+						var chapterElemControl = document.createElement("div");
+						chapterElemControl.classList.add("list_elem_btn_wrap");
 						
-						document.getElementById("chapter_list").appendChild(storyElem);
+						var chapterElemRemove = document.createElement("span");
+						chapterElemRemove.classList.add("list_elem_btn");
+						chapterElemRemove.classList.add("list_elem_btn_red");
+						chapterElemRemove.innerHTML = "X";
+						chapterElemRemove.addEventListener("dblclick", removeChapter);
+						
+						chapterElemControl.appendChild(chapterElemRemove);
+						
+						//Add to section elem
+						chapterElem.appendChild(chapterElemName);
+						chapterElem.appendChild(chapterElemControl)
+						
+						chapterList.appendChild(chapterElem);
 					}
 				}
 			}
@@ -187,6 +200,42 @@ function moveStory(first, second){var xhr = new XMLHttpRequest();
 		}
 	}
 	
+	xhr.send();
+}
+
+function removeChapter(e){
+
+	//Prevent double click from linking
+	if(e.stopPropagation){
+		e.stopPropagation();
+	}
+
+	//Abort if user does not confirm
+	if(!window.confirm("Are you sure you want to delete this chapter? All sections contained within will be deleted. You will not be able to undo this action!")){
+		return;
+	}
+	
+	var uid = e.target.getAttribute("data-chapter-uid");
+	var target = e.target;
+
+	while(!uid){
+		target = target.parentNode;
+		uid = target.getAttribute("data-chapter-uid");
+	}
+
+	var xhr = new XMLHttpRequest();
+	var url = "/story/" + currentStoryUID + "/" + uid + "/delete";
+	xhr.open("POST", url, true);
+	xhr.onreadystatechange = function() {
+		if(this.readyState === 4 && this.status === 200){
+			showResponse("Chapter removed.");
+			setTimeout("hideResponse()",2000);
+			updateChapterList();
+		} else if(this.readyState === 4 && this.status !== 200){
+			showResponse("Unable to remove chapter.");
+			setTimeout("hideResponse()",2000);
+		}
+	}
 	xhr.send();
 }
 

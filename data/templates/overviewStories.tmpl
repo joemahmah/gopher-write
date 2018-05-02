@@ -96,11 +96,24 @@ function updateStoryList(){
 						storyElem.addEventListener("dragstart",dragListElement);
 						storyElem.addEventListener("dblclick",linkListElement);
 						
-						var storyElemLink = document.createElement("span");
-						storyElem.setAttribute("draggable","true");
-						storyElemLink.innerHTML = storyListJSON.Names[i];
+						var storyElemName = document.createElement("span");
+						storyElemName.innerHTML = storyListJSON.Names[i];
 						
-						storyElem.appendChild(storyElemLink);
+						//Control buttons
+						var storyElemControl = document.createElement("div");
+						storyElemControl.classList.add("list_elem_btn_wrap");
+						
+						var storyElemRemove = document.createElement("span");
+						storyElemRemove.classList.add("list_elem_btn");
+						storyElemRemove.classList.add("list_elem_btn_red");
+						storyElemRemove.innerHTML = "X";
+						storyElemRemove.addEventListener("dblclick", removeStory);
+						
+						storyElemControl.appendChild(storyElemRemove);
+						
+						//Add to section elem
+						storyElem.appendChild(storyElemName);
+						storyElem.appendChild(storyElemControl)
 						
 						storyList.appendChild(storyElem);
 					}
@@ -125,6 +138,41 @@ function moveStory(first, second){var xhr = new XMLHttpRequest();
 		}
 	}
 	
+	xhr.send();
+}
+
+function removeStory(e){
+	//Stop click from linking to page
+	if(e.stopPropagation){
+		e.stopPropagation();
+	}
+
+	//Abort if user does not confirm
+	if(!window.confirm("Are you sure you want to delete this story? All chapters and sections contained within will be deleted. You will not be able to undo this action!")){
+		return;
+	}
+	
+	var uid = e.target.getAttribute("data-story-uid");
+	var target = e.target;
+
+	while(!uid){
+		target = target.parentNode;
+		uid = target.getAttribute("data-story-uid");
+	}
+
+	var xhr = new XMLHttpRequest();
+	var url = "/story/" + uid + "/delete";
+	xhr.open("POST", url, true);
+	xhr.onreadystatechange = function() {
+		if(this.readyState === 4 && this.status === 200){
+			showResponse("Story removed.");
+			setTimeout("hideResponse()",2000);
+			updateStoryList();
+		} else if(this.readyState === 4 && this.status !== 200){
+			showResponse("Unable to remove story.");
+			setTimeout("hideResponse()",2000);
+		}
+	}
 	xhr.send();
 }
 

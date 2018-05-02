@@ -125,7 +125,12 @@ func (p *Project) RemoveChapterRel(suid int, cuidRel int) error {
 
 	cuid := story.Chapters[cuidRel]
 
+	//Remove from the story
+	story.Chapters = append(story.Chapters[:cuidRel], story.Chapters[cuidRel+1:]...)
+	
 	//Remove all sections from the chapter
+	//We don't care about deleting their local references
+	//since the chapter will be gone...
 	for _,elem := range p.Chapters[cuid].Sections {
 		p.RemoveSection(elem)
 	}
@@ -154,6 +159,9 @@ func (p *Project) RemoveSectionRel(suid int, cuidRel int, seuidRel int) error{
 	}
 
 	seuid := chapter.Sections[seuidRel]
+	
+	//Remove from the chapter
+	chapter.Sections = append(chapter.Sections[:seuidRel], chapter.Sections[seuidRel+1:]...)
 
 	delete(p.Sections, seuid)
 
