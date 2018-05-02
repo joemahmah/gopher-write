@@ -184,10 +184,9 @@ function updateSectionList(){
 					}
 				}
 			}
-			
-		} else if (this.readyState === 4 && this.status != 200){
-			showResponse("Unable to get sections!");
-			setTimeout("hideResponse()",5000);
+		} else if(this.readyState === 4 && this.status !== 200){
+			showResponse("There was an error loading the section list. Status: " + this.status);
+			setTimeout("hideResponse()",2000);
 		}
 	}
 	

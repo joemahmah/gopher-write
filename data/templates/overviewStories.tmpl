@@ -119,7 +119,9 @@ function updateStoryList(){
 					}
 				}
 			}
-			
+		} else if(this.readyState === 4 && this.status !== 200){
+			showResponse("There was an error loading the story list. Status: " + this.status);
+			setTimeout("hideResponse()",2000);
 		}
 	}
 	
