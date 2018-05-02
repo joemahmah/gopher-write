@@ -158,10 +158,23 @@ function updateCharList(){
 					charElem.addEventListener("dblclick",linkListElement);
 					
 					var charElemName = document.createElement("span");
-					charElem.setAttribute("draggable","true");
 					charElemName.innerHTML = data[i].S; //set to char name
 					
+					//Control buttons
+					var charElemControl = document.createElement("div");
+					charElemControl.classList.add("list_elem_btn_wrap");
+					
+					var charElemRemove = document.createElement("span");
+					charElemRemove.classList.add("list_elem_btn");
+					charElemRemove.classList.add("list_elem_btn_red");
+					charElemRemove.innerHTML = "X";
+					charElemRemove.addEventListener("click", removeCharacter);
+					
+					charElemControl.appendChild(charElemRemove);
+					
+					//Add name and buttons
 					charElem.appendChild(charElemName);
+					charElem.appendChild(charElemControl)
 					
 					charList.appendChild(charElem);
 					
@@ -175,6 +188,41 @@ function updateCharList(){
 	}
 	
 	xhr.send();	
+}
+
+function removeCharacter(e){
+	//Stop click from linking to page
+	if(e.stopPropagation){
+		e.stopPropagation();
+	}
+
+	//Abort if user does not confirm
+	if(!window.confirm("Are you sure you want to delete this character? References to this character will be purged. You will not be able to undo this action!")){
+		return;
+	}
+	
+	var uid = e.target.getAttribute("data-char-uid");
+	var target = e.target;
+
+	while(!uid){
+		target = target.parentNode;
+		uid = target.getAttribute("data-char-uid");
+	}
+
+	var xhr = new XMLHttpRequest();
+	var url = "/char/" + uid + "/delete";
+	xhr.open("POST", url, true);
+	xhr.onreadystatechange = function() {
+		if(this.readyState === 4 && this.status === 200){
+			showResponse("Character removed.");
+			setTimeout("hideResponse()",2000);
+			updateCharList();
+		} else if(this.readyState === 4 && this.status !== 200){
+			showResponse("Unable to remove character.");
+			setTimeout("hideResponse()",2000);
+		}
+	}
+	xhr.send();
 }
 
 function linkListElement(e){

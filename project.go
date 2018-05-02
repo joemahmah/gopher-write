@@ -72,7 +72,26 @@ func (p *Project) AddCharacter(char *character.Character) {
 }
 
 func (p *Project) RemoveCharacter(uid int) {
+	//Delete character from project
 	delete(p.Characters, uid)
+	
+	//Remove references to character in sections
+	for _, section := range p.Sections {
+		var toDelete []int
+		
+		//Get relative locations
+		for index, value := range section.Characters {
+			if value == uid{
+				toDelete = append(toDelete, index)
+			}
+		}
+		
+		//Remove the uids from the section
+		for _, location := range toDelete {
+			//Remove the character from the slice
+			section.Characters = append(section.Characters[:location], section.Characters[location + 1:]...)
+		}
+	}
 }
 
 

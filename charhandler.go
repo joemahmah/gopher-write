@@ -476,3 +476,12 @@ func AliasListJSONCharHandler(w http.ResponseWriter, r *http.Request) {
 		LogError.Println(err)
 	}
 }
+
+func DeleteCharHandler(w http.ResponseWriter, r *http.Request){
+	
+	cid, _ := strconv.Atoi(mux.Vars(r)["cid"])
+
+	ActiveProject.RemoveCharacter(cid)
+
+	w.WriteHeader(http.StatusOK)
+}

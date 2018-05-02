@@ -180,6 +180,14 @@ function removeStory(e){
 
 function linkListElement(e){
 	var suid = e.target.getAttribute("data-story-uid");
+	var target = e.target;
+	
+	//Go to parent node if needed.
+	while(!suid){
+		target = target.parentNode
+		suid = target.getAttribute("data-story-uid");
+	}
+	
 	location.href = "/story/" + suid;
 }
 
