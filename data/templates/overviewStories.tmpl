@@ -109,9 +109,16 @@ function updateStoryList(){
 						storyElemRemove.innerHTML = "X";
 						storyElemRemove.addEventListener("dblclick", removeStory);
 						
+						var storyElemExport = document.createElement("span");
+						storyElemExport.classList.add("list_elem_btn");
+						storyElemExport.innerHTML = "⎘";
+						storyElemExport.addEventListener("dblclick", exportStory);
+						
+						storyElemControl.appendChild(storyElemExport);
+						
 						storyElemControl.appendChild(storyElemRemove);
 						
-						//Add to section elem
+						//Add to story elem
 						storyElem.appendChild(storyElemName);
 						storyElem.appendChild(storyElemControl)
 						
@@ -176,6 +183,24 @@ function removeStory(e){
 		}
 	}
 	xhr.send();
+}
+
+function exportStory(e){
+	//Stop click from linking to page
+	if(e.stopPropagation){
+		e.stopPropagation();
+	}
+	
+	var uid = e.target.getAttribute("data-story-uid");
+	var target = e.target;
+
+	while(!uid){
+		target = target.parentNode;
+		uid = target.getAttribute("data-story-uid");
+	}
+
+	var url = "/story/" + uid + "/export";
+	window.location = url;
 }
 
 function linkListElement(e){

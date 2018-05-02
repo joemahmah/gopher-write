@@ -2,6 +2,7 @@ package main
 
 import (
 	"github.com/joemahmah/gopher-write/common"
+	"github.com/joemahmah/gopher-write/story"
 )
 
 type DataTransferText struct {
@@ -71,4 +72,20 @@ type DataTransferMonoIntMonoName struct {
 
 type DataTransferMonoIntMonoNameSlice struct {
 	Data	[]MonoIntMonoName
+}
+
+
+////////////////////
+// Export Structs //
+////////////////////
+
+type ExportChapter struct {
+	Chapter		story.Chapter
+	Sections	[]story.Section
+}
+
+type ExportStory struct {
+	Story		story.Story
+	Chapters	[]story.Chapter
+	Sections	[][]story.Section
 }

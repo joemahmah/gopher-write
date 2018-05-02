@@ -132,6 +132,12 @@ function updateChapterList(){
 						chapterElemRemove.innerHTML = "X";
 						chapterElemRemove.addEventListener("dblclick", removeChapter);
 						
+						var chapterElemExport = document.createElement("span");
+						chapterElemExport.classList.add("list_elem_btn");
+						chapterElemExport.innerHTML = "⎘";
+						chapterElemExport.addEventListener("dblclick", exportChapter);
+						
+						chapterElemControl.appendChild(chapterElemExport);
 						chapterElemControl.appendChild(chapterElemRemove);
 						
 						//Add to section elem
@@ -245,6 +251,25 @@ function removeChapter(e){
 		}
 	}
 	xhr.send();
+}
+
+function exportChapter(e){
+
+	//Prevent double click from linking
+	if(e.stopPropagation){
+		e.stopPropagation();
+	}
+	
+	var uid = e.target.getAttribute("data-chapter-uid");
+	var target = e.target;
+
+	while(!uid){
+		target = target.parentNode;
+		uid = target.getAttribute("data-chapter-uid");
+	}
+
+	var url = "/story/" + currentStoryUID + "/" + uid + "/export";
+	window.location = url;
 }
 
 function linkListElement(e){

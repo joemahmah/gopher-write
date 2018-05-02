@@ -114,6 +114,23 @@ function removeSection(e){
 	xhr.send();
 }
 
+function exportSection(e){
+	//Stop click from linking to page
+	if(e.stopPropagation){
+		e.stopPropagation();
+	}
+	var uid = e.target.getAttribute("data-section-uid");
+	var target = e.target;
+
+	while(!uid){
+		target = target.parentNode;
+		uid = target.getAttribute("data-section-uid");
+	}
+
+	var url = "/story/" + currentStoryUID + "/" + currentChapterUID + "/" + uid + "/export";
+	window.location = url;
+}
+
 function updateSectionList(){
 	var xhr = new XMLHttpRequest();
 	var url = "/story/" + currentStoryUID + "/" + currentChapterUID + "/list";
@@ -174,6 +191,12 @@ function updateSectionList(){
 						sectionElemRemove.innerHTML = "X";
 						sectionElemRemove.addEventListener("dblclick", removeSection);
 						
+						var sectionElemExport = document.createElement("span");
+						sectionElemExport.classList.add("list_elem_btn");
+						sectionElemExport.innerHTML = "⎘";
+						sectionElemExport.addEventListener("dblclick", exportSection);
+						
+						sectionElemControl.appendChild(sectionElemExport);
 						sectionElemControl.appendChild(sectionElemRemove);
 						
 						//Add to section elem

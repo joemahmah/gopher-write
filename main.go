@@ -71,6 +71,7 @@ func main(){
 	router.HandleFunc("/story/{storyuid:[0-9]{1,9}}", ViewStoryHandler) //Story overview
 	router.HandleFunc("/story/new", NewStoryHandler) //new story
 	router.HandleFunc("/story/{storyuid:[0-9]{1,9}}/delete", DeleteStoryHandler) //delete story
+	router.HandleFunc("/story/{storyuid:[0-9]{1,9}}/export", ExportStoryHandler) //export story
 	router.HandleFunc("/story/{storyuid:[0-9]{1,9}}/edit", EditStoryHandler) //edit story
 	router.HandleFunc("/story/{storyuid:[0-9]{1,9}}/json", GetJSONStoryHandler) //get story json
 	router.HandleFunc("/story/list", ListJSONStoryHandler) //Story list json
@@ -79,6 +80,7 @@ func main(){
 	router.HandleFunc("/story/{storyuid:[0-9]{1,9}}/{chapteruid:[0-9]{1,9}}", ViewChapterHandler) //Chapter overview
 	router.HandleFunc("/story/{storyuid:[0-9]{1,9}}/new", NewChapterHandler) //new chapter
 	router.HandleFunc("/story/{storyuid:[0-9]{1,9}}/{chapteruid:[0-9]{1,9}}/delete", DeleteChapterHandler) //delete chapter
+	router.HandleFunc("/story/{storyuid:[0-9]{1,9}}/{chapteruid:[0-9]{1,9}}/export", ExportChapterHandler) //export chapter
 	router.HandleFunc("/story/{storyuid:[0-9]{1,9}}/{chapteruid:[0-9]{1,9}}/edit", EditChapterHandler) //edit chapter
 	router.HandleFunc("/story/{storyuid:[0-9]{1,9}}/{chapteruid:[0-9]{1,9}}/json", GetJSONChapterHandler) //get chapter json
 	router.HandleFunc("/story/{storyuid:[0-9]{1,9}}/list", ListJSONChapterHandler) //Chapter list json
@@ -87,6 +89,7 @@ func main(){
 	router.HandleFunc("/story/{storyuid:[0-9]{1,9}}/{chapteruid:[0-9]{1,9}}/{sectionuid:[0-9]{1,9}}", ViewSectionHandler) //Section Overview
 	router.HandleFunc("/story/{storyuid:[0-9]{1,9}}/{chapteruid:[0-9]{1,9}}/new", NewSectionHandler) //new section
 	router.HandleFunc("/story/{storyuid:[0-9]{1,9}}/{chapteruid:[0-9]{1,9}}/{sectionuid:[0-9]{1,9}}/delete", DeleteSectionHandler) //delete section
+	router.HandleFunc("/story/{storyuid:[0-9]{1,9}}/{chapteruid:[0-9]{1,9}}/{sectionuid:[0-9]{1,9}}/export", ExportSectionHandler) //export section
 	router.HandleFunc("/story/{storyuid:[0-9]{1,9}}/{chapteruid:[0-9]{1,9}}/{sectionuid:[0-9]{1,9}}/edit", EditSectionHandler) //edit section
 	router.HandleFunc("/story/{storyuid:[0-9]{1,9}}/{chapteruid:[0-9]{1,9}}/{sectionuid:[0-9]{1,9}}/json", GetJSONSectionHandler) //get section json
 	router.HandleFunc("/story/{storyuid:[0-9]{1,9}}/{chapteruid:[0-9]{1,9}}/list", ListJSONSectionHandler) //Chapter list json

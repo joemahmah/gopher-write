@@ -516,3 +516,121 @@ func DeleteSectionHandler(w http.ResponseWriter, r *http.Request){
 
 	w.WriteHeader(http.StatusOK)
 }
+
+
+func ExportStoryHandler(w http.ResponseWriter, r *http.Request) {
+	
+	suid, _ := strconv.Atoi(mux.Vars(r)["storyuid"])
+	
+	storyToExport, err := ActiveProject.GetStory(suid);
+
+	//If error, return 404
+	if err != nil{
+		w.WriteHeader(http.StatusNotFound)
+		LogWarning.Println(err)
+		return
+	}
+	
+	//Actual export var
+	var storyData ExportStory
+	
+	//Assign story
+	storyData.Story = *storyToExport
+	
+	//Assign chapters and sections
+	for _, chapterUID := range storyToExport.Chapters {
+		//TODO: add getter to get section by absolute uid
+		//TODO: add error checking
+		storyData.Chapters = append(storyData.Chapters, *ActiveProject.Chapters[chapterUID])
+		
+		//Assign sections
+		var sects []story.Section
+		for _, sectionUID := range ActiveProject.Chapters[chapterUID].Sections{
+			sects = append(sects, *ActiveProject.Sections[sectionUID])
+		}
+		storyData.Sections = append(storyData.Sections, sects)
+	}
+	
+	//Set header
+	w.Header().Set("Content-Disposition", "attachment; filename=" + storyToExport.Name.PrimaryName + ".json")
+	w.Header().Set("Content-Type","application/json")
+	
+	//Encode
+	err = json.NewEncoder(w).Encode(storyData)
+
+	//Report errors
+	if err != nil {
+		w.WriteHeader(http.StatusInternalServerError)
+		LogError.Println(err)
+	}
+}
+
+func ExportChapterHandler(w http.ResponseWriter, r *http.Request) {
+	
+	suid, _ := strconv.Atoi(mux.Vars(r)["storyuid"])
+	cuidRel, _ := strconv.Atoi(mux.Vars(r)["chapteruid"])
+	
+	chapter, err := ActiveProject.GetChapter(suid, cuidRel);
+
+	//If error, return 404
+	if err != nil{
+		w.WriteHeader(http.StatusNotFound)
+		LogWarning.Println(err)
+		return
+	}
+	
+	//Actual export var
+	var chapterData ExportChapter
+	
+	//Assign chapter
+	chapterData.Chapter = *chapter
+	
+	//Assign sections
+	for _, sectionUID := range chapter.Sections {
+		//TODO: add getter to get section by absolute uid
+		//TODO: add error checking
+		chapterData.Sections = append(chapterData.Sections, *ActiveProject.Sections[sectionUID])
+	}
+	
+	//Set header
+	w.Header().Set("Content-Disposition", "attachment; filename=" + chapter.Name.PrimaryName + ".json")
+	w.Header().Set("Content-Type","application/json")
+	
+	//Encode
+	err = json.NewEncoder(w).Encode(chapterData)
+
+	//Report errors
+	if err != nil {
+		w.WriteHeader(http.StatusInternalServerError)
+		LogError.Println(err)
+	}
+}
+
+func ExportSectionHandler(w http.ResponseWriter, r *http.Request) {
+	
+	suid, _ := strconv.Atoi(mux.Vars(r)["storyuid"])
+	cuidRel, _ := strconv.Atoi(mux.Vars(r)["chapteruid"])
+	seuidRel, _ := strconv.Atoi(mux.Vars(r)["sectionuid"])
+	
+	section, err := ActiveProject.GetSection(suid, cuidRel, seuidRel);
+
+	//If error, return 404
+	if err != nil{
+		w.WriteHeader(http.StatusNotFound)
+		LogWarning.Println(err)
+		return
+	}
+	
+	//Set header
+	w.Header().Set("Content-Disposition", "attachment; filename=" + section.Name.PrimaryName + ".json")
+	w.Header().Set("Content-Type","application/json")
+	
+	//Encode
+	err = json.NewEncoder(w).Encode(section)
+
+	//Report errors
+	if err != nil {
+		w.WriteHeader(http.StatusInternalServerError)
+		LogError.Println(err)
+	}
+}
