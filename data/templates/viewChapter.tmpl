@@ -35,29 +35,8 @@ function initPage(){
 	window.setInterval(saveChanges, 3000);
 }
 
-function addSectionForm(){
-
-	var form = document.getElementById("section_form");
-	
-	if(form == null){
-		form = MakeForm("section_form");
-	}
-	
-	form.innerHTML=form.innerHTML + "Name:<br><input id=\"form_name\" type=\"text\" onkeypress=\"ConsumeEnterKeyEvent(event);\"><br>";
-	
-	document.getElementById("form_new").style.display = 'none'
-	document.getElementById("form_control").style.display = 'block'
-}
-
-function removeSectionForm(){
-	DeleteNodeById("section_form");
-	
-	document.getElementById("form_new").style.display = 'block'
-	document.getElementById("form_control").style.display = 'none'
-}
-
 function processSection(){
-	var name = MakeName(document.getElementById("form_name").value,false,null);
+	var name = MakeName(document.getElementById("section_new_name_input").value,false,null);
 	var section = MakeSection(name,"",0);
 	
 	var xhr = new XMLHttpRequest();
@@ -67,8 +46,13 @@ function processSection(){
 	xhr.onreadystatechange = function () {
 		//if server returns proper, update display
 		if (this.readyState == 4 && this.status == 200){
-			removeSectionForm(); //remove form
+			showResponse("Section added.");
+			setTimeout("hideResponse()",2000);
 			updateSectionList(); //update Chapter list
+			HideModal("section_new_modal"); //Hide the modal
+			
+			//Clear the name in the modal
+			document.getElementById("section_new_name_input").value = "";
 		} else if (this.readyState == 4 && this.status == 500) {
 			showResponse("There was an error creating the new section.");
 			setTimeout("hideResponse()",5000);
@@ -418,6 +402,50 @@ function updateName(){
 	xhr.send(JSON.stringify(name));
 }
 
+function importSection(){
+	var files = document.getElementById("section_import_input").files;
+	var bindchar = document.getElementById("section_import_bindchar_input").checked;
+	var bindloc = document.getElementById("section_import_bindloc_input").checked;
+	
+	//check if one file uploaded
+	if(files.length !== 1){
+		showResponse("Select a single file to import.");
+		setTimeout("hideResponse()",5000);
+		return;
+	}
+	
+	//get the file
+	file = files[0];
+	
+	//Make a file reader
+	var fileReader = new FileReader();
+	
+	//Make the request
+	var xhr = new XMLHttpRequest();
+	var url = "/story/" + currentStoryUID + "/" + currentChapterUID + "/import/" + bindchar + "/" + bindloc;
+	xhr.open("POST", url, true);
+	xhr.setRequestHeader("Content-Type", "application/json");
+	xhr.onreadystatechange = function () {
+		if (this.readyState == 4 && this.status == 200){
+			showResponse("Section imported.");
+			setTimeout("hideResponse()",2000);
+			HideModal("section_import_modal"); //Hide the modal
+			updateSectionList(); //Update the project list
+		} else if (this.readyState == 4 && this.status !== 200) {
+			showResponse("Unable to create project.");
+			setTimeout("hideResponse()",5000);
+		}
+	}
+	
+	//Set the filereader to send the file
+	fileReader.onload = function(e){
+		xhr.send(e.target.result);
+	}
+	
+	//Read the file
+	fileReader.readAsBinaryString(file)
+}
+
 </script>
 
 {{template "header"}}
@@ -456,19 +484,46 @@ function updateName(){
 <hr>
 <h2>Sections</h2>
 
-<div class="form_container" id="form_container">
-	<div id="form_new">
-		<button type="button" onclick="addSectionForm()">Add Section</button>
-	</div>
-	<div id="form_control" style="display:none">
-		<button onclick="processSection()">Submit</button>
-	</div>
+<div class="control_wrap">
+	<span class="form_make_button" onclick='DisplayModal("section_new_modal");'>Add Section</span>
+	<span class="form_make_button" onclick='DisplayModal("section_import_modal")'>Import Section</span>
 </div>
-
-
 
 <div class="list" id="section_list">
 
+</div>
+
+
+<div class="ui_modal" id="section_new_modal">
+<div class="ui_modal_content">
+	<div class="ui_modal_form">
+		<label>Section Name: </label>
+		<input id="section_new_name_input" type="text" onkeypress="ConsumeEnterKeyEvent(event);">
+	</div>
+	<br>
+	<div class="ui_modal_control">
+			<span class="form_make_button form_make_button_big form_make_button_round form_make_button_right" onclick="processSection();">Create Section</span>
+			<span class="form_make_button form_make_button_big form_make_button_round form_make_button_right" onclick='HideModal("section_new_modal");'>Close</span>
+	</div>
+</div>
+</div>
+
+<div class="ui_modal" id="section_import_modal">
+<div class="ui_modal_content">
+	<div class="ui_modal_form">
+		<input id="section_import_input" type="file" multiple="false">
+		<br>
+		<label title="Binding characters will keep the section's characters. This will only work correctly if the section being imported is from the current project.">Bind Characters: </label>
+		<input class="ui_modal_form_checkbox" id="section_import_bindchar_input" type="checkbox">
+		<label title="Binding locations will keep the section's locations. This will only work correctly if the section being imported is from the current project.">Bind Locations: </label>
+		<input class="ui_modal_form_checkbox" id="section_import_bindloc_input" type="checkbox">
+	</div>
+	<br>
+	<div class="ui_modal_control">
+			<span class="form_make_button form_make_button_big form_make_button_round form_make_button_right" onclick="importSection();">Import Section</span>
+			<span class="form_make_button form_make_button_big form_make_button_round form_make_button_right" onclick='HideModal("section_import_modal");'>Close</span>
+	</div>
+</div>
 </div>
 
 </body>

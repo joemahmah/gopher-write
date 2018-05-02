@@ -127,7 +127,6 @@ function importProject(){
 			setTimeout("hideResponse()",2000);
 			HideModal("project_import_modal"); //Hide the modal
 			updateProjectList(); //Update the project list
-			document.getElementById("project_new_input").value = ""; //Clear name
 		} else if (this.readyState == 4 && this.status !== 200) {
 			showResponse("Unable to create project.");
 			setTimeout("hideResponse()",5000);

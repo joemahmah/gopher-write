@@ -634,3 +634,51 @@ func ExportSectionHandler(w http.ResponseWriter, r *http.Request) {
 		LogError.Println(err)
 	}
 }
+
+
+func ImportSectionHandler(w http.ResponseWriter, r *http.Request) {
+
+	//Get the uids of the story and chapter
+	suid, _ := strconv.Atoi(mux.Vars(r)["storyuid"])
+	cuidRel, _ := strconv.Atoi(mux.Vars(r)["chapteruid"])
+	bindchar, _ := strconv.ParseBool(mux.Vars(r)["bindchar"])
+	bindloc, _ := strconv.ParseBool(mux.Vars(r)["bindloc"])
+
+	selectedChapter, err := ActiveProject.GetChapter(suid, cuidRel)
+	
+	if err != nil {
+		w.WriteHeader(http.StatusNotFound)
+		LogError.Println(err)
+		return
+	}
+	
+	//Get the JSON sent
+	importedSection := &story.Section{}
+	
+	err = json.NewDecoder(r.Body).Decode(importedSection)
+	
+	if err != nil {
+		w.WriteHeader(http.StatusInternalServerError)
+		LogError.Println(err)
+	} else {
+		w.WriteHeader(http.StatusOK)
+
+		//unbind chars and locations if needed
+		if !bindchar {
+			importedSection.Characters = make([]int, 0)
+		}
+		if !bindloc {
+			importedSection.Locations = make([]int, 0)
+		}
+		
+		//Add section to project to assign uid
+		ActiveProject.AddSection(importedSection)
+
+		//Add chapter to story
+		selectedChapter.Sections = append(selectedChapter.Sections, importedSection.UID)
+
+		//Log
+		LogInfo.Println("Section " + importedSection.Name.PrimaryName + " added to project " + ActiveProject.Name + ".")
+	}
+	
+}
