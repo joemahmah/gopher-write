@@ -79,6 +79,7 @@ func main(){
 		//chapter
 	router.HandleFunc("/story/{storyuid:[0-9]{1,9}}/{chapteruid:[0-9]{1,9}}", ViewChapterHandler) //Chapter overview
 	router.HandleFunc("/story/{storyuid:[0-9]{1,9}}/new", NewChapterHandler) //new chapter
+	router.HandleFunc("/story/{storyuid:[0-9]{1,9}}/import/{bindchar:true|false}/{bindloc:true|false}", ImportChapterHandler) //import chapter
 	router.HandleFunc("/story/{storyuid:[0-9]{1,9}}/{chapteruid:[0-9]{1,9}}/delete", DeleteChapterHandler) //delete chapter
 	router.HandleFunc("/story/{storyuid:[0-9]{1,9}}/{chapteruid:[0-9]{1,9}}/export", ExportChapterHandler) //export chapter
 	router.HandleFunc("/story/{storyuid:[0-9]{1,9}}/{chapteruid:[0-9]{1,9}}/edit", EditChapterHandler) //edit chapter

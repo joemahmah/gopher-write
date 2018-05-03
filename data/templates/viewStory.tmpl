@@ -32,29 +32,8 @@ function initPage(){
 	window.setInterval(saveChanges, 1000);
 }
 
-function addChapterForm(){
-
-	var form = document.getElementById("chapter_form");
-	
-	if(form == null){
-		form = MakeForm("chapter_form");
-	}
-	
-	form.innerHTML=form.innerHTML + "Name:<br><input id=\"form_name\" type=\"text\" onkeypress=\"ConsumeEnterKeyEvent(event);\"><br>";
-	
-	
-	document.getElementById("form_new").style.display = 'none'
-	document.getElementById("form_control").style.display = 'block'
-}
-
-function removeChapterForm(){
-	DeleteNodeById("chapter_form");
-	
-	document.getElementById("form_new").style.display = 'block'
-	document.getElementById("form_control").style.display = 'none'
-}
 function processChapter(){
-	var name = MakeName(document.getElementById("form_name").value,false,null);
+	var name = MakeName(document.getElementById("chapter_new_name_input").value,false,null);
 	var story = MakeChapter(name,0,null);
 	
 	var xhr = new XMLHttpRequest();
@@ -64,8 +43,13 @@ function processChapter(){
 	xhr.onreadystatechange = function () {
 		//if server returns proper, update display
 		if (this.readyState == 4 && this.status == 200){
-			removeChapterForm(); //remove form
+			showResponse("Section added.");
+			setTimeout("hideResponse()",2000);
 			updateChapterList(); //update Chapter list
+			HideModal("chapter_new_modal"); //Hide the modal
+			
+			//Clear the name in the modal
+			document.getElementById("chapter_new_name_input").value = "";
 		} else if (this.readyState == 4 && this.status == 500) {
 			showResponse("There was an error adding the chapter.");
 			setTimeout("hideResponse()",2000);
@@ -338,6 +322,50 @@ function clearSelectedElementBG(e){
 	e.target.style.background="transparent";
 }
 
+function importChapter(){
+	var files = document.getElementById("chapter_import_input").files;
+	var bindchar = document.getElementById("chapter_import_bindchar_input").checked;
+	var bindloc = document.getElementById("chapter_import_bindloc_input").checked;
+	
+	//check if one file uploaded
+	if(files.length !== 1){
+		showResponse("Select a single file to import.");
+		setTimeout("hideResponse()",5000);
+		return;
+	}
+	
+	//get the file
+	file = files[0];
+	
+	//Make a file reader
+	var fileReader = new FileReader();
+	
+	//Make the request
+	var xhr = new XMLHttpRequest();
+	var url = "/story/" + currentStoryUID + "/import/" + bindchar + "/" + bindloc;
+	xhr.open("POST", url, true);
+	xhr.setRequestHeader("Content-Type", "application/json");
+	xhr.onreadystatechange = function () {
+		if (this.readyState == 4 && this.status == 200){
+			showResponse("Chapter imported.");
+			setTimeout("hideResponse()",2000);
+			HideModal("chapter_import_modal"); //Hide the modal
+			updateChapterList(); //Update the chapter list
+		} else if (this.readyState == 4 && this.status !== 200) {
+			showResponse("Unable to import chapter.");
+			setTimeout("hideResponse()",5000);
+		}
+	}
+	
+	//Set the filereader to send the file
+	fileReader.onload = function(e){
+		xhr.send(e.target.result);
+	}
+	
+	//Read the file
+	fileReader.readAsBinaryString(file)
+}
+
 </script>
 
 {{template "header"}}
@@ -360,19 +388,48 @@ function clearSelectedElementBG(e){
 </div>
 
 <hr>
-<h2>Chapters</h2>
+<h2>Chapter</h2>
 
-<div class="form_container" id="form_container">
-	<div id="form_new">
-		<button type="button" onclick="addChapterForm()">Add Chapter</button>
-	</div>
-	<div id="form_control" style="display:none">
-		<button onclick="processChapter()">Submit</button>
-	</div>
+<div class="control_wrap">
+	<span class="form_make_button" onclick='DisplayModal("chapter_new_modal");'>Add Chapter</span>
+	<span class="form_make_button" onclick='DisplayModal("chapter_import_modal")'>Import Chapter</span>
 </div>
 
 <div class="list" id="chapter_list">
 
+</div>
+
+
+<div class="ui_modal" id="chapter_new_modal">
+<div class="ui_modal_content">
+	<div class="ui_modal_form">
+		<label>Chapter Name: </label>
+		<input id="chapter_new_name_input" type="text" onkeypress="ConsumeEnterKeyEvent(event, processChapter);">
+	</div>
+	<br>
+	<div class="ui_modal_control">
+			<span class="form_make_button form_make_button_big form_make_button_round form_make_button_right" onclick="processChapter();">Create Chapter</span>
+			<span class="form_make_button form_make_button_big form_make_button_round form_make_button_right" onclick='HideModal("chapter_new_modal");'>Close</span>
+	</div>
+</div>
+</div>
+
+<div class="ui_modal" id="chapter_import_modal">
+<div class="ui_modal_content">
+	<div class="ui_modal_form">
+		<input id="chapter_import_input" type="file" multiple="false">
+		<br>
+		<label title="Binding characters will keep the section's characters. This will only work correctly if the section being imported is from the current project.">Bind Characters: </label>
+		<input class="ui_modal_form_checkbox" id="chapter_import_bindchar_input" type="checkbox">
+		<label title="Binding locations will keep the section's locations. This will only work correctly if the section being imported is from the current project.">Bind Locations: </label>
+		<input class="ui_modal_form_checkbox" id="chapter_import_bindloc_input" type="checkbox">
+	</div>
+	<br>
+	<div class="ui_modal_control">
+			<span class="form_make_button form_make_button_big form_make_button_round form_make_button_right" onclick="importChapter();">Import Chapter</span>
+			<span class="form_make_button form_make_button_big form_make_button_round form_make_button_right" onclick='HideModal("chapter_import_modal");'>Close</span>
+	</div>
+</div>
 </div>
 
 </body>

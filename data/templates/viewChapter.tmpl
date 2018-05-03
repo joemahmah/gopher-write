@@ -430,9 +430,9 @@ function importSection(){
 			showResponse("Section imported.");
 			setTimeout("hideResponse()",2000);
 			HideModal("section_import_modal"); //Hide the modal
-			updateSectionList(); //Update the project list
+			updateSectionList(); //Update the section list
 		} else if (this.readyState == 4 && this.status !== 200) {
-			showResponse("Unable to create project.");
+			showResponse("Unable to import section.");
 			setTimeout("hideResponse()",5000);
 		}
 	}

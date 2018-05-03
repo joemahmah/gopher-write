@@ -635,6 +635,69 @@ func ExportSectionHandler(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
+func ImportChapterHandler(w http.ResponseWriter, r *http.Request) {
+
+	//Get the uids of the story and chapter
+	suid, _ := strconv.Atoi(mux.Vars(r)["storyuid"])
+	bindchar, _ := strconv.ParseBool(mux.Vars(r)["bindchar"])
+	bindloc, _ := strconv.ParseBool(mux.Vars(r)["bindloc"])
+
+	selectedStory, err := ActiveProject.GetStory(suid)
+	
+	if err != nil {
+		w.WriteHeader(http.StatusNotFound)
+		LogError.Println(err)
+		return
+	}
+	
+	//Get the JSON sent
+	importedData := &ExportChapter{}
+	
+	err = json.NewDecoder(r.Body).Decode(importedData)
+	
+	if err != nil {
+		w.WriteHeader(http.StatusInternalServerError)
+		LogError.Println(err)
+	} else {
+		w.WriteHeader(http.StatusOK)
+
+		//Add Chapter to project to assigun uid
+		ActiveProject.AddChapter(&importedData.Chapter)
+		
+		//Add chapter to story
+		selectedStory.Chapters = append(selectedStory.Chapters, importedData.Chapter.UID)
+		
+		//Remove section references (UIDS not valid)
+		importedData.Chapter.Sections = make([]int, 0)
+		
+		//Add sections
+		for _, section := range importedData.Sections {
+			//Assign section to new section otherwise the 
+			//previous sections get overwritten.
+			newSect := section
+			
+			//unbind chars and locations if needed
+			if !bindchar {
+				newSect.Characters = make([]int, 0)
+			}
+			if !bindloc {
+				newSect.Locations = make([]int, 0)
+			}
+			
+			//Add section to project to assign uid
+			ActiveProject.AddSection(&newSect)
+			LogInfo.Println(ActiveProject.Sections[4])
+	
+			//Add section to chapter
+			importedData.Chapter.Sections = append(importedData.Chapter.Sections, newSect.UID)
+		}
+		
+		
+		//Log
+		LogInfo.Println("Chapter " + importedData.Chapter.Name.PrimaryName + " imported to project " + ActiveProject.Name + ".")
+	}
+	
+}
 
 func ImportSectionHandler(w http.ResponseWriter, r *http.Request) {
 
@@ -674,11 +737,11 @@ func ImportSectionHandler(w http.ResponseWriter, r *http.Request) {
 		//Add section to project to assign uid
 		ActiveProject.AddSection(importedSection)
 
-		//Add chapter to story
+		//Add section to chapter
 		selectedChapter.Sections = append(selectedChapter.Sections, importedSection.UID)
 
 		//Log
-		LogInfo.Println("Section " + importedSection.Name.PrimaryName + " added to project " + ActiveProject.Name + ".")
+		LogInfo.Println("Section " + importedSection.Name.PrimaryName + " imported to project " + ActiveProject.Name + ".")
 	}
 	
 }
