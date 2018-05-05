@@ -34,6 +34,19 @@ type DataTransferDualStringSlice struct {
 	Data	[]DualString
 }
 
+type DualInt struct {
+	I1	int
+	I2	int
+}
+
+type DataTransferDualInt struct {
+	Data	DualInt
+}
+
+type DataTransferDualIntSlice struct {
+	Data	[]DualInt
+}
+
 type DualStringMonoBool struct {
 	S1	string
 	S2	string
@@ -59,6 +72,20 @@ type DataTransferMonoStringMonoInt struct {
 
 type DataTransferMonoStringMonoIntSlice struct {
 	Data	[]MonoStringMonoInt
+}
+
+type MonoStringDualInt struct {
+	S	string
+	I1	int
+	I2	int
+}
+
+type DataTransferMonoStringDualInt struct {
+	Data	MonoStringDualInt
+}
+
+type DataTransferMonoStringDualIntSlice struct {
+	Data	[]MonoStringDualInt
 }
 
 type MonoIntMonoName struct {

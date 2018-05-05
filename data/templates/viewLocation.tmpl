@@ -1,0 +1,446 @@
+<html>
+
+<head>
+	<meta charset="utf-8">
+	<title>View Location {{.Name.PrimaryName}} | gopher-write</title>
+
+	{{template "css"}}
+</head>
+
+<body>
+	
+{{template "js"}}
+	
+<script language="javascript">
+
+var currentLocationUID = {{.UID}};
+var descriptionChanged = false;
+var nameChanged = false;
+
+var parentUID = {{.Parent}};
+
+window.onload = initPage;
+
+function initPage(){
+	//Get the aliases
+	updateAliasList();
+	
+	//Get the sublocations
+	updateSublocationList();
+
+	//Get all locations
+	PopulateLocationList();
+	
+	//Init parent info
+	initParentInfo();
+	
+	//Save changes every 30 seconds
+	window.setInterval(saveChanges, 30 * 1000);
+}
+
+//Have ConsumeEnterKeyEvent hook this function
+//to allow enter to save changes.
+function NewEnterKeyEvent(){
+	saveChanges();
+}
+
+function saveChanges(){
+	
+	if(descriptionChanged){
+		updateDescription();
+	}
+
+	if(nameChanged){
+		updateName();
+	}
+	
+	console.log("saved")
+}
+
+function initParentInfo(){
+	
+	if(LocationList === null){
+		setTimeout(initParentInfo, 50);
+		return;
+	}
+
+	//Update the GUI
+	updateParentInfo();
+	
+	//Populate the select list
+	var parentList = document.getElementById("parent_value")
+	
+	var index = 1;
+	
+	for(var loc of LocationList.values()){
+		//Don't add the current element to the thing
+		if(loc.uid === currentLocationUID){
+			continue;
+		}
+		
+		//If the location is a sublocation
+		//exclude from list
+		if(IsSublocation(loc.uid, currentLocationUID)){
+			continue;
+		}
+		
+		var newOption = document.createElement("option")
+		newOption.innerHTML = loc.name;
+		newOption.value = loc.uid;
+		
+		parentList.appendChild(newOption);
+		
+		if(loc.uid === parentUID){
+			parentList.selectedIndex = index;
+		}
+		
+		index++;
+		
+	}
+	
+}
+
+function updateParentInfo(){
+	var parentText = document.getElementById("parent_text");
+	
+	if(parentUID !== -1){
+		parentText.innerHTML = "This location is a sublocation of ";
+	} else {
+		parentText.innerHTML = "This location is not a sublocation.";
+	}
+}
+
+function updateAliasList(){
+	var xhr = new XMLHttpRequest();
+	var url = "/loc/" + currentLocationUID + "/aliaslist";
+	xhr.open("POST", url, true);
+	xhr.onreadystatechange = function () {
+		//if server returns JSON, update display
+		if (this.readyState === 4 && this.status === 200){
+			//get the alias list
+			var aliasList = document.getElementById("alias_list");
+			
+			//Clear the alias list
+			aliasList.innerHTML = "";
+			
+			//convert json into object
+			var aliasListJSON = JSON.parse(this.responseText);
+			
+			if(aliasListJSON.Data != null) {
+				
+				var data = aliasListJSON.Data;
+			
+				//add the stories to the page
+				for (var i = 0; i < data.length; i++) {
+					var aliasElem = document.createElement("div");
+					aliasElem.classList.add("list_elem");
+					aliasElem.classList.add("meta_height_40px");
+					aliasElem.setAttribute("data-alias-uid",data[i].I);
+					
+					//Get Primary Name
+					var aliasElemName = document.createElement("span");
+					aliasElemName.innerHTML = data[i].Name.PrimaryName;
+					
+					//Get auxilary names
+					//TODO
+					
+					//Control buttons
+					var aliasElemControl = document.createElement("div");
+					aliasElemControl.classList.add("list_elem_btn_wrap");
+					
+					var aliasElemRemove = document.createElement("span");
+					aliasElemRemove.classList.add("list_elem_btn");
+					aliasElemRemove.classList.add("list_elem_btn_red");
+					aliasElemRemove.innerHTML = "X";
+					aliasElemRemove.addEventListener("click",removeAlias);
+					
+					var aliasElemEdit = document.createElement("span");
+					aliasElemEdit.classList.add("list_elem_btn");
+					aliasElemEdit.innerHTML = "✏";
+					aliasElemEdit.addEventListener("click",editAlias);
+					
+					aliasElemControl.appendChild(aliasElemEdit);
+					aliasElemControl.appendChild(aliasElemRemove);
+					
+					//Add name and buttons
+					aliasElem.appendChild(aliasElemName);
+					aliasElem.appendChild(aliasElemControl)
+					
+					aliasList.appendChild(aliasElem);
+				}
+			}
+			
+		}
+	}
+	
+	xhr.send();
+}
+
+function updateSublocationList(){
+	var xhr = new XMLHttpRequest();
+	var url = "/loc/" + currentLocationUID + "/subloclist";
+	xhr.open("POST", url, true);
+	xhr.onreadystatechange = function () {
+		//if server returns JSON, update display
+		if (this.readyState === 4 && this.status === 200){
+			//get the alias list
+			var sublocationList = document.getElementById("sublocation_list");
+			
+			//Clear the sublocation list
+			sublocationList.innerHTML = "";
+			console.log(this.responseText);
+			//convert json into object
+			var sublocationListJSON = JSON.parse(this.responseText);
+			
+			if(sublocationListJSON.Data != null) {
+				
+				var data = sublocationListJSON.Data;
+			
+				//add the stories to the page
+				for (var i = 0; i < data.length; i++) {
+					var sublocationElem = document.createElement("div");
+					sublocationElem.classList.add("list_elem");
+					sublocationElem.classList.add("meta_height_40px");
+					sublocationElem.setAttribute("data-subloc-uid",data[i].I);
+					
+					//Get Primary Name
+					var sublocationElemName = document.createElement("span");
+					sublocationElemName.innerHTML = data[i].S;
+					
+					//Get auxilary names
+					//TODO
+					
+					//Control buttons
+					var sublocationElemControl = document.createElement("div");
+					sublocationElemControl.classList.add("list_elem_btn_wrap");
+					
+					var sublocationElemRemove = document.createElement("span");
+					sublocationElemRemove.classList.add("list_elem_btn");
+					sublocationElemRemove.innerHTML = "→";
+					sublocationElemRemove.addEventListener("click",linkSublocation);
+					
+					sublocationElemControl.appendChild(sublocationElemRemove);
+					
+					//Add name and buttons
+					sublocationElem.appendChild(sublocationElemName);
+					sublocationElem.appendChild(sublocationElemControl)
+					
+					sublocationList.appendChild(sublocationElem);
+				}
+			}
+			
+		}
+	}
+	
+	xhr.send();
+}
+
+function linkSublocation(e){
+	var lid = e.target.getAttribute("data-subloc-uid");
+	var target = e.target;
+	
+	while(!lid){
+		target = target.parentNode;
+		lid = target.getAttribute("data-subloc-uid");
+	}
+	
+	window.location = "/loc/" + lid; 
+}
+
+function removeAlias(e){
+	//Get the alias UID stored in the list element (grandparent) node
+	var aliasUID = parseInt(e.target.parentNode.parentNode.getAttribute("data-alias-uid"));
+	
+	var xhr = new XMLHttpRequest();
+	var url = "/loc/" + currentLocationUID + "/edit/removealias";
+	xhr.open("POST", url, true);
+	xhr.setRequestHeader("Content-Type", "application/json");
+	xhr.onreadystatechange = function () {
+		if(this.readyState === 4 && this.status === 200){
+			updateAliasList();
+			showResponse("Alias removed.");
+			setTimeout("hideResponse()", 2000);
+		} else if (this.readyState === 4 && this.status !== 200){
+			showResponse("Unable to remove alias.");
+			setTimeout("hideResponse()", 2000);
+		}
+	}
+	xhr.send(JSON.stringify({Data: aliasUID}));
+}
+
+function editAlias(e){
+	alert("TODO");
+}
+
+//////////////////////
+// Update Functions //
+//////////////////////
+
+function updateName(){
+	var name = MakeName(document.getElementById("name_text").value,false,null);
+	var xhr = new XMLHttpRequest();
+	var url = "/loc/" + currentLocationUID + "/edit/name";
+	xhr.open("POST", url, true);
+	xhr.setRequestHeader("Content-Type", "application/json");
+	xhr.onreadystatechange = function () {
+		if(this.readyState === 4 && this.status === 200){
+			nameChanged = false;
+			showResponse("Saved.");
+			setTimeout("hideResponse()", 2000);
+		} else if (this.readyState === 4 && this.status !== 200){
+			showResponse("Unable to update name. Will try again on the next save.");
+			setTimeout("hideResponse()", 2000);
+		}
+	}
+	xhr.send(JSON.stringify(name));
+}
+
+function updateDescription(){
+	var text = document.getElementById("text_textarea").value;
+	var textObj = {Data: text};
+
+	var xhr = new XMLHttpRequest();
+	var url = "/loc/" + currentLocationUID + "/edit/description";
+	xhr.open("POST", url, true);
+	xhr.setRequestHeader("Content-Type", "application/json");
+	xhr.onreadystatechange = function () {
+		if(this.readyState === 4 && this.status === 200){
+			descriptionChanged = false;
+			showResponse("Saved.");
+			setTimeout("hideResponse()", 2000);
+		} else if (this.readyState === 4 && this.status !== 200){
+			showResponse("Unable to update description. Will try again on the next save.");
+			setTimeout("hideResponse()", 2000);
+		}
+	}
+	xhr.send(JSON.stringify(textObj));
+}
+
+function addAlias(){
+	//Get the primary name for the alias
+	var primaryName = document.getElementById("alias_input").value;
+	var alternateNames = [];
+	
+	//Get all alternate names for the alias
+	for(var name of document.getElementById("alias_alt_list").getElementsByClassName("alias_alt")){
+		alternateNames.push(name.value);
+	}
+	
+	//Make a name object
+	var name = MakeName(primaryName, true, alternateNames);
+	
+	var xhr = new XMLHttpRequest();
+	var url = "/loc/" + currentLocationUID + "/edit/addalias";
+	xhr.open("POST", url, true);
+	xhr.setRequestHeader("Content-Type", "application/json");
+	xhr.onreadystatechange = function () {
+		if(this.readyState === 4 && this.status === 200){
+			showResponse("Saved.");
+			setTimeout("hideResponse()", 2000);
+			
+			//update alias list
+			updateAliasList();
+			
+			//Clear add alias form
+			document.getElementById("alias_input").value = "";
+			document.getElementById("alias_alt_list").innerHTML = "";
+			
+			//Close the modal
+			HideModal("alias_modal")
+		} else if (this.readyState === 4 && this.status !== 200){
+			showResponse("Unable to add alias.");
+			setTimeout("hideResponse()", 2000);
+		}
+	}
+	xhr.send(JSON.stringify(name));
+}
+
+
+//Adds an alternate name field to the form
+function addAltNameAlias(){
+	var altNameList = document.getElementById("alias_alt_list");
+	
+	var newAltName = document.createElement("input");
+	newAltName.classList.add("alias_alt");
+	
+	altNameList.appendChild(newAltName);
+}
+
+//Adds an alternate name field to the form
+function removeAltNameAlias(){
+	var altNameList = document.getElementById("alias_alt_list");
+	var altNames = altNameList.getElementsByClassName("alias_alt")
+	
+	//If not exist, no need to remove
+	if(altNames.length == 0){
+		return;
+	}
+	
+	var lastAltName = altNames[altNames.length - 1]; //Get last alt name input
+	
+	altNameList.removeChild(lastAltName);
+}
+
+
+</script>
+	
+{{template "header"}}
+
+<input class="name" id="name_text" type="text" onkeypress="nameChanged=true; ConsumeEnterKeyEvent(event);" value="{{.Name.PrimaryName}}">
+
+
+<div class="" id="parent_wrap">
+	<span id="parent_text">Loading locations... </span>
+	<select class="parent_list" id="parent_value" onchange="parentChanged=true; saveChanges();">
+		<option value="-1">No Parent</option>
+	</select>
+</div>
+
+<div class="meta_control">
+	<a href="/loc">Return to location list </a>
+</div>
+
+<div class="text_wrap" id="text_wrap">
+	<div class="text_control" id="text_control">
+		<span class="button_control" onclick="saveChanges();">Save</span>
+	</div>
+	<textarea id="text_textarea" onchange="descriptionChanged=true;">{{.Description}}</textarea>
+</div>
+
+<h3 class="subheader meta_mouse_hand" onclick='DisplayModal("alias_modal");'>Aliases <span>+</span></h3>
+<div class="list" id="alias_list">
+	
+</div>
+
+<h3 class="subheader meta_mouse_hand">Sublocations</h3>
+<div class="list" id="sublocation_list">
+	
+</div>
+
+
+<div class="ui_modal" id="alias_modal">
+<div class="ui_modal_content">
+	<div class="ui_modal_form_small">
+		<label>Alias: </label>
+		<input id="alias_input" type="text">
+		<br>
+		
+		<label>Alternate Names (Nicknames, Name Fragments)</label>
+		<span class="form_make_button form_make_button_round" onclick="addAltNameAlias();">Add</span>
+		<span class="form_make_button form_make_button_round" onclick="removeAltNameAlias();">Remove</span>
+		<hr>
+		<div id="alias_alt_list" class="ui_modal_form_list">
+			
+		</div>
+	</div>
+	<br>
+	<div class="ui_modal_control">
+			<span class="form_make_button form_make_button_big form_make_button_round form_make_button_right" onclick='NoProp(event); addAlias();'>Add Alias</span>
+			<span class="form_make_button form_make_button_big form_make_button_round form_make_button_right" onclick='NoProp(event); HideModal("alias_modal")'>Close</span>
+	</div>
+</div>
+</div>
+
+</body>
+
+</html>

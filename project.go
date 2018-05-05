@@ -279,6 +279,14 @@ func (p *Project) GetCharacter(cuid int) (*character.Character, error) {
 	}
 }
 
+func (p *Project) GetLocation(lid int) (*location.Location, error) {
+	if location, exists := p.Locations[lid]; exists {
+		return location, nil
+	} else {
+		return nil, errors.New("Location does not exist.")
+	}
+}
+
 ///////////////////////////////////////////////////////////
 //                Save/Load Operations                   //
 ///////////////////////////////////////////////////////////

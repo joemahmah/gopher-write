@@ -234,6 +234,63 @@ function GetCharacter(id){
 	}
 }
 
+var LocationList = null;
+
+function PopulateLocationList(){
+	LocationList = null;
+	
+	var xhr = new XMLHttpRequest();
+	var url = "/loc/list";
+	xhr.open("POST", url, true);
+	xhr.onreadystatechange = function () {
+		//if server returns JSON, update display
+		if (this.readyState == 4 && this.status === 200){
+			
+			LocationList = new Map();
+			
+			//convert json into object
+			var response = JSON.parse(this.responseText).Data;
+			
+			if(response != null) {
+				//add the locations to the page
+				for (var i = 0; i < response.length; i++) {
+					LocationList.set(response[i].I1, {uid: response[i].I1, name: response[i].S, parent: response[i].I2})
+				}
+			}
+		}
+	}
+	
+	xhr.send();	
+}
+
+function GetLocation(id){
+	if(LocationList === null){
+		return null;
+	}
+	
+	//if exists
+	if(LocationList.has(id)){
+		return LocationList.get(id);
+	} else {
+		return null;
+	}
+}
+
+function IsSublocation(uidPotentialSL, uidTargetLoc){
+	var potentialSL = GetLocation(uidPotentialSL);
+	
+	if(potentialSL.parent === -1){
+		//If is a root node
+		return false;
+	} else if (potentialSL.parent === uidTargetLoc ){
+		//If is a sublocation
+		return true;
+	} else {
+		//Otherwise, check if a parent is a sublocation
+		return IsSublocation(potentialSL.parent, uidTargetLoc);
+	}
+}
+
 //
 //Story
 //

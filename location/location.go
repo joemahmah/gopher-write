@@ -11,10 +11,11 @@ type Location struct {
 	Name			common.Name
 	Aliases			[]common.Name
 	Description		string
-	Sublocations	[]uint
+	Parent			int
+	Sublocations	[]int
 }
 
-func (l *Location) GetSublocationUID(index int) (uint, error) {
+func (l *Location) GetSublocationUID(index int) (int, error) {
 	if len(l.Sublocations) < index {
 		return 0, errors.New("Index out of bounds.")
 	}

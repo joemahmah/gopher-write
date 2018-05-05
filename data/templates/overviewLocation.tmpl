@@ -1,0 +1,212 @@
+<html>
+
+<head>
+	<meta charset="utf-8">
+	<title>Locations | gopher-write</title>
+	
+	{{template "css"}}
+</head>
+
+<body>
+
+{{template "js"}}
+
+<script language="javascript">
+
+window.onload = updateLocationList;
+
+function addName(){
+	var form = getForm();
+	var newName = document.createElement("div");
+	newName.className = "form_alias_div";
+	newName.innerHTML = "Alias:<br><input class=\"form_alias\" type=\"text\"><br>";
+	
+	form.appendChild(newName);
+	
+}
+
+function removeLastName(){
+	var form = getForm();
+	var aliases = form.getElementsByClassName("form_alias_div");
+	
+	if(aliases.length > 0){
+		form.removeChild(aliases[aliases.length - 1]);
+	}
+}
+
+function processLocation(){
+	var name = MakeName(document.getElementById("location_new_name_input").value,false,null);
+	var description = document.getElementById("location_new_description_input").value;
+	
+	var loc = MakeLocation(name, description);
+	
+	var xhr = new XMLHttpRequest();
+	var url = "/loc/new";
+	xhr.open("POST", url, true);
+	xhr.setRequestHeader("Content-Type", "application/json");
+	xhr.onreadystatechange = function () {
+		//if server returns proper, update display
+		if (this.readyState == 4 && this.status == 200){
+			updateLocationList(); //update location list
+			showResponse("Location added.");
+			setTimeout("hideResponse()",2000);
+			HideModal("location_new_modal");
+		} else if (this.readyState == 4 && this.status == 500) {
+			showResponse("There was an error adding the location.");
+			setTimeout("hideResponse()",2000);
+		}
+	}
+	
+	xhr.send(JSON.stringify(loc));
+}
+
+function updateLocationList(){
+	var xhr = new XMLHttpRequest();
+	var url = "/loc/list";
+	xhr.open("POST", url, true);
+	xhr.onreadystatechange = function () {
+		//if server returns JSON, update display
+		if (this.readyState == 4 && this.status === 200){
+			//get the location list
+			var locationList = document.getElementById("location_list");
+			
+			//convert json into object
+			var data = JSON.parse(this.responseText).Data;
+			
+			//blank the existing list
+			locationList.innerHTML = "";
+			
+			if(data != null) {
+				
+				//add the locations to the page
+				for (var i = 0; i < data.length; i++) {
+					var locationElem = document.createElement("div");
+					locationElem.className = "list_elem list_elem_color";
+					locationElem.setAttribute("data-location-uid",data[i].I1); //set to location uid
+					locationElem.addEventListener("dblclick",linkListElement);
+					
+					var locationElemName = document.createElement("span");
+					locationElemName.innerHTML = data[i].S; //set to location name
+					
+					//Control buttons
+					var locationElemControl = document.createElement("div");
+					locationElemControl.classList.add("list_elem_btn_wrap");
+					
+					var locationElemRemove = document.createElement("span");
+					locationElemRemove.classList.add("list_elem_btn");
+					locationElemRemove.classList.add("list_elem_btn_red");
+					locationElemRemove.innerHTML = "X";
+					locationElemRemove.addEventListener("dblclick", removeLocation);
+					
+					var locationElemExport = document.createElement("span");
+					locationElemExport.classList.add("list_elem_btn");
+					locationElemExport.innerHTML = "⎘";
+					locationElemExport.addEventListener("dblclick", exportLocation);
+					
+					locationElemControl.appendChild(locationElemRemove);
+					
+					//Add name and buttons
+					locationElem.appendChild(locationElemName);
+					locationElem.appendChild(locationElemControl)
+					
+					locationList.appendChild(locationElem);
+					
+				}
+			} else {
+				showResponse("There are not any locations in this project.");
+				setTimeout("hideResponse()",2000);
+			}
+			
+		}
+	}
+	
+	xhr.send();	
+}
+
+function removeLocation(e){
+	//Stop click from linking to page
+	if(e.stopPropagation){
+		e.stopPropagation();
+	}
+
+	//Abort if user does not confirm
+	if(!window.confirm("Are you sure you want to delete this location? References to this character will be purged. You will not be able to undo this action!")){
+		return;
+	}
+	
+	var uid = e.target.getAttribute("data-location-uid");
+	var target = e.target;
+
+	while(!uid){
+		target = target.parentNode;
+		uid = target.getAttribute("data-location-uid");
+	}
+
+	var xhr = new XMLHttpRequest();
+	var url = "/loc/" + uid + "/delete";
+	xhr.open("POST", url, true);
+	xhr.onreadystatechange = function() {
+		if(this.readyState === 4 && this.status === 200){
+			showResponse("Location removed.");
+			setTimeout("hideResponse()",2000);
+			updateLocationList();
+		} else if(this.readyState === 4 && this.status !== 200){
+			showResponse("Unable to remove location.");
+			setTimeout("hideResponse()",2000);
+		}
+	}
+	xhr.send();
+}
+
+function linkListElement(e){
+	var lid = e.target.getAttribute("data-location-uid");
+	var target = e.target;
+	
+	//Go to parent node if needed.
+	while(!lid){
+		target = target.parentNode
+		lid = target.getAttribute("data-location-uid");
+	}
+	
+	location.href = "/loc/" + lid;
+}
+
+function exportLocation(e){
+
+}
+
+</script>
+
+{{template "header"}}
+
+<h1 class="name">Locations</h1>
+
+<div class="control_wrap">
+	<span class="form_make_button" onclick='DisplayModal("location_new_modal");'>Add Location</span>
+	<span class="form_make_button" onclick='alert("TODO");'>Import Location</span>
+</div>
+
+<div class="list" id="location_list">
+</div>
+
+<div class="ui_modal" id="location_new_modal">
+<div class="ui_modal_content">
+	<div class="ui_modal_form">
+		<label>Location Name: </label>
+		<input id="location_new_name_input" type="text">
+		<br>
+		<label>Description: </label>
+		<br>
+		<textarea rows="5" id="location_new_description_input"></textarea>
+	</div>
+	<br>
+	<div class="ui_modal_control">
+			<span class="form_make_button form_make_button_big form_make_button_round form_make_button_right" onclick="processLocation();">Add Location</span>
+			<span class="form_make_button form_make_button_big form_make_button_round form_make_button_right" onclick='HideModal("location_new_modal");'>Close</span>
+	</div>
+</div>
+</div>
+
+</body>
+
+</html>

@@ -63,6 +63,25 @@ func main(){
 	router.HandleFunc("/char/list",ListJSONCharHandler) //Char list json
 	router.HandleFunc("/char", OverviewCharHandler) //Char overview
 
+	/////////////////////////
+	//    location manip   //
+	/////////////////////////
+	router.HandleFunc("/loc/new", NewLocationHandler) //new location
+	router.HandleFunc("/loc/{lid:[0-9]{1,9}}", ViewLocationHandler) //view location
+	router.HandleFunc("/loc/{lid:[0-9]{1,9}}/json", GetJSONLocationHandler) //get location json
+	router.HandleFunc("/loc/{lid:[0-9]{1,9}}/edit", EditLocationHandler) //edit location
+	router.HandleFunc("/loc/{lid:[0-9]{1,9}}/delete", DeleteLocationHandler) //delete location
+	router.HandleFunc("/loc/{lid:[0-9]{1,9}}/edit/description", EditLocationSetDescriptionHandler) //edit location description
+	router.HandleFunc("/loc/{lid:[0-9]{1,9}}/edit/name", EditLocationSetNameHandler) //edit location name
+	router.HandleFunc("/loc/{lid:[0-9]{1,9}}/edit/addsubloc", EditLocationAddSublocationHandler) //add sublocation
+	router.HandleFunc("/loc/{lid:[0-9]{1,9}}/edit/removesubloc", EditLocationRemoveSublocationHandler) //remove sublocation
+	router.HandleFunc("/loc/{lid:[0-9]{1,9}}/subloclist", SublocationListJSONLocationHandler) //serve json list of sublocations
+	router.HandleFunc("/loc/{lid:[0-9]{1,9}}/edit/addalias", EditLocationAddAliasHandler) //add alias
+	router.HandleFunc("/loc/{lid:[0-9]{1,9}}/edit/removealias", EditLocationRemoveAliasHandler) //remove alias
+	router.HandleFunc("/loc/{lid:[0-9]{1,9}}/aliaslist", AliasListJSONLocationHandler) //serve json list of aliases
+	router.HandleFunc("/loc/list",ListJSONLocationHandler) //Location list json
+	router.HandleFunc("/loc", OverviewLocationHandler) //Location overview
+
 	
 	/////////////////////////
 	//     story manip     //
