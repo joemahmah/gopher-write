@@ -12,7 +12,7 @@ type Location struct {
 	Aliases			[]common.Name
 	Description		string
 	Parent			int
-	Sublocations	[]int
+	Sublocations	map[int]int
 }
 
 func (l *Location) GetSublocationUID(index int) (int, error) {
@@ -21,4 +21,12 @@ func (l *Location) GetSublocationUID(index int) (int, error) {
 	}
 
 	return l.Sublocations[index], nil
+}
+
+func (l *Location) AddSublocation(uid int) {
+	l.Sublocations[uid] = uid
+}
+
+func (l *Location) RemoveSublocation(uid int) {
+		delete(l.Sublocations, uid)
 }

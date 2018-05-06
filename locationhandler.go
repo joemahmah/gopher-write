@@ -23,6 +23,9 @@ func NewLocationHandler(w http.ResponseWriter, r *http.Request) {
 		w.WriteHeader(http.StatusInternalServerError)
 		LogError.Println(err)
 	} else {
+		//Make sublocation map
+		newLoc.Sublocations = make(map[int]int)
+	
 		w.WriteHeader(http.StatusOK)
 		ActiveProject.AddLocation(newLoc)
 	}
@@ -293,68 +296,55 @@ func EditLocationRemoveAliasHandler(w http.ResponseWriter, r *http.Request){
 }
 
 
-func EditLocationAddSublocationHandler(w http.ResponseWriter, r *http.Request){
+func EditLocationSetParentHandler(w http.ResponseWriter, r *http.Request){
 	//Get the uid
 	lid, _ := strconv.Atoi(mux.Vars(r)["lid"])
 
 	//Get the location
 	loc, err := ActiveProject.GetLocation(lid)
 	
+	//Ensure location exists
 	if err != nil {
 		w.WriteHeader(http.StatusNotFound)
 		LogWarning.Println(err)
 		return
 	}
 	
-	inputData := DataTransferInt{}
+	newParentUID := &DataTransferInt{}
 	
-	err = json.NewDecoder(r.Body).Decode(inputData)
+	err = json.NewDecoder(r.Body).Decode(newParentUID)
 	
+	//Check for errors
 	if err != nil {
 		w.WriteHeader(http.StatusInternalServerError)
 		LogWarning.Println(err)
 		return
 	}
 	
-	//Send ok
-	w.WriteHeader(http.StatusOK)
-	
-	//Add the alias
-	loc.Sublocations = append(loc.Sublocations, inputData.Data)
-}
-
-func EditLocationRemoveSublocationHandler(w http.ResponseWriter, r *http.Request){
-	//Get the uid
-	lid, _ := strconv.Atoi(mux.Vars(r)["lid"])
-
-	//Get the location
-	loc, err := ActiveProject.GetLocation(lid)
-	
-	if err != nil {
+	//Check if the new parent is valid
+	newParent, err := ActiveProject.GetLocation(newParentUID.Data);
+	if err != nil && newParentUID.Data != -1{
 		w.WriteHeader(http.StatusNotFound)
 		LogWarning.Println(err)
 		return
 	}
 	
-	inputData := &DataTransferInt{}
+	//Purge from old parent's sublocation list if needed
+	oldParent, err := ActiveProject.GetLocation(loc.Parent)
+	if err == nil {
+		oldParent.RemoveSublocation(loc.UID)
+	}
 	
-	err = json.NewDecoder(r.Body).Decode(inputData)
+	//Set new parent
+	loc.Parent = newParentUID.Data
 	
-	
-	if err != nil {
-		w.WriteHeader(http.StatusInternalServerError)
-		LogWarning.Println(err)
-		return
+	//Add to new parent sublocation list if needed
+	if newParentUID.Data != -1 {
+		newParent.AddSublocation(loc.UID)
 	}
 	
 	//Send ok
 	w.WriteHeader(http.StatusOK)
-	
-	//Get the uid needed to be removed
-	uidToRemove := inputData.Data
-	
-	//Set the note
-	loc.Sublocations = append(loc.Sublocations[:uidToRemove], loc.Sublocations[uidToRemove+1:]...)
 }
 
 func SublocationListJSONLocationHandler(w http.ResponseWriter, r *http.Request) {

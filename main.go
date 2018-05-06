@@ -73,8 +73,7 @@ func main(){
 	router.HandleFunc("/loc/{lid:[0-9]{1,9}}/delete", DeleteLocationHandler) //delete location
 	router.HandleFunc("/loc/{lid:[0-9]{1,9}}/edit/description", EditLocationSetDescriptionHandler) //edit location description
 	router.HandleFunc("/loc/{lid:[0-9]{1,9}}/edit/name", EditLocationSetNameHandler) //edit location name
-	router.HandleFunc("/loc/{lid:[0-9]{1,9}}/edit/addsubloc", EditLocationAddSublocationHandler) //add sublocation
-	router.HandleFunc("/loc/{lid:[0-9]{1,9}}/edit/removesubloc", EditLocationRemoveSublocationHandler) //remove sublocation
+	router.HandleFunc("/loc/{lid:[0-9]{1,9}}/edit/parent", EditLocationSetParentHandler) //add sublocation
 	router.HandleFunc("/loc/{lid:[0-9]{1,9}}/subloclist", SublocationListJSONLocationHandler) //serve json list of sublocations
 	router.HandleFunc("/loc/{lid:[0-9]{1,9}}/edit/addalias", EditLocationAddAliasHandler) //add alias
 	router.HandleFunc("/loc/{lid:[0-9]{1,9}}/edit/removealias", EditLocationRemoveAliasHandler) //remove alias

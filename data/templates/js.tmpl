@@ -368,16 +368,16 @@ function MakeStory(name, stat, chapters,note){
 //
 //Location
 //
-function Location(UID, Name, Aliases, Description, Sublocations){
-	this.UID = UID;
+function Location(UID, Name, Aliases, Description, Sublocations, Parent){
 	this.Name = Name;
 	this.Aliases = Aliases;
 	this.Description = Description;
 	this.Sublocations = Sublocations;
+	this.Parent = Parent;
 }
 
-function MakeLocation(name, description, aliases, sublocations){
-	var location = new Location(0, name, null, description, null);
+function MakeLocation(name, description, aliases, sublocations, parent){
+	var location = new Location(0, name, null, description, null, -1);
 
 	if(aliases != null && aliases.length >= 1){
 		location.Aliases = aliases;
@@ -385,6 +385,10 @@ function MakeLocation(name, description, aliases, sublocations){
 
 	if(sublocations != null && sublocations.length >= 1){
 		location.Sublocations = sublocations;
+	}
+	
+	if(parent){
+		location.Parent = parent;
 	}
 
 	return location;
