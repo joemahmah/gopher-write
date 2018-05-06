@@ -12,6 +12,8 @@ type Chapter struct {
 	Sections	[]int
 	Status		common.Status
 	Note		string
+	Summary		string
+	Purpose		string
 }
 
 func (c *Chapter) SwapSections(first int, second int) error{

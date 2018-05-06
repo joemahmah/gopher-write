@@ -13,4 +13,6 @@ type Section struct {
 	Characters	[]int
 	Locations	[]int
 	Note		string
+	Summary		string
+	Purpose		string
 }
