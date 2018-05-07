@@ -1,0 +1,33 @@
+<html>
+
+<head>
+	<meta charset="utf-8">
+	<title>Projects | gopher-write</title>
+	
+	{{template "css"}}
+</head>
+
+<body>
+
+{{template "js"}}
+
+{{template "header"}}
+
+<h1 class="name">Welcome to gopher-write!</h1>
+
+{{if .}}
+<div>
+	TODO: add links
+</div>
+{{else}}
+<div>
+	<span>gopher-write is a program to assist you in planning and writing stories.</span> 
+	<br>
+	<br>
+	<span>You have not yet <a href="/project">created a new project or loaded an existing one</a>. Please note that unless you create/load a project, any changes you make to the current project will not be automatically saved. However, should you manually save, gopher-write will automatically create a new project with all your edits for you.</span> 
+</div>
+{{end}}
+
+</body>
+
+</html>

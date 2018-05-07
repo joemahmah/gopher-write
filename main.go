@@ -6,6 +6,7 @@ import (
 	"os"
 	"os/signal"
 	"syscall"
+	"html/template"
 )
 
 func main(){
@@ -29,7 +30,7 @@ func main(){
 	/////////////////////////
 	//       overview      //
 	/////////////////////////
-	router.HandleFunc("/", testHandler) //Landing page, routes if project open
+	router.HandleFunc("/", LandingHandler) //Landing page, routes if project open
 	router.HandleFunc("/settings", testHandler) //Program settings
 
 	/////////////////////////
@@ -200,6 +201,12 @@ func SaveAndExit(server *http.Server){
 	if err != nil {
 		LogError.Println(err)
 	}
+
+	//If a valid project is not loaded
+	if !ValidProjectLoaded {
+		LogWarning.Println("A valid project is not loaded. Aborting save.")
+		os.Exit(0)
+	}
 	
 	//Save Project
 	projectPath := "./data/projects/" + ActiveProject.SaveName + ".json"
@@ -210,6 +217,25 @@ func SaveAndExit(server *http.Server){
 
 	//Exit Program
 	os.Exit(0)
+}
+
+//Landing Handler
+func LandingHandler(w http.ResponseWriter, r *http.Request){
+	//Parse the templates
+	tmpl, err := template.ParseFiles("data/templates/landing.tmpl", "data/templates/style.tmpl", "data/templates/header.tmpl", "data/templates/js.tmpl")
+
+	if err != nil {
+		w.WriteHeader(http.StatusInternalServerError)
+		LogError.Println(err)
+		return
+	}
+
+	err = tmpl.Execute(w, ValidProjectLoaded)
+
+	if err != nil {
+		w.WriteHeader(http.StatusInternalServerError)
+		LogError.Println(err)
+	}
 }
 
 //Dummy handler
