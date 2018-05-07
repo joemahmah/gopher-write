@@ -27,11 +27,28 @@ func LoadProjectHandler(w http.ResponseWriter, r *http.Request) {
 		w.WriteHeader(http.StatusOK)
 		LogInfo.Println("Loaded project " + ActiveProject.Name + " (" + projectPath + ")")
 		projectListHasChanged = true
+
+		//Flag valid project loaded
+		ValidProjectLoaded = true
 	}
 	
 }
 
 func SaveProjectHandler(w http.ResponseWriter, r *http.Request) {
+	
+	//If the default project is being saved
+	if !ValidProjectLoaded {
+		ActiveProject.SaveName = time.Now().Format("20060102150405.000000")
+		ActiveProject.Name = "Untitled Project"
+		ValidProjectLoaded = true
+		
+		//Add to project list
+		ProjectList[ActiveProject.SaveName] = ActiveProject.Name //Add to project list
+		projectListHasChanged = true //Flag list as having changed
+		SaveProjectList("./data/projects/projectList.json")
+	}
+	
+	
 	projectPath := "./data/projects/" + ActiveProject.SaveName + ".json"
 	
 	//load project
@@ -79,6 +96,9 @@ func NewProjectHandler(w http.ResponseWriter, r *http.Request) {
 		ProjectList[projectSaveName] = projectName //Add to project list
 		projectListHasChanged = true //Flag list as having changed
 		SaveProjectList("./data/projects/projectList.json")
+
+		//Flag valid project loaded
+		ValidProjectLoaded = true
 	}
 	
 }

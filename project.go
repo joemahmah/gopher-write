@@ -13,6 +13,7 @@ import (
 
 //The active project
 var ActiveProject *Project = MakeProject("","")
+var ValidProjectLoaded bool = false
 
 //The project list (map location->name)
 var ProjectList map[string]string = make(map[string]string)
