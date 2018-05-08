@@ -222,7 +222,7 @@ func SaveAndExit(server *http.Server){
 //Landing Handler
 func LandingHandler(w http.ResponseWriter, r *http.Request){
 	//Parse the templates
-	tmpl, err := template.ParseFiles("data/templates/landing.tmpl", "data/templates/style.tmpl", "data/templates/header.tmpl", "data/templates/js.tmpl")
+	tmpl, err := template.ParseFiles("data/templates/landing.tmpl", "data/templates/style.tmpl", "data/templates/header.tmpl", "data/templates/js.tmpl", "data/templates/footer.tmpl")
 
 	if err != nil {
 		w.WriteHeader(http.StatusInternalServerError)

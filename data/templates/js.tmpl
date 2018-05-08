@@ -3,6 +3,24 @@
 <script language="javascript">
 
 //
+//Sidebar
+//
+var SidebarOpen = false;
+
+function ToggleSidebar(){
+	if(SidebarOpen){
+		document.getElementById("sidebar").style.display="none";
+		document.getElementById("sidebar_open").innerHTML="&gt;";
+	} else {
+		document.getElementById("sidebar").style.display="block";
+		document.getElementById("sidebar_open").innerHTML="&lt;";
+	}
+
+	SidebarOpen = !SidebarOpen;
+}
+
+
+//
 //Project
 //
 function SaveProject(){

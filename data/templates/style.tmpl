@@ -497,6 +497,49 @@
 	flex-wrap: wrap;
 }
 
+.sidebar {
+	display: none;
+	height: 80%;
+	min-width: 100px;
+	width: 25%;
+	position: absolute;
+
+	top: 10%;
+
+	background-color: #BBBBFF;
+	border: 1px dotted;
+	border-radius: 5px 20px 20px 5px
+
+}
+
+.sidebar_open {
+	display: block;
+	position: absolute;
+	left: 5px;
+	top: 50%;
+	font-size: 2em;
+	border: 0px;
+	border-radius: 5px;
+
+
+	-webkit-transition: left .5s, background-color .5s;
+	-moz-transition: left .5s, background-color .5s;
+	transition: left .5s, background-color .5s;
+}
+
+.sidebar_open:hover {
+	left: 8px;
+	background-color: #CCCCCC;
+}
+
+.content {
+
+	width: 80%;
+	min-width: 500px;
+	margin-left: auto;
+	margin-right: auto;
+}
+
 </style>
 
 {{end}}
