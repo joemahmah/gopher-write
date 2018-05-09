@@ -45,7 +45,7 @@ func ViewLocationHandler(w http.ResponseWriter, r *http.Request) {
 	}
 	
 	//Parse template
-	tmpl, err := template.ParseFiles("data/templates/viewLocation.tmpl", "data/templates/style.tmpl", "data/templates/header.tmpl", "data/templates/js.tmpl")
+	tmpl, err := template.ParseFiles("data/templates/viewLocation.tmpl", "data/templates/style.tmpl", "data/templates/header.tmpl", "data/templates/js.tmpl", "data/templates/footer.tmpl")
 	
 	//if error parsing template
 	if err != nil {
@@ -141,7 +141,7 @@ func ListJSONLocationHandler(w http.ResponseWriter, r *http.Request) {
 func OverviewLocationHandler(w http.ResponseWriter, r *http.Request) {
 	
 	//Parse template
-	tmpl, err := template.ParseFiles("data/templates/overviewLocation.tmpl", "data/templates/style.tmpl", "data/templates/header.tmpl", "data/templates/js.tmpl")
+	tmpl, err := template.ParseFiles("data/templates/overviewLocation.tmpl", "data/templates/style.tmpl", "data/templates/header.tmpl", "data/templates/js.tmpl", "data/templates/footer.tmpl")
 	
 	//if error parsing template
 	if err != nil {

@@ -1,5 +1,6 @@
 {{define "header"}}
 
+<div class="content">
 <nav class="nav-wrap" id="nav-wrap">
 <span class="nav-title">gopher-write</span>
 <ul class="nav-list" id="nav-list">
@@ -13,7 +14,7 @@
 		<div class="nav-dropdown">
 			<a class="nav-dropdown-major" href="/story">Stories</a>
 			<div class="nav-dropdown-minor">
-				<a class="nav-dropdown-minor-elem" href="">Reorganize</a>
+				<a class="nav-dropdown-minor-elem" href="/story/move">Reorganize</a>
 			</div>
 		</div>
 	</li>
@@ -68,10 +69,23 @@
 
 <ul>
 </nav>
+</div>
 
 <br>
 <br>
 
 <div class="response_text" id="response_text"></div>
+
+<div class="content_wrap">
+
+<div>
+	<div class="sidebar" id="sidebar">
+	This is a sidebar.
+	</div>
+
+	<div class="sidebar_open" id="sidebar_open" onclick="ToggleSidebar();" >&gt;</div>
+</div>
+
+<div class="content">
 
 {{end}}

@@ -56,7 +56,7 @@ func ViewCharHandler(w http.ResponseWriter, r *http.Request) {
 		})
 	
 		//Parse template
-		tmpl, err := tmpl.ParseFiles("data/templates/viewChar.tmpl", "data/templates/style.tmpl", "data/templates/header.tmpl", "data/templates/js.tmpl")
+		tmpl, err := tmpl.ParseFiles("data/templates/viewChar.tmpl", "data/templates/style.tmpl", "data/templates/header.tmpl", "data/templates/js.tmpl", "data/templates/footer.tmpl")
 		
 		//if error parsing template
 		if err != nil {
@@ -164,7 +164,7 @@ func ListJSONCharHandler(w http.ResponseWriter, r *http.Request) {
 func OverviewCharHandler(w http.ResponseWriter, r *http.Request) {
 	
 	//Parse template
-	tmpl, err := template.ParseFiles("data/templates/overviewChar.tmpl", "data/templates/style.tmpl", "data/templates/header.tmpl", "data/templates/js.tmpl")
+	tmpl, err := template.ParseFiles("data/templates/overviewChar.tmpl", "data/templates/style.tmpl", "data/templates/header.tmpl", "data/templates/js.tmpl", "data/templates/footer.tmpl")
 	
 	//if error parsing template
 	if err != nil {

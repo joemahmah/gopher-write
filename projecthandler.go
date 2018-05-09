@@ -105,7 +105,7 @@ func NewProjectHandler(w http.ResponseWriter, r *http.Request) {
 
 func OverviewProjectHandler(w http.ResponseWriter, r *http.Request) {
 	//Parse template
-	tmpl, err := template.ParseFiles("data/templates/overviewProject.tmpl", "data/templates/style.tmpl", "data/templates/header.tmpl", "data/templates/js.tmpl")
+	tmpl, err := template.ParseFiles("data/templates/overviewProject.tmpl", "data/templates/style.tmpl", "data/templates/header.tmpl", "data/templates/js.tmpl", "data/templates/footer.tmpl")
 
 	//check for errors
 	if err != nil {
