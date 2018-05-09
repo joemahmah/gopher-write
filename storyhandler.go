@@ -487,6 +487,29 @@ func OverviewStoryHandler(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
+func SwapStoryHandler(w http.ResponseWriter, r *http.Request) {
+	
+	//Parse template
+	tmpl, err := template.ParseFiles("data/templates/swapStories.tmpl", "data/templates/style.tmpl", "data/templates/header.tmpl", "data/templates/js.tmpl")
+	
+	//if error parsing template
+	if err != nil {
+		w.WriteHeader(http.StatusInternalServerError)
+		LogError.Println(err)
+		
+		return
+	} 
+	
+	//serve template
+	err = tmpl.Execute(w, nil)
+	
+	//IF error executing template
+	if err != nil {
+		w.WriteHeader(http.StatusInternalServerError)
+		LogError.Println(err)
+	}
+}
+
 func DeleteStoryHandler(w http.ResponseWriter, r *http.Request) {
 	
 	suid, _ := strconv.Atoi(mux.Vars(r)["storyuid"])

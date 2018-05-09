@@ -1,0 +1,220 @@
+<html>
+
+<head>
+	<meta charset="utf-8">
+	<title>Story List | gopher-write</title>
+	
+	{{template "css"}}
+</head>
+
+<body>
+
+{{template "js"}}
+
+<script language="javascript">
+
+//Set story list to update on load
+window.onload = updateStoryList;
+
+function updateStoryList(){
+	var xhr = new XMLHttpRequest();
+	var url = "/story/list";
+	xhr.open("POST", url, true);
+	xhr.onreadystatechange = function () {
+		//if server returns JSON, update display
+		if (this.readyState === 4 && this.status === 200){
+			//get the char list
+			var storyList = document.getElementById("story_list");
+			
+			//convert json into object
+			var storyListJSON = JSON.parse(this.responseText);
+			
+			if(storyListJSON.Names != null) {
+				storyList.innerHTML = "";
+			
+				//add the stories to the page
+				for (var i = 0; i <= storyListJSON.Names.length; i++) {
+					if(i === storyListJSON.Names.length){
+						var storyElem = document.createElement("div");
+						storyElem.className = "list_elem list_elem_ghost";
+						storyElem.setAttribute("data-story-uid",i);
+						storyElem.setAttribute("draggable","false");
+						storyElem.addEventListener("drop",dropListElement);
+						storyElem.addEventListener("dragover",allowDragListElement);
+						
+						document.getElementById("story_list").appendChild(storyElem);
+					} else {
+						var storyElem = document.createElement("div");
+						storyElem.className = "list_elem list_elem_color";
+						storyElem.setAttribute("data-story-uid",storyListJSON.UIDS[i]);
+						storyElem.setAttribute("draggable","true");
+						storyElem.addEventListener("drop",dropListElement);
+						storyElem.addEventListener("dragover",allowDragListElement);
+						storyElem.addEventListener("dragstart",dragListElement);
+						storyElem.addEventListener("dblclick",linkListElement);
+						
+						var storyElemName = document.createElement("span");
+						storyElemName.innerHTML = storyListJSON.Names[i];
+						
+						//Control buttons
+						var storyElemControl = document.createElement("div");
+						storyElemControl.classList.add("list_elem_btn_wrap");
+						
+						var storyElemRemove = document.createElement("span");
+						storyElemRemove.classList.add("list_elem_btn");
+						storyElemRemove.classList.add("list_elem_btn_red");
+						storyElemRemove.innerHTML = "X";
+						storyElemRemove.addEventListener("dblclick", removeStory);
+						
+						var storyElemExport = document.createElement("span");
+						storyElemExport.classList.add("list_elem_btn");
+						storyElemExport.innerHTML = "⎘";
+						storyElemExport.addEventListener("dblclick", exportStory);
+						
+						storyElemControl.appendChild(storyElemExport);
+						
+						storyElemControl.appendChild(storyElemRemove);
+						
+						//Add to story elem
+						storyElem.appendChild(storyElemName);
+						storyElem.appendChild(storyElemControl)
+						
+						storyList.appendChild(storyElem);
+					}
+				}
+			}
+		} else if(this.readyState === 4 && this.status !== 200){
+			showResponse("There was an error loading the story list. Status: " + this.status);
+			setTimeout("hideResponse()",2000);
+		}
+	}
+	
+	xhr.send();
+}
+
+function moveStory(first, second){var xhr = new XMLHttpRequest();
+	var url = "/move/story/" + first + "/" + second;
+	xhr.open("POST", url, true);
+	xhr.onreadystatechange = function () {
+		if (this.readyState === 4 && this.status === 200){
+			updateStoryList();
+		} else if(this.readyState === 4 && this.status !== 200){
+			showResponse("There was an error moving the story.");
+			setTimeout("hideResponse()",2000);
+		}
+	}
+	
+	xhr.send();
+}
+
+function removeStory(e){
+	//Stop click from linking to page
+	if(e.stopPropagation){
+		e.stopPropagation();
+	}
+
+	//Abort if user does not confirm
+	if(!window.confirm("Are you sure you want to delete this story? All chapters and sections contained within will be deleted. You will not be able to undo this action!")){
+		return;
+	}
+	
+	var uid = e.target.getAttribute("data-story-uid");
+	var target = e.target;
+
+	while(!uid){
+		target = target.parentNode;
+		uid = target.getAttribute("data-story-uid");
+	}
+
+	var xhr = new XMLHttpRequest();
+	var url = "/story/" + uid + "/delete";
+	xhr.open("POST", url, true);
+	xhr.onreadystatechange = function() {
+		if(this.readyState === 4 && this.status === 200){
+			showResponse("Story removed.");
+			setTimeout("hideResponse()",2000);
+			updateStoryList();
+		} else if(this.readyState === 4 && this.status !== 200){
+			showResponse("Unable to remove story.");
+			setTimeout("hideResponse()",2000);
+		}
+	}
+	xhr.send();
+}
+
+function linkListElement(e){
+	var suid = e.target.getAttribute("data-story-uid");
+	var target = e.target;
+	
+	//Go to parent node if needed.
+	while(!suid){
+		target = target.parentNode
+		suid = target.getAttribute("data-story-uid");
+	}
+	
+	location.href = "/story/" + suid;
+}
+
+function dropListElement(e){
+	e.preventDefault();
+	
+	if(e.stopPropagation !== "undefined"){
+		e.stopPropagation();
+	}
+	
+	var firstID = parseInt(e.dataTransfer.getData("text"));
+	var secondID = parseInt(e.target.getAttribute("data-story-uid"));
+	
+	var target = e.target;
+	
+	while(isNaN(secondID)){
+		target = target.parentNode
+		secondID = parseInt(target.getAttribute("data-story-uid"));
+	}
+	
+	if(firstID !== secondID){
+		moveStory(firstID, secondID);
+	}
+}
+
+function dragListElement(e){
+	var storyUID = e.target.getAttribute("data-story-uid");
+	
+	var target = e.target;
+	
+	while(storyUID === null){
+		target = target.parentNode
+		storyUID = parseInt(target.getAttribute("data-story-uid"));
+	}
+	
+	e.dataTransfer.setData("text", storyUID);
+}
+
+function allowDragListElement(e){
+	e.preventDefault();
+}
+
+</script>
+
+{{template "header"}}
+
+<h1>Stories</h1>
+
+<select>
+	<option value="0">Move Chapters</option>
+	<option value="1">Move Sections</option>
+</select>
+
+<div class="ui_grid_2">
+<div class="list" id="list_a">
+
+</div>
+
+<div class="list" id="list_b">
+
+</div>
+</div>
+
+</body>
+
+</html>

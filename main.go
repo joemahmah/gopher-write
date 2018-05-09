@@ -136,6 +136,7 @@ func main(){
 
 		//overview
 	router.HandleFunc("/story", OverviewStoryHandler) //Story list
+	router.HandleFunc("/story/move", SwapStoryHandler) //Story list
 
 	/////////////////////////
 	//   move operations   //

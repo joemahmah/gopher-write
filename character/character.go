@@ -14,8 +14,13 @@ type Character struct {
 	Motivation	string //What drives the character
 	Goal		string //What the character aims to do
 	Role		string //The purpose of the character
-	//more
 	Age			common.Age //The age of the character
+	
+	
+	//Character Profile Information
+	BirthDate	string
+	BirthPlace	string
+	
 }
 
 //Checks if a string is the character's name
