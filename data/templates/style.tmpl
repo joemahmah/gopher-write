@@ -504,14 +504,24 @@
 
 .sidebar {
 	display: none;
-	height: 80%;
-	min-width: 100px;
-	width: 25%;
+	
+	position: absolute;
+	top: 5vh;
+	left: 5px;
+	overflow: hidden;
+	
+	width: 235px;
+	height: 90vh;
+	max-height: 100vh;
+	margin-left: 0px;
 
 	background-color: #BBBBFF;
+	opacity: .9;
 	border: 1px dotted;
-	border-radius: 5px 20px 20px 5px
+	border-radius: 5px 15px 15px 5px;
 
+	transition: all .25s ease-in-out;
+	
 }
 
 .sidebar_open {
@@ -523,23 +533,39 @@
 
 	left: 5px;
 	top: 50%;
+	cursor: pointer;
+	padding-left: 3px;
+	padding-right: 3px;
 
-
-	-webkit-transition: left .5s, background-color .5s;
-	-moz-transition: left .5s, background-color .5s;
-	transition: left .5s, background-color .5s;
+	transition: all .25s ease-in-out;
 }
 
 .sidebar_open:hover {
-	left: 8px;
 	background-color: #CCCCCC;
+}
+
+.sidebar_close {
+	position: absolute;
+	right: 5px;
+	top: 5px;
+	border-radius: 5px;
+	padding: 2px;
+	opacity: .8;
+	
+	cursor: pointer;
+	transition: all .25s ease-in-out;
+}
+
+.sidebar_close:hover {
+	opacity: 1;
+	background-color: #EEAAAA;
 }
 
 .content {
 	display: block;
-	width: 80%;
-	min-width: 500px;
-	margin-left: auto;
+	width: 75%;
+	min-width: 400px;
+	margin-left: 250px;
 	margin-right: auto;
 }
 
