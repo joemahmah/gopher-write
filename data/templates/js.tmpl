@@ -9,11 +9,11 @@ var SidebarOpen = false;
 
 function ToggleSidebar(){
 	if(SidebarOpen){
-		document.getElementById("sidebar").style.display="none";
-		document.getElementById("sidebar_open").innerHTML="&gt;";
+		document.getElementById("sidebar").classList.add("sidebar_hidden");
+		document.getElementById("sidebar_open").classList.remove("sidebar_open_hidden");
 	} else {
-		document.getElementById("sidebar").style.display="block";
-		document.getElementById("sidebar_open").innerHTML="&lt;";
+		document.getElementById("sidebar").classList.remove("sidebar_hidden");
+		document.getElementById("sidebar_open").classList.add("sidebar_open_hidden");
 	}
 
 	SidebarOpen = !SidebarOpen;

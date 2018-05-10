@@ -161,7 +161,7 @@
 }
 
 .meta_hidden{
-	display: none;
+	display: none !important;
 }
 
 .meta_mouse_hand {
@@ -503,8 +503,6 @@
 }
 
 .sidebar {
-	display: none;
-	
 	position: absolute;
 	top: 5vh;
 	left: 5px;
@@ -520,7 +518,7 @@
 	border: 1px dotted;
 	border-radius: 5px 15px 15px 5px;
 
-	transition: all .25s ease-in-out;
+	transition: all 1s ease-in-out;
 	
 }
 
@@ -537,11 +535,20 @@
 	padding-left: 3px;
 	padding-right: 3px;
 
-	transition: all .25s ease-in-out;
+	transition: all .75s ease-in-out;
 }
 
 .sidebar_open:hover {
 	background-color: #CCCCCC;
+}
+
+.sidebar_open_hidden {
+	opacity: 0;
+}
+
+.sidebar_hidden {
+	opacity: 0;
+	margin-left: -250px;
 }
 
 .sidebar_close {
