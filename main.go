@@ -147,7 +147,25 @@ func main(){
 	router.HandleFunc("/move/chapter/inter/{fsuid:[0-9]{1,9}}/{first:[0-9]{1,9}}/{ssuid:[0-9]{1,9}}/{second:[0-9]{1,9}}", InterChapterMoveHandler) //move chapter positions between stories (first in front of second)
 	router.HandleFunc("/move/section/intra/{suid:[0-9]{1,9}}/{cuid:[0-9]{1,9}}/{first:[0-9]{1,9}}/{second:[0-9]{1,9}}", IntraSectionMoveHandler) //move section positions within a chapter (first in front of second)
 
-	
+	/////////////////////////
+	//      resources      //
+	/////////////////////////
+
+	router.HandleFunc("/res/note", testHandler)
+	router.HandleFunc("/res/note/list", testHandler)
+	router.HandleFunc("/res/note/add", testHandler)
+	router.HandleFunc("/res/note/{nid:[0-9]{1,9}}", testHandler)
+	router.HandleFunc("/res/note/{nid:[0-9]{1,9}}/json", testHandler)
+	router.HandleFunc("/res/note/{nid:[0-9]{1,9}}/delete", testHandler)
+	router.HandleFunc("/res/note/{nid:[0-9]{1,9}}/edit", testHandler)
+	router.HandleFunc("/res/link", testHandler)
+	router.HandleFunc("/res/link/list", testHandler)
+	router.HandleFunc("/res/link/add", testHandler)
+	router.HandleFunc("/res/link/{lid:[0-9]{1,9}}", testHandler)
+	router.HandleFunc("/res/link/{lid:[0-9]{1,9}}/json", testHandler)
+	router.HandleFunc("/res/link/{lid:[0-9]{1,9}}/delete", testHandler)
+	router.HandleFunc("/res/link/{lid:[0-9]{1,9}}/edit", testHandler)
+
 	/////////////////////////
 	//        server       //
 	/////////////////////////
