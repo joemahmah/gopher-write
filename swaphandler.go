@@ -173,7 +173,7 @@ func IntraChapterMoveHandler(w http.ResponseWriter, r *http.Request) {
 	//Get the story uids
 	firstChapterIndex, _ := strconv.Atoi(mux.Vars(r)["first"])
 	secondChapterIndex, _ := strconv.Atoi(mux.Vars(r)["second"])
-	suid, _ := strconv.Atoi(mux.Vars(r)["suid"])
+	suid, _ := strconv.Atoi(mux.Vars(r)["fsuid"])
 
 	if len(ActiveProject.Stories) <= suid {
 		w.WriteHeader(http.StatusInternalServerError)
@@ -202,6 +202,12 @@ func InterChapterMoveHandler(w http.ResponseWriter, r *http.Request) {
 	fsuid, _ := strconv.Atoi(mux.Vars(r)["fsuid"])
 	ssuid, _ := strconv.Atoi(mux.Vars(r)["ssuid"])
 
+	//Check if this is actually an intra story move
+	if(fsuid == ssuid){
+		IntraChapterMoveHandler(w, r)
+		return
+	}
+	
 	if len(ActiveProject.Stories) <= fsuid || len(ActiveProject.Stories) <= ssuid {
 		w.WriteHeader(http.StatusInternalServerError)
 		LogError.Println("Story index out of bounds.")
@@ -239,8 +245,8 @@ func IntraSectionMoveHandler(w http.ResponseWriter, r *http.Request) {
 	//Get the story uids
 	firstSectionIndex, _ := strconv.Atoi(mux.Vars(r)["first"])
 	secondSectionIndex, _ := strconv.Atoi(mux.Vars(r)["second"])
-	suid, _ := strconv.Atoi(mux.Vars(r)["suid"])
-	cuidRel, _ := strconv.Atoi(mux.Vars(r)["cuid"])
+	suid, _ := strconv.Atoi(mux.Vars(r)["fsuid"])
+	cuidRel, _ := strconv.Atoi(mux.Vars(r)["fcuid"])
 	
 	//Process relative uids
 	cuid := ActiveProject.Stories[suid].Chapters[cuidRel]

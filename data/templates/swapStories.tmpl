@@ -13,8 +13,53 @@
 
 <script language="javascript">
 
+//The current move mode
+var mode = 1; //1=chapter, 2=section
+
 //Set story list to update on load
-window.onload = updateStoryList;
+window.onload = init;
+
+function init(){
+		updateStorySelect();
+}
+
+function updateStorySelect(){
+	var selectA = document.getElementById("list_a_story");
+	var selectB = document.getElementById("list_b_story");
+	
+	//remove all stories from the select boxes
+	//except for the first option (-1).
+	//note: select A,B should have same options
+	for( var i = selectA.options.length - 1; i > 0; i--){
+		selectA.remove(i);
+		selectB.remove(i);
+	}
+	
+	var xhr = new XMLHttpRequest();
+	var url = "/story/list";
+	xhr.open("POST", url, true);
+	xhr.onreadystatechange = function () {
+		if (this.readyState === 4 && this.status === 200){
+			var storyListJSON = JSON.parse(this.responseText);
+			
+			if(storyListJSON.Names != null) {
+				for (var i = 0; i < storyListJSON.Names.length; i++) {
+					var newOption = document.createElement("option")
+					newOption.innerHTML = storyListJSON.Names[i];
+					newOption.value = storyListJSON.UIDS[i];
+					
+					selectA.appendChild(newOption);
+					selectB.appendChild(newOption.cloneNode(true));
+				}
+			}
+		} else if(this.readyState === 4 && this.status !== 200){
+			showResponse("There was an error loading the story list. Status: " + this.status);
+			setTimeout("hideResponse()",2000);
+		}
+	}
+	
+	xhr.send();
+}
 
 function updateStoryList(){
 	var xhr = new XMLHttpRequest();
@@ -194,24 +239,224 @@ function allowDragListElement(e){
 	e.preventDefault();
 }
 
+function setMoveMode(){
+	mode = parseInt(document.getElementById("move_mode").value);
+	
+	if (mode === 1){ //Move chapter mode
+		document.getElementById("list_a_chapter").classList.add("meta_hidden");
+		document.getElementById("list_b_chapter").classList.add("meta_hidden");
+	} else if (mode === 2){ //Move section mode
+		document.getElementById("list_a_chapter").classList.remove("meta_hidden");
+		document.getElementById("list_b_chapter").classList.remove("meta_hidden");
+	} else {
+		console.log(mode);
+	}
+	
+}
+
+function setStory(id){
+	var value = parseInt(document.getElementById("list_" + id + "_story").value);
+	
+	//Blank the list
+	document.getElementById("list_" + id).innerHTML = "";
+	
+	if (value === -1){ //No story selected
+		return;
+	}
+	
+	if (mode === 1) { //Move chapters mode
+		updateChapterList(id, value);
+	} else if (mode === 2) { //move sections mode
+		//blank list
+		//update chapter select list
+	}
+}
+
+function updateChapterList(idTag, idStory){
+	var xhr = new XMLHttpRequest();
+	var url = "/story/" + idStory + "/list";
+	xhr.open("POST", url, true);
+	xhr.onreadystatechange = function () {
+		//if server returns JSON, update display
+		if (this.readyState === 4 && this.status === 200){
+			//get the char list
+			var chapterList = document.getElementById("list_" + idTag);
+			
+			//blank the existing list
+			chapterList.innerHTML = "";
+			
+			//convert json into object
+			var chapterListJSON = JSON.parse(this.responseText);
+			if(chapterListJSON.Names != null) {
+				//add the chapters to the page
+				for (var i = 0; i <= chapterListJSON.Names.length; i++) {
+					if (i === chapterListJSON.Names.length){
+						var chapterElem = document.createElement("div");
+						chapterElem.className = "list_elem list_elem_ghost";
+						chapterElem.setAttribute("data-story-uid", idStory);
+						chapterElem.setAttribute("data-chapter-uid", i);
+						chapterElem.setAttribute("draggable", "false");
+						chapterElem.addEventListener("drop", dropListElement);
+						chapterElem.addEventListener("dragover", allowDragListElement);
+						chapterElem.addEventListener("dragenter", changeSelectedElementBG);
+						chapterElem.addEventListener("dragleave", clearSelectedElementBG);
+						
+						chapterList.appendChild(chapterElem);
+					} else {
+						var chapterElem = document.createElement("div");
+						chapterElem.className = "list_elem list_elem_color";
+						chapterElem.setAttribute("data-story-uid", idStory);
+						chapterElem.setAttribute("data-chapter-uid", chapterListJSON.UIDS[i]);
+						chapterElem.setAttribute("draggable", "true");
+						chapterElem.addEventListener("drop", dropListElement);
+						chapterElem.addEventListener("dragover", allowDragListElement);
+						chapterElem.addEventListener("dragstart", dragListElement);
+						chapterElem.addEventListener("dragenter", changeSelectedElementBG);
+						chapterElem.addEventListener("dragleave", clearSelectedElementBG);
+						
+						var chapterElemName = document.createElement("span");
+						chapterElemName.innerHTML = chapterListJSON.Names[i];
+						
+						//Add to section elem
+						chapterElem.appendChild(chapterElemName);
+						
+						chapterList.appendChild(chapterElem);
+					}
+				}
+			} else { //If no chapters, just create empty element
+				var chapterElem = document.createElement("div");
+				chapterElem.className = "list_elem list_elem_ghost";
+				chapterElem.setAttribute("data-story-uid", idStory);
+				chapterElem.setAttribute("data-chapter-uid", 0);
+				chapterElem.setAttribute("draggable", "false");
+				chapterElem.addEventListener("drop", dropListElement);
+				chapterElem.addEventListener("dragover", allowDragListElement);
+				chapterElem.addEventListener("dragenter", changeSelectedElementBG);
+				chapterElem.addEventListener("dragleave", clearSelectedElementBG);
+				
+				chapterList.appendChild(chapterElem);
+			}
+		} else if(this.readyState === 4 && this.status !== 200){
+			showResponse("There was an error loading the chapter list. Status: " + this.status);
+			setTimeout("hideResponse()",2000);
+		}
+	}
+	
+	xhr.send();
+}
+
+function dropListElement(e){
+	e.preventDefault();
+	
+	if(e.stopPropagation !== "undefined"){
+		e.stopPropagation();
+	}
+	
+	e.target.style.background="none";
+	
+	var first = JSON.parse(e.dataTransfer.getData("text"));
+	var secondCUID = parseInt(e.target.getAttribute("data-chapter-uid"));
+	var secondSUID = parseInt(e.target.getAttribute("data-story-uid"));
+	
+	var target = e.target;
+	
+	while(isNaN(secondSUID)){
+		target = target.parentNode
+		secondCUID = parseInt(target.getAttribute("data-chapter-uid"));
+		secondSUID = parseInt(target.getAttribute("data-story-uid"));
+	}
+	
+	if(first.cuid !== secondCUID && first.suid !== secondSUID){
+		moveChapter(first.suid, first.cuid, secondSUID, secondCUID);
+	}
+}
+
+function dragListElement(e){
+	var SUID = e.target.getAttribute("data-story-uid");
+	var CUID = e.target.getAttribute("data-chapter-uid");
+	
+	var target = e.target;
+	
+	while(isNaN(SUID)){
+		target = target.parentNode
+		SUID = parseInt(target.getAttribute("data-story-uid"));
+		CUID = parseInt(target.getAttribute("data-chapter-uid"));
+	}
+	
+	e.dataTransfer.setData("text", JSON.stringify({suid: SUID, cuid: CUID}));
+}
+
+function allowDragListElement(e){
+	e.preventDefault();
+}
+
+function changeSelectedElementBG(e){
+	e.preventDefault();
+	e.target.style.background="#DDEEDD";
+}
+
+function clearSelectedElementBG(e){
+	e.preventDefault();
+	e.target.style.background="transparent";
+}
+
+function moveChapter(storyFirst, chapterFirst, storySecond, chapterSecond){
+	var xhr = new XMLHttpRequest();
+	var url = "/move/chapter/inter/" + storyFirst + "/" + chapterFirst + "/" + storySecond + "/" + chapterSecond;
+	xhr.open("POST", url, true);
+	xhr.onreadystatechange = function () {
+		if (this.readyState === 4 && this.status === 200){
+			updateChapterList("a",document.getElementById("list_a_story").value);
+			updateChapterList("b",document.getElementById("list_b_story").value);
+			showResponse("Chapter has been moved.");
+			setTimeout("hideResponse()",2000);
+		} else if(this.readyState === 4 && this.status !== 200){
+			showResponse("There was an error moving the chapter.");
+			setTimeout("hideResponse()",2000);
+		}
+	}
+	
+	xhr.send();
+}
+
 </script>
 
 {{template "header"}}
 
-<h1>Stories</h1>
+<h1 class="name">Stories</h1>
 
-<select>
-	<option value="0">Move Chapters</option>
-	<option value="1">Move Sections</option>
+<select id="move_mode" onchange="setMoveMode();">
+	<option value="1">Move Chapters</option>
+	<option value="2">Move Sections</option>
 </select>
 
 <div class="ui_grid_2">
-<div class="list" id="list_a">
-
+<div class="list_wrapper">
+	<div class="list_control">
+		<select id="list_a_story" onchange='setStory("a");'>
+			<option value="-1">Select a Story</option>
+		</select>
+		<select id="list_a_chapter" class="meta_hidden">
+			<option value="-1">Select a Chapter</option>
+		</select>
+	</div>
+	<div class="list" id="list_a">
+		a
+	</div>
 </div>
 
-<div class="list" id="list_b">
-
+<div class="list_wrapper">
+	<div class="list_control">
+		<select id="list_b_story" onchange='setStory("b");'>
+			<option value="-1">Select a Story</option>
+		</select>
+		<select id="list_b_chapter" class="meta_hidden">
+			<option value="-1">Select a Chapter</option>
+		</select>
+	</div>
+	<div class="list" id="list_b">
+	b
+	</div>
 </div>
 </div>
 

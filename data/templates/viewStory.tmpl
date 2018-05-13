@@ -183,7 +183,10 @@ function saveChanges(){
 	}
 }
 
-function moveStory(first, second){var xhr = new XMLHttpRequest();
+function moveStory(first, second){
+
+	var xhr = new XMLHttpRequest();
+	
 	//save to prevent data loss.
 	saveChanges();
 
