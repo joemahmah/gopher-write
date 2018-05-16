@@ -198,23 +198,23 @@ func (p *Project) RemoveLocation(uid int) {
 	delete(p.Locations, uid)
 }
 
-func (p *Project) AddResLink(link *resources.Link) {
+func (p *Project) AddLink(link *resources.Link) {
 	link.UID = p.ResLinkNext //Set UID to next available
 	p.ResLinkNext++ //Increment next UID available
 	p.ResLinks[link.UID] = link //Add to map 
 }
 
-func (p *Project) RemoveResLink(uid int) {
+func (p *Project) RemoveLink(uid int) {
 	delete(p.ResLinks, uid)
 }
 
-func (p *Project) AddResNote(note *resources.Note) {
+func (p *Project) AddNote(note *resources.Note) {
 	note.UID = p.ResNoteNext //Set UID to next available
 	p.ResNoteNext++ //Increment next UID available
 	p.ResNotes[note.UID] = note //Add to map 
 }
 
-func (p *Project) RemoveResNote(uid int) {
+func (p *Project) RemoveNote(uid int) {
 	delete(p.ResNotes, uid)
 }
 
@@ -285,6 +285,22 @@ func (p *Project) GetLocation(lid int) (*location.Location, error) {
 		return location, nil
 	} else {
 		return nil, errors.New("Location does not exist.")
+	}
+}
+
+func (p *Project) GetLink(lid int) (*resources.Link, error) {
+	if link, exists := p.ResLinks[lid]; exists {
+		return link, nil
+	} else {
+		return nil, errors.New("Resource (link) does not exist.")
+	}
+}
+
+func (p *Project) GetNote(nid int) (*resources.Note, error) {
+	if note, exists := p.ResNotes[nid]; exists {
+		return note, nil
+	} else {
+		return nil, errors.New("Resource (note) does not exist.")
 	}
 }
 

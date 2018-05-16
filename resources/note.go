@@ -6,4 +6,6 @@ type Note struct {
 	Title		string
 	Description	string
 	Text		string
+	
+	Featured	bool
 }

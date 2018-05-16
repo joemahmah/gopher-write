@@ -61,6 +61,21 @@ type DataTransferDualStringMonoBoolSlice struct {
 	Data	[]DualStringMonoBool
 }
 
+type DualStringMonoIntMonoBool struct {
+	S1	string
+	S2	string
+	I	int
+	B	bool
+}
+
+type DataTransferDualStringMonoIntMonoBool struct {
+	Data	DualStringMonoIntMonoBool
+}
+
+type DataTransferDualStringMonoIntMonoBoolSlice struct {
+	Data	[]DualStringMonoIntMonoBool
+}
+
 type MonoStringMonoInt struct {
 	S	string
 	I	int
