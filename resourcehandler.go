@@ -5,10 +5,8 @@ import (
 	"github.com/gorilla/mux"
 	"strconv"
 	"github.com/joemahmah/gopher-write/resources"
-	//"github.com/joemahmah/gopher-write/common"
 	"encoding/json"
 	"html/template"
-	//"sort"
 )
 
 func NewNoteHandler(w http.ResponseWriter, r *http.Request) {
