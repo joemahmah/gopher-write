@@ -153,7 +153,7 @@ func main(){
 
 	router.HandleFunc("/res/note", OverviewNoteHandler)
 	router.HandleFunc("/res/note/list", ListJSONNoteHandler)
-	router.HandleFunc("/res/note/add", NewNoteHandler)
+	router.HandleFunc("/res/note/new", NewNoteHandler)
 	router.HandleFunc("/res/note/{nid:[0-9]{1,9}}", ViewNoteHandler)
 	router.HandleFunc("/res/note/{nid:[0-9]{1,9}}/json", GetJSONNoteHandler)
 	router.HandleFunc("/res/note/{nid:[0-9]{1,9}}/delete", DeleteNoteHandler)
@@ -163,7 +163,7 @@ func main(){
 	router.HandleFunc("/res/note/{nid:[0-9]{1,9}}/edit/toggleFeatured", EditNoteToggleFeaturedHandler)
 	router.HandleFunc("/res/link", OverviewLinkHandler)
 	router.HandleFunc("/res/link/list", ListJSONLinkHandler)
-	router.HandleFunc("/res/link/add", NewLinkHandler)
+	router.HandleFunc("/res/link/new", NewLinkHandler)
 	router.HandleFunc("/res/link/{lid:[0-9]{1,9}}", ViewLinkHandler)
 	router.HandleFunc("/res/link/{lid:[0-9]{1,9}}/json", GetJSONLinkHandler)
 	router.HandleFunc("/res/link/{lid:[0-9]{1,9}}/delete", DeleteLinkHandler)
