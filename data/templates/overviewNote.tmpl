@@ -1,0 +1,199 @@
+<html>
+
+<head>
+	<meta charset="utf-8">
+	<title>Project Notes | gopher-write</title>
+	
+	{{template "css"}}
+</head>
+
+<body>
+
+{{template "js"}}
+
+<script language="javascript">
+
+window.onload = updateNoteList;
+
+function processNote(){
+	var title = document.getElementById("note_new_title_input").value;
+	var description = document.getElementById("note_new_description_input").value;
+	var text = document.getElementById("note_new_text_input").value;
+	
+	var note = MakeNote(title, description, text);
+	console.log(note);
+	
+	var xhr = new XMLHttpRequest();
+	var url = "/res/note/new";
+	xhr.open("POST", url, true);
+	xhr.setRequestHeader("Content-Type", "application/json");
+	xhr.onreadystatechange = function () {
+		//if server returns proper, update display
+		if (this.readyState == 4 && this.status == 200){
+			updateNoteList();
+			showResponse("Note added.");
+			setTimeout("hideResponse()",2000);
+			HideModal("note_new_modal");
+		} else if (this.readyState == 4 && this.status == 500) {
+			showResponse("There was an error adding the note.");
+			setTimeout("hideResponse()",2000);
+		}
+	}
+	
+	xhr.send(JSON.stringify(note));
+}
+
+function updateNoteList(){
+	var xhr = new XMLHttpRequest();
+	var url = "/res/note/list";
+	xhr.open("POST", url, true);
+	xhr.onreadystatechange = function () {
+		//if server returns JSON, update display
+		if (this.readyState == 4 && this.status === 200){
+			//get the note list
+			var noteList = document.getElementById("note_list");
+			
+			//convert json into object
+			var data = JSON.parse(this.responseText).Data;
+			
+			//blank the existing list
+			noteList.innerHTML = "";
+			
+			if(data != null) {
+				
+				//add the locations to the page
+				for (var i = 0; i < data.length; i++) {
+					var noteElem = document.createElement("div");
+					noteElem.className = "list_elem list_elem_color";
+					noteElem.setAttribute("data-note-uid",data[i].I);
+					noteElem.addEventListener("dblclick",linkListElement);
+					
+					var noteElemName = document.createElement("span");
+					noteElemName.innerHTML = data[i].S1;
+					
+					var noteElemDescription = document.createElement("span");
+					noteElemDescription.innerHTML = data[i].S2;
+					
+					//Control buttons
+					var noteElemControl = document.createElement("div");
+					noteElemControl.classList.add("list_elem_btn_wrap");
+					
+					var noteElemRemove = document.createElement("span");
+					noteElemRemove.classList.add("list_elem_btn");
+					noteElemRemove.classList.add("list_elem_btn_red");
+					noteElemRemove.innerHTML = "X";
+					noteElemRemove.addEventListener("dblclick", removeNote);
+					
+					noteElemControl.appendChild(noteElemRemove);
+					
+					//Add name and buttons
+					noteElem.appendChild(noteElemName);
+					noteElem.appendChild(noteElemDescription);
+					noteElem.appendChild(noteElemControl)
+					
+					noteList.appendChild(noteElem);
+					
+				}
+			} else {
+				showResponse("There are not any notes in this project.");
+				setTimeout("hideResponse()",2000);
+			}
+			
+		}
+	}
+	
+	xhr.send();	
+}
+
+function removeNote(e){
+	//Stop click from linking to page
+	if(e.stopPropagation){
+		e.stopPropagation();
+	}
+
+	//Abort if user does not confirm
+	if(!window.confirm("Are you sure you want to delete this note?")){
+		return;
+	}
+	
+	var uid = e.target.getAttribute("data-note-uid");
+	var target = e.target;
+
+	while(!uid){
+		target = target.parentNode;
+		uid = target.getAttribute("data-note-uid");
+	}
+
+	var xhr = new XMLHttpRequest();
+	var url = "/res/note/" + uid + "/delete";
+	xhr.open("POST", url, true);
+	xhr.onreadystatechange = function() {
+		if(this.readyState === 4 && this.status === 200){
+			showResponse("Note removed.");
+			setTimeout("hideResponse()",2000);
+			updateNoteList();
+		} else if(this.readyState === 4 && this.status !== 200){
+			showResponse("Unable to remove note.");
+			setTimeout("hideResponse()",2000);
+		}
+	}
+	xhr.send();
+}
+
+function linkListElement(e){
+	var lid = e.target.getAttribute("data-note-uid");
+	var target = e.target;
+	
+	//Go to parent node if needed.
+	while(!lid){
+		target = target.parentNode
+		lid = target.getAttribute("data-note-uid");
+	}
+	
+	location.href = "/loc/" + lid;
+}
+
+function exportLocation(e){
+
+}
+
+</script>
+
+{{template "header"}}
+
+<h1 class="name">Notes</h1>
+
+<div class="control_wrap">
+	<span class="form_make_button" onclick='DisplayModal("note_new_modal");'>Add Note</span>
+</div>
+
+<div class="list" id="note_list">
+</div>
+
+<div class="ui_modal" id="note_new_modal">
+<div class="ui_modal_content">
+	<div class="ui_modal_form">
+		<label>Note Title: </label>
+		<input id="note_new_title_input" type="text">
+		<br>
+		<label>Description: </label>
+		<br>
+		<textarea rows="5" id="note_new_description_input"></textarea>
+		<br>
+		<label>Text: </label>
+		<br>
+		<textarea rows="5" id="note_new_text_input"></textarea>
+	</div>
+	<br>
+	<div class="ui_modal_control">
+			<span class="form_make_button form_make_button_big form_make_button_round form_make_button_right" onclick="processNote();">Add Location</span>
+			<span class="form_make_button form_make_button_big form_make_button_round form_make_button_right" onclick='HideModal("note_new_modal");'>Close</span>
+	</div>
+</div>
+</div>
+
+{{template "footer"}}
+
+</body>
+
+</html>

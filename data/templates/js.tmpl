@@ -387,6 +387,7 @@ function MakeStory(name, stat, chapters,note){
 //Location
 //
 function Location(UID, Name, Aliases, Description, Sublocations, Parent){
+	this.UID = UID;
 	this.Name = Name;
 	this.Aliases = Aliases;
 	this.Description = Description;
@@ -410,6 +411,28 @@ function MakeLocation(name, description, aliases, sublocations, parent){
 	}
 
 	return location;
+}
+
+
+//
+//Resources
+//
+function Note(UID, Title, Description, Text, Featured){
+	this.UID = UID;
+	this.Title = Title;
+	this.Description = Description;
+	this.Text = Text;
+	this.Featured = Featured;
+}
+
+function MakeNote(title, description, text, featured){
+	var note = new Note(0, title, description, text, false);
+	
+	if(featured){
+		note.Featured = featured;
+	}
+
+	return note;
 }
 
 </script>
