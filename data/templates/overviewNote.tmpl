@@ -141,20 +141,16 @@ function removeNote(e){
 }
 
 function linkListElement(e){
-	var lid = e.target.getAttribute("data-note-uid");
+	var uid = e.target.getAttribute("data-note-uid");
 	var target = e.target;
 	
 	//Go to parent node if needed.
-	while(!lid){
+	while(!uid){
 		target = target.parentNode
-		lid = target.getAttribute("data-note-uid");
+		uid = target.getAttribute("data-note-uid");
 	}
 	
-	location.href = "/loc/" + lid;
-}
-
-function exportLocation(e){
-
+	location.href = "/res/note/" + uid;
 }
 
 </script>
