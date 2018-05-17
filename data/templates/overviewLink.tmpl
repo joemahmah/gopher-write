@@ -1,0 +1,195 @@
+<html>
+
+<head>
+	<meta charset="utf-8">
+	<title>Project Links | gopher-write</title>
+	
+	{{template "css"}}
+</head>
+
+<body>
+
+{{template "js"}}
+
+<script language="javascript">
+
+window.onload = updateLinkList;
+
+function processLink(){
+	var title = document.getElementById("link_new_title_input").value;
+	var description = document.getElementById("link_new_description_input").value;
+	var url = document.getElementById("link_new_text_input").value;
+	
+	var link = MakeLink(title, description, url);
+	console.log(link);
+	
+	var xhr = new XMLHttpRequest();
+	var url = "/res/link/new";
+	xhr.open("POST", url, true);
+	xhr.setRequestHeader("Content-Type", "application/json");
+	xhr.onreadystatechange = function () {
+		//if server returns proper, update display
+		if (this.readyState == 4 && this.status == 200){
+			updateLinkList();
+			showResponse("Link added.");
+			setTimeout("hideResponse()",2000);
+			HideModal("link_new_modal");
+		} else if (this.readyState == 4 && this.status == 500) {
+			showResponse("There was an error adding the link.");
+			setTimeout("hideResponse()",2000);
+		}
+	}
+	
+	xhr.send(JSON.stringify(link));
+}
+
+function updateLinkList(){
+	var xhr = new XMLHttpRequest();
+	var url = "/res/link/list";
+	xhr.open("POST", url, true);
+	xhr.onreadystatechange = function () {
+		//if server returns JSON, update display
+		if (this.readyState == 4 && this.status === 200){
+			//get the link list
+			var LinkList = document.getElementById("link_list");
+			
+			//convert json into object
+			var data = JSON.parse(this.responseText).Data;
+			
+			//blank the existing list
+			LinkList.innerHTML = "";
+			
+			if(data != null) {
+				
+				//add the locations to the page
+				for (var i = 0; i < data.length; i++) {
+					var linkElem = document.createElement("div");
+					linkElem.className = "list_elem list_elem_color";
+					linkElem.setAttribute("data-link-uid",data[i].I);
+					linkElem.addEventListener("dblclick",linkListElement);
+					
+					var linkElemName = document.createElement("span");
+					linkElemName.innerHTML = data[i].S1;
+					
+					var linkElemDescription = document.createElement("span");
+					linkElemDescription.innerHTML = data[i].S2;
+					
+					//Control buttons
+					var linkElemControl = document.createElement("div");
+					linkElemControl.classList.add("list_elem_btn_wrap");
+					
+					var linkElemRemove = document.createElement("span");
+					linkElemRemove.classList.add("list_elem_btn");
+					linkElemRemove.classList.add("list_elem_btn_red");
+					linkElemRemove.innerHTML = "X";
+					linkElemRemove.addEventListener("dblclick", removeLink);
+					
+					linkElemControl.appendChild(linkElemRemove);
+					
+					//Add name and buttons
+					linkElem.appendChild(linkElemName);
+					linkElem.appendChild(linkElemDescription);
+					linkElem.appendChild(linkElemControl)
+					
+					LinkList.appendChild(linkElem);
+					
+				}
+			} else {
+				showResponse("There are not any links in this project.");
+				setTimeout("hideResponse()",2000);
+			}
+			
+		}
+	}
+	
+	xhr.send();	
+}
+
+function removeLink(e){
+	//Stop click from linking to page
+	if(e.stopPropagation){
+		e.stopPropagation();
+	}
+
+	//Abort if user does not confirm
+	if(!window.confirm("Are you sure you want to delete this link?")){
+		return;
+	}
+	
+	var uid = e.target.getAttribute("data-link-uid");
+	var target = e.target;
+
+	while(!uid){
+		target = target.parentNode;
+		uid = target.getAttribute("data-link-uid");
+	}
+
+	var xhr = new XMLHttpRequest();
+	var url = "/res/link/" + uid + "/delete";
+	xhr.open("POST", url, true);
+	xhr.onreadystatechange = function() {
+		if(this.readyState === 4 && this.status === 200){
+			showResponse("Link removed.");
+			setTimeout("hideResponse()",2000);
+			updateLinkList();
+		} else if(this.readyState === 4 && this.status !== 200){
+			showResponse("Unable to remove link.");
+			setTimeout("hideResponse()",2000);
+		}
+	}
+	xhr.send();
+}
+
+function linkListElement(e){
+	var uid = e.target.getAttribute("data-link-uid");
+	var target = e.target;
+	
+	//Go to parent node if needed.
+	while(!uid){
+		target = target.parentNode
+		uid = target.getAttribute("data-link-uid");
+	}
+	
+	location.href = "/res/link/" + uid;
+}
+
+</script>
+
+{{template "header"}}
+
+<h1 class="name">Links</h1>
+
+<div class="control_wrap">
+	<span class="form_make_button" onclick='DisplayModal("link_new_modal");'>Add Link</span>
+</div>
+
+<div class="list" id="link_list">
+</div>
+
+<div class="ui_modal" id="link_new_modal">
+<div class="ui_modal_content">
+	<div class="ui_modal_form">
+		<label>Link Title: </label>
+		<input id="link_new_title_input" type="text">
+		<br>
+		<label>Description: </label>
+		<br>
+		<textarea rows="5" id="link_new_description_input"></textarea>
+		<br>
+		<label>URL: </label>
+		<br>
+		<textarea rows="5" id="link_new_text_input"></textarea>
+	</div>
+	<br>
+	<div class="ui_modal_control">
+			<span class="form_make_button form_make_button_big form_make_button_round form_make_button_right" onclick="processLink();">Add Location</span>
+			<span class="form_make_button form_make_button_big form_make_button_round form_make_button_right" onclick='HideModal("link_new_modal");'>Close</span>
+	</div>
+</div>
+</div>
+
+{{template "footer"}}
+
+</body>
+
+</html>
