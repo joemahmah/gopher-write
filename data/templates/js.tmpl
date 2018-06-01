@@ -14,11 +14,56 @@ function ToggleSidebar(){
 	} else {
 		document.getElementById("sidebar").classList.remove("sidebar_hidden");
 		document.getElementById("sidebar_open").classList.add("sidebar_open_hidden");
+	
+		UpdateSidebar();
 	}
 
 	SidebarOpen = !SidebarOpen;
 }
 
+function UpdateSidebar(){
+	var xhr = new XMLHttpRequest();
+	var url = "/res/note/list";
+	xhr.open("POST", url, true);
+	xhr.onreadystatechange = function() {
+		if (this.readyState === 4 && this.status === 200){
+			var sidebar = document.getElementById("sidebar");
+
+			var noteData = JSON.parse(this.responseText).Data;
+			
+			if(noteData != null){
+				for(var i=0; i < noteData.length; i++){
+					//Only add if featured
+					if(noteData[i].B){
+						var noteElem = document.createElement("div");
+						noteElem.className = "sidebar_elem";
+						noteElem.setAttribute("data-note-uid", noteData[i].I);
+						
+						var noteElemName = document.createElement("span");
+						noteElemName.innerHTML = noteData[i].S1;
+
+						var noteElemDescription = document.createElement("span");
+						noteElemDescription.innerHTML = noteData[i].S2;
+
+						//add name and desc
+						noteElem.appendChild(noteElemName);
+						noteElem.appendChild(noteElemDescription);
+
+						sidebar.appendChild(noteElem);
+					}
+				}
+			}
+
+
+
+			//Do same with links
+		} else if (this.readyState === 4 && this.status !== 200){
+			showResponse("Unable to update sidebar.");
+			setTimeout("hideResponse()",2000);
+		}
+	};
+	xhr.send();
+}
 
 //
 //Project
