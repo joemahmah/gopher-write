@@ -1,11 +1,11 @@
 package main
 
 import (
-	"net/http"
+	"errors"
 	"github.com/gorilla/mux"
 	"github.com/joemahmah/gopher-write/story"
+	"net/http"
 	"strconv"
-	"errors"
 )
 
 func moveItemInSlice(slice []int, targetIndex int, moveBeforeIndex int) ([]int, error) {
@@ -28,27 +28,27 @@ func moveItemInSlice(slice []int, targetIndex int, moveBeforeIndex int) ([]int, 
 		var right []int
 
 		//edge case, targetIndex is at right
-		if(targetIndex == len(slice) - 1){
+		if targetIndex == len(slice)-1 {
 			//Do noting since nothing is there
 		} else {
 			right = slice[targetIndex+1:]
 		}
 
 		//create new slice (eliminates slice BS)
-		var newSlice []int;
+		var newSlice []int
 		newSlice = append(newSlice, left...)
 		newSlice = append(newSlice, right...)
 		newSlice = append(newSlice, slice[targetIndex])
 
 		//set stories to new slice
 		return newSlice, nil
-	} else if (targetIndex < moveBeforeIndex){
+	} else if targetIndex < moveBeforeIndex {
 		left := slice[:targetIndex]
 		right := slice[moveBeforeIndex:]
-		between := slice[targetIndex+1:moveBeforeIndex]
+		between := slice[targetIndex+1 : moveBeforeIndex]
 
 		//create new slice (eliminates slice BS)
-		var newSlice []int;
+		var newSlice []int
 		newSlice = append(newSlice, left...)
 		newSlice = append(newSlice, between...)
 		newSlice = append(newSlice, slice[targetIndex])
@@ -62,7 +62,7 @@ func moveItemInSlice(slice []int, targetIndex int, moveBeforeIndex int) ([]int, 
 		between := slice[moveBeforeIndex:targetIndex]
 
 		//create new slice (eliminates slice BS)
-		var newSlice []int;
+		var newSlice []int
 		newSlice = append(newSlice, left...)
 		newSlice = append(newSlice, slice[targetIndex])
 		newSlice = append(newSlice, between...)
@@ -73,7 +73,7 @@ func moveItemInSlice(slice []int, targetIndex int, moveBeforeIndex int) ([]int, 
 	}
 }
 
-func moveItemFromSlice(slice []int, targetIndex int) (int,[]int,error) {
+func moveItemFromSlice(slice []int, targetIndex int) (int, []int, error) {
 	targetAtEnd, err := moveItemInSlice(slice, targetIndex, len(slice))
 
 	if err != nil {
@@ -83,7 +83,7 @@ func moveItemFromSlice(slice []int, targetIndex int) (int,[]int,error) {
 	return targetAtEnd[len(targetAtEnd)-1], targetAtEnd[:len(targetAtEnd)-1], nil
 }
 
-func insertItemIntoSlice(slice []int, item int, moveBeforeIndex int) ([]int, error){
+func insertItemIntoSlice(slice []int, item int, moveBeforeIndex int) ([]int, error) {
 	appendedSlice := append(slice, item)
 	newSlice, err := moveItemInSlice(appendedSlice, len(appendedSlice)-1, moveBeforeIndex)
 
@@ -95,45 +95,45 @@ func insertItemIntoSlice(slice []int, item int, moveBeforeIndex int) ([]int, err
 }
 
 func StoryMoveHandler(w http.ResponseWriter, r *http.Request) {
-	
+
 	//Get the story uids
 	firstStoryIndex, _ := strconv.Atoi(mux.Vars(r)["first"])
 	secondStoryIndex, _ := strconv.Atoi(mux.Vars(r)["second"])
-	
+
 	//If story indices are out of bounds
-	if secondStoryIndex > len(ActiveProject.Stories) || firstStoryIndex >= len(ActiveProject.Stories) || firstStoryIndex == secondStoryIndex{
+	if secondStoryIndex > len(ActiveProject.Stories) || firstStoryIndex >= len(ActiveProject.Stories) || firstStoryIndex == secondStoryIndex {
 		w.WriteHeader(http.StatusInternalServerError)
 		LogError.Println("Story index out of bounds.")
 		return
 	}
-	
+
 	//If moving story to end
 	if len(ActiveProject.Stories) == secondStoryIndex {
 		left := ActiveProject.Stories[:firstStoryIndex]
 		var right []*story.Story
-		
+
 		//edge case, first is at right
-		if(firstStoryIndex == len(ActiveProject.Stories) - 1){
+		if firstStoryIndex == len(ActiveProject.Stories)-1 {
 			//Do noting since nothing is there
 		} else {
 			right = ActiveProject.Stories[firstStoryIndex+1:]
 		}
-		
+
 		//create new slice (eliminates slice BS)
-		var newStorySlice []*story.Story;
+		var newStorySlice []*story.Story
 		newStorySlice = append(newStorySlice, left...)
 		newStorySlice = append(newStorySlice, right...)
 		newStorySlice = append(newStorySlice, ActiveProject.Stories[firstStoryIndex])
-		
+
 		//set stories to new slice
 		ActiveProject.Stories = newStorySlice
-	} else if (firstStoryIndex < secondStoryIndex){
+	} else if firstStoryIndex < secondStoryIndex {
 		left := ActiveProject.Stories[:firstStoryIndex]
 		right := ActiveProject.Stories[secondStoryIndex:]
-		between := ActiveProject.Stories[firstStoryIndex+1:secondStoryIndex]
-		
+		between := ActiveProject.Stories[firstStoryIndex+1 : secondStoryIndex]
+
 		//create new slice (eliminates slice BS)
-		var newStorySlice []*story.Story;
+		var newStorySlice []*story.Story
 		newStorySlice = append(newStorySlice, left...)
 		newStorySlice = append(newStorySlice, between...)
 		newStorySlice = append(newStorySlice, ActiveProject.Stories[firstStoryIndex])
@@ -147,7 +147,7 @@ func StoryMoveHandler(w http.ResponseWriter, r *http.Request) {
 		between := ActiveProject.Stories[secondStoryIndex:firstStoryIndex]
 
 		//create new slice (eliminates slice BS)
-		var newStorySlice []*story.Story;
+		var newStorySlice []*story.Story
 		newStorySlice = append(newStorySlice, left...)
 		newStorySlice = append(newStorySlice, ActiveProject.Stories[firstStoryIndex])
 		newStorySlice = append(newStorySlice, between...)
@@ -203,11 +203,11 @@ func InterChapterMoveHandler(w http.ResponseWriter, r *http.Request) {
 	ssuid, _ := strconv.Atoi(mux.Vars(r)["ssuid"])
 
 	//Check if this is actually an intra story move
-	if(fsuid == ssuid){
+	if fsuid == ssuid {
 		IntraChapterMoveHandler(w, r)
 		return
 	}
-	
+
 	if len(ActiveProject.Stories) <= fsuid || len(ActiveProject.Stories) <= ssuid {
 		w.WriteHeader(http.StatusInternalServerError)
 		LogError.Println("Story index out of bounds.")
@@ -247,7 +247,7 @@ func IntraSectionMoveHandler(w http.ResponseWriter, r *http.Request) {
 	secondSectionIndex, _ := strconv.Atoi(mux.Vars(r)["second"])
 	suid, _ := strconv.Atoi(mux.Vars(r)["fsuid"])
 	cuidRel, _ := strconv.Atoi(mux.Vars(r)["fcuid"])
-	
+
 	//Process relative uids
 	cuid := ActiveProject.Stories[suid].Chapters[cuidRel]
 
@@ -256,19 +256,19 @@ func IntraSectionMoveHandler(w http.ResponseWriter, r *http.Request) {
 		LogError.Println("Story index out of bounds.")
 		return
 	}
-	
+
 	if selectedChapter, exists := ActiveProject.Chapters[cuid]; exists {
-	
+
 		newChapterSlice, err := moveItemInSlice(selectedChapter.Sections, firstSectionIndex, secondSectionIndex)
-	
+
 		if err != nil {
 			w.WriteHeader(http.StatusInternalServerError)
 			LogError.Println(err)
 			return
 		}
-	
+
 		selectedChapter.Sections = newChapterSlice
-	
+
 		w.WriteHeader(http.StatusOK)
 	} else {
 		w.WriteHeader(http.StatusNotFound)

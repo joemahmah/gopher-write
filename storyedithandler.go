@@ -1,14 +1,14 @@
 package main
 
 import (
-	"net/http"
-	"github.com/gorilla/mux"
-	"strconv"
 	"encoding/json"
+	"github.com/gorilla/mux"
 	"github.com/joemahmah/gopher-write/common"
+	"net/http"
+	"strconv"
 )
 
-func EditSectionAddCharHandler(w http.ResponseWriter, r *http.Request){
+func EditSectionAddCharHandler(w http.ResponseWriter, r *http.Request) {
 
 	//Get the uids
 	suid, _ := strconv.Atoi(mux.Vars(r)["storyuid"])
@@ -20,7 +20,7 @@ func EditSectionAddCharHandler(w http.ResponseWriter, r *http.Request){
 
 	//Get the section
 	section, err := ActiveProject.GetSection(suid, cuidRel, seuidRel)
-	
+
 	if err != nil {
 		w.WriteHeader(http.StatusNotFound)
 		LogWarning.Println(err)
@@ -30,11 +30,11 @@ func EditSectionAddCharHandler(w http.ResponseWriter, r *http.Request){
 
 		//Add character
 		section.Characters = append(section.Characters, newChar)
-	
+
 	}
 }
 
-func EditSectionRemoveCharHandler(w http.ResponseWriter, r *http.Request){
+func EditSectionRemoveCharHandler(w http.ResponseWriter, r *http.Request) {
 
 	//Get the uids
 	suid, _ := strconv.Atoi(mux.Vars(r)["storyuid"])
@@ -46,7 +46,7 @@ func EditSectionRemoveCharHandler(w http.ResponseWriter, r *http.Request){
 
 	//Get the section
 	section, err := ActiveProject.GetSection(suid, cuidRel, seuidRel)
-	
+
 	if err != nil {
 		w.WriteHeader(http.StatusNotFound)
 		LogWarning.Println(err)
@@ -56,11 +56,11 @@ func EditSectionRemoveCharHandler(w http.ResponseWriter, r *http.Request){
 
 		//Add character
 		section.Characters = append(section.Characters[:index], section.Characters[index+1:]...)
-	
+
 	}
 }
 
-func EditSectionAddLocationHandler(w http.ResponseWriter, r *http.Request){
+func EditSectionAddLocationHandler(w http.ResponseWriter, r *http.Request) {
 
 	//Get the uids
 	suid, _ := strconv.Atoi(mux.Vars(r)["storyuid"])
@@ -72,7 +72,7 @@ func EditSectionAddLocationHandler(w http.ResponseWriter, r *http.Request){
 
 	//Get the section
 	section, err := ActiveProject.GetSection(suid, cuidRel, seuidRel)
-	
+
 	if err != nil {
 		w.WriteHeader(http.StatusNotFound)
 		LogWarning.Println(err)
@@ -82,11 +82,11 @@ func EditSectionAddLocationHandler(w http.ResponseWriter, r *http.Request){
 
 		//Add character
 		section.Locations = append(section.Locations, newLoc)
-	
+
 	}
 }
 
-func EditSectionSetStatusHandler(w http.ResponseWriter, r *http.Request){
+func EditSectionSetStatusHandler(w http.ResponseWriter, r *http.Request) {
 
 	//Get the uids
 	suid, _ := strconv.Atoi(mux.Vars(r)["storyuid"])
@@ -98,7 +98,7 @@ func EditSectionSetStatusHandler(w http.ResponseWriter, r *http.Request){
 
 	//Get the section
 	section, err := ActiveProject.GetSection(suid, cuidRel, seuidRel)
-	
+
 	if err != nil {
 		w.WriteHeader(http.StatusNotFound)
 		LogWarning.Println(err)
@@ -108,11 +108,11 @@ func EditSectionSetStatusHandler(w http.ResponseWriter, r *http.Request){
 
 		//Add character
 		section.Status = status
-	
+
 	}
 }
 
-func EditSectionSetNoteHandler(w http.ResponseWriter, r *http.Request){
+func EditSectionSetNoteHandler(w http.ResponseWriter, r *http.Request) {
 
 	//Get the uids
 	suid, _ := strconv.Atoi(mux.Vars(r)["storyuid"])
@@ -121,31 +121,31 @@ func EditSectionSetNoteHandler(w http.ResponseWriter, r *http.Request){
 
 	//Get the section
 	section, err := ActiveProject.GetSection(suid, cuidRel, seuidRel)
-	
+
 	if err != nil {
 		w.WriteHeader(http.StatusNotFound)
 		LogWarning.Println(err)
 		return
 	}
-	
+
 	inputData := &DataTransferText{}
-	
+
 	err = json.NewDecoder(r.Body).Decode(inputData)
-	
+
 	if err != nil {
 		w.WriteHeader(http.StatusInternalServerError)
 		LogWarning.Println(err)
 		return
 	}
-	
+
 	//Send ok
 	w.WriteHeader(http.StatusOK)
-	
+
 	//Set the note
 	section.Note = inputData.Data
 }
 
-func EditSectionSetTextHandler(w http.ResponseWriter, r *http.Request){
+func EditSectionSetTextHandler(w http.ResponseWriter, r *http.Request) {
 
 	//Get the uids
 	suid, _ := strconv.Atoi(mux.Vars(r)["storyuid"])
@@ -154,31 +154,31 @@ func EditSectionSetTextHandler(w http.ResponseWriter, r *http.Request){
 
 	//Get the section
 	section, err := ActiveProject.GetSection(suid, cuidRel, seuidRel)
-	
+
 	if err != nil {
 		w.WriteHeader(http.StatusNotFound)
 		LogWarning.Println(err)
 		return
 	}
-	
+
 	inputData := &DataTransferText{}
-	
+
 	err = json.NewDecoder(r.Body).Decode(inputData)
-	
+
 	if err != nil {
 		w.WriteHeader(http.StatusInternalServerError)
 		LogWarning.Println(err)
 		return
 	}
-	
+
 	//Send ok
 	w.WriteHeader(http.StatusOK)
-	
+
 	//Set the text
 	section.Text = inputData.Data
 }
 
-func EditSectionSetNameHandler(w http.ResponseWriter, r *http.Request){
+func EditSectionSetNameHandler(w http.ResponseWriter, r *http.Request) {
 
 	//Get the uids
 	suid, _ := strconv.Atoi(mux.Vars(r)["storyuid"])
@@ -187,36 +187,35 @@ func EditSectionSetNameHandler(w http.ResponseWriter, r *http.Request){
 
 	//Get the section
 	section, err := ActiveProject.GetSection(suid, cuidRel, seuidRel)
-	
+
 	if err != nil {
 		w.WriteHeader(http.StatusNotFound)
 		LogWarning.Println(err)
 		return
 	}
-	
+
 	inputData := &common.Name{}
-	
+
 	err = json.NewDecoder(r.Body).Decode(inputData)
-	
+
 	if err != nil {
 		w.WriteHeader(http.StatusInternalServerError)
 		LogWarning.Println(err)
 		return
 	}
-	
+
 	//Send ok
 	w.WriteHeader(http.StatusOK)
-	
+
 	//Set the name (name gets dereferenced and copied)
 	section.Name = *inputData
 }
-
 
 /////////////
 // CHAPTER //
 /////////////
 
-func EditChapterSetNameHandler(w http.ResponseWriter, r *http.Request){
+func EditChapterSetNameHandler(w http.ResponseWriter, r *http.Request) {
 
 	//Get the uids
 	suid, _ := strconv.Atoi(mux.Vars(r)["storyuid"])
@@ -224,31 +223,31 @@ func EditChapterSetNameHandler(w http.ResponseWriter, r *http.Request){
 
 	//Get the chapter
 	chapter, err := ActiveProject.GetChapter(suid, cuidRel)
-	
+
 	if err != nil {
 		w.WriteHeader(http.StatusNotFound)
 		LogWarning.Println(err)
 		return
 	}
-	
+
 	inputData := &common.Name{}
-	
+
 	err = json.NewDecoder(r.Body).Decode(inputData)
-	
+
 	if err != nil {
 		w.WriteHeader(http.StatusInternalServerError)
 		LogWarning.Println(err)
 		return
 	}
-	
+
 	//Send ok
 	w.WriteHeader(http.StatusOK)
-	
+
 	//Set the name
 	chapter.Name = *inputData
 }
 
-func EditChapterSetStatusHandler(w http.ResponseWriter, r *http.Request){
+func EditChapterSetStatusHandler(w http.ResponseWriter, r *http.Request) {
 
 	//Get the uids
 	suid, _ := strconv.Atoi(mux.Vars(r)["storyuid"])
@@ -259,49 +258,48 @@ func EditChapterSetStatusHandler(w http.ResponseWriter, r *http.Request){
 
 	//Get the chapter
 	chapter, err := ActiveProject.GetChapter(suid, cuidRel)
-	
+
 	if err != nil {
 		w.WriteHeader(http.StatusNotFound)
 		LogWarning.Println(err)
 		return
 	}
-	
+
 	//Send ok
 	w.WriteHeader(http.StatusOK)
-	
+
 	//Set the status
 	chapter.Status = status
 }
 
-func EditChapterSetNoteHandler(w http.ResponseWriter, r *http.Request){
+func EditChapterSetNoteHandler(w http.ResponseWriter, r *http.Request) {
 
 	//Get the uids
 	suid, _ := strconv.Atoi(mux.Vars(r)["storyuid"])
 	cuidRel, _ := strconv.Atoi(mux.Vars(r)["chapteruid"])
-	
+
 	//Get the chapter
 	chapter, err := ActiveProject.GetChapter(suid, cuidRel)
-	
+
 	if err != nil {
 		w.WriteHeader(http.StatusNotFound)
 		LogWarning.Println(err)
 		return
 	}
-	
+
 	inputData := &DataTransferText{}
-	
+
 	err = json.NewDecoder(r.Body).Decode(inputData)
-	
-	
+
 	if err != nil {
 		w.WriteHeader(http.StatusInternalServerError)
 		LogWarning.Println(err)
 		return
 	}
-	
+
 	//Send ok
 	w.WriteHeader(http.StatusOK)
-	
+
 	//Set the note
 	chapter.Note = inputData.Data
 }
@@ -310,38 +308,38 @@ func EditChapterSetNoteHandler(w http.ResponseWriter, r *http.Request){
 //  STORY  //
 /////////////
 
-func EditStorySetNameHandler(w http.ResponseWriter, r *http.Request){
+func EditStorySetNameHandler(w http.ResponseWriter, r *http.Request) {
 
 	//Get the uids
 	suid, _ := strconv.Atoi(mux.Vars(r)["storyuid"])
 
 	//Get the story
 	story, err := ActiveProject.GetStory(suid)
-	
+
 	if err != nil {
 		w.WriteHeader(http.StatusNotFound)
 		LogWarning.Println(err)
 		return
 	}
-	
+
 	inputData := &common.Name{}
-	
+
 	err = json.NewDecoder(r.Body).Decode(inputData)
-	
+
 	if err != nil {
 		w.WriteHeader(http.StatusInternalServerError)
 		LogWarning.Println(err)
 		return
 	}
-	
+
 	//Send ok
 	w.WriteHeader(http.StatusOK)
-	
+
 	//Set the name
 	story.Name = *inputData
 }
 
-func EditStorySetStatusHandler(w http.ResponseWriter, r *http.Request){
+func EditStorySetStatusHandler(w http.ResponseWriter, r *http.Request) {
 
 	//Get the uids
 	suid, _ := strconv.Atoi(mux.Vars(r)["storyuid"])
@@ -351,48 +349,47 @@ func EditStorySetStatusHandler(w http.ResponseWriter, r *http.Request){
 
 	//Get the story
 	story, err := ActiveProject.GetStory(suid)
-	
+
 	if err != nil {
 		w.WriteHeader(http.StatusNotFound)
 		LogWarning.Println(err)
 		return
 	}
-	
+
 	//Send ok
 	w.WriteHeader(http.StatusOK)
-	
+
 	//Set the status
 	story.Status = status
 }
 
-func EditStorySetNoteHandler(w http.ResponseWriter, r *http.Request){
+func EditStorySetNoteHandler(w http.ResponseWriter, r *http.Request) {
 
 	//Get the uids
 	suid, _ := strconv.Atoi(mux.Vars(r)["storyuid"])
 
 	//Get the story
 	story, err := ActiveProject.GetStory(suid)
-	
+
 	if err != nil {
 		w.WriteHeader(http.StatusNotFound)
 		LogWarning.Println(err)
 		return
 	}
-	
+
 	inputData := &DataTransferText{}
-	
+
 	err = json.NewDecoder(r.Body).Decode(inputData)
-	
-	
+
 	if err != nil {
 		w.WriteHeader(http.StatusInternalServerError)
 		LogWarning.Println(err)
 		return
 	}
-	
+
 	//Send ok
 	w.WriteHeader(http.StatusOK)
-	
+
 	//Set the note
 	story.Note = inputData.Data
 }

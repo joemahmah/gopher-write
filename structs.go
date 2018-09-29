@@ -6,128 +6,127 @@ import (
 )
 
 type DataTransferText struct {
-	Data	string
+	Data string
 }
 
 type DataTransferInt struct {
-	Data	int
+	Data int
 }
 
 type DataTransferTextSlice struct {
-	Data	[]string
+	Data []string
 }
 
 type DataTransferIntSlice struct {
-	Data	[]int
+	Data []int
 }
 
 type DualString struct {
-	S1	string
-	S2	string
+	S1 string
+	S2 string
 }
 
 type DataTransferDualString struct {
-	Data	DualString
+	Data DualString
 }
 
 type DataTransferDualStringSlice struct {
-	Data	[]DualString
+	Data []DualString
 }
 
 type DualInt struct {
-	I1	int
-	I2	int
+	I1 int
+	I2 int
 }
 
 type DataTransferDualInt struct {
-	Data	DualInt
+	Data DualInt
 }
 
 type DataTransferDualIntSlice struct {
-	Data	[]DualInt
+	Data []DualInt
 }
 
 type DualStringMonoBool struct {
-	S1	string
-	S2	string
-	B	bool
+	S1 string
+	S2 string
+	B  bool
 }
 
 type DataTransferDualStringMonoBool struct {
-	Data	DualStringMonoBool
+	Data DualStringMonoBool
 }
 
 type DataTransferDualStringMonoBoolSlice struct {
-	Data	[]DualStringMonoBool
+	Data []DualStringMonoBool
 }
 
 type DualStringMonoIntMonoBool struct {
-	S1	string
-	S2	string
-	I	int
-	B	bool
+	S1 string
+	S2 string
+	I  int
+	B  bool
 }
 
 type DataTransferDualStringMonoIntMonoBool struct {
-	Data	DualStringMonoIntMonoBool
+	Data DualStringMonoIntMonoBool
 }
 
 type DataTransferDualStringMonoIntMonoBoolSlice struct {
-	Data	[]DualStringMonoIntMonoBool
+	Data []DualStringMonoIntMonoBool
 }
 
 type MonoStringMonoInt struct {
-	S	string
-	I	int
+	S string
+	I int
 }
 
 type DataTransferMonoStringMonoInt struct {
-	Data	MonoStringMonoInt
+	Data MonoStringMonoInt
 }
 
 type DataTransferMonoStringMonoIntSlice struct {
-	Data	[]MonoStringMonoInt
+	Data []MonoStringMonoInt
 }
 
 type MonoStringDualInt struct {
-	S	string
-	I1	int
-	I2	int
+	S  string
+	I1 int
+	I2 int
 }
 
 type DataTransferMonoStringDualInt struct {
-	Data	MonoStringDualInt
+	Data MonoStringDualInt
 }
 
 type DataTransferMonoStringDualIntSlice struct {
-	Data	[]MonoStringDualInt
+	Data []MonoStringDualInt
 }
 
 type MonoIntMonoName struct {
-	I		int
-	Name	common.Name
+	I    int
+	Name common.Name
 }
 
 type DataTransferMonoIntMonoName struct {
-	Data	MonoIntMonoName
+	Data MonoIntMonoName
 }
 
 type DataTransferMonoIntMonoNameSlice struct {
-	Data	[]MonoIntMonoName
+	Data []MonoIntMonoName
 }
-
 
 ////////////////////
 // Export Structs //
 ////////////////////
 
 type ExportChapter struct {
-	Chapter		story.Chapter
-	Sections	[]story.Section
+	Chapter  story.Chapter
+	Sections []story.Section
 }
 
 type ExportStory struct {
-	Story		story.Story
-	Chapters	[]story.Chapter
-	Sections	[][]story.Section
+	Story    story.Story
+	Chapters []story.Chapter
+	Sections [][]story.Section
 }
